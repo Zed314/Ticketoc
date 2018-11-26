@@ -1,13 +1,10 @@
-version: "3"
+version: '2'
 services:
-  kafka:
-    image: wurstmeister/kafka:2.12-2.1.0
-    hostname: kafka
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: kafka:2181/kafka
-      KAFKA_ADVERTISED_HOST_NAME: kafka
-      KAFKA_ADVERTISED_PORT: 9092
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
     ports:
-      - 9092
-      - 2181
-
+      - '2181:2181'
+  kafka:
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '9092:9092'

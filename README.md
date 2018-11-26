@@ -1,34 +1,34 @@
 # Ticketoc
 
-First install docker.
+## Install docker
 
 Add yourself to the group docker :
+```
+groups
+sudo usermod -a -G docker <user>
+groups
+```
 
-```
-groups
-sudo usermod -a -G docker zvergne
-groups
-```
 If you are not added to this group, it is because you have to type :
+```
+su <user>
+```
 
-```
-su zvergne
-```
 The command above will open a new session in your terminal where your groups 
 have been updated, preventing you from login and out to do so.
 
-
-Make it as a service that start at boot if you want.
+Make it as a service that start at boot if you want :
 ```
 sudo systemctl enable docker
 ```
-And start it using the following command, you can check the status afterwards
 
+And start it using the following command, you can check the status afterwards :
 ```
 sudo service docker start
 sudo service docker status
 ```
 
+To start everything :
 ```
 docker swarm init
 docker stack deploy -c docker/docker-compose.yml ticketoc
