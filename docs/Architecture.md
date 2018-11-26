@@ -38,3 +38,6 @@ Aggrégation :
 Mesurer temps de latence :
 	Instant de création généré par la source
 	Instant ingestion par Kafka
+
+
+Affichage : Créer dockerfile pour le dashboard à partir d'un projet déjà existant (bootstrap zero, …)

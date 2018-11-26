@@ -41,6 +41,7 @@ To check the status:
 
 ```
 docker service ps ticketoc_kafka
+docker  ps
 ```
 
 To shutdown:
