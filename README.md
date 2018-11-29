@@ -27,6 +27,7 @@ And start it using the following command, you can check the status afterwards :
 sudo service docker start
 sudo service docker status
 ```
+__Attention:__ To use swarm, every used package has to be in a registry. Our dashboard is not, so for time being, you'll have to do `docker-compose up -f ./docker/docker-compose.yml` instead.
 
 To start everything :
 ```

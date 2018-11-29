@@ -1,5 +1,11 @@
 version: '3'
 services:
+  dashboard:
+    build:
+      context: ./../dashboard/
+      dockerfile: Dockerfile
+    ports:
+      - '80:8080'
   zookeeper:
     image: 'bitnami/zookeeper:latest'
     ports:
