@@ -1,9 +1,9 @@
 version: '3'
 services:
   dashboard:
-    build:
-      context: ./../dashboard/
-      dockerfile: Dockerfile
+    build: ./../dashboard/
+    # context: ./../dashboard/
+    #  dockerfile: Dockerfile
     ports:
       - '80:8080'
   zookeeper:
@@ -19,3 +19,7 @@ services:
     environment:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
+  mongo:
+    image: mongo
+    ports:
+      - '27017:27017'
