@@ -4,10 +4,6 @@ services:
     build: dashboard/
     ports:
       - '8080:80'
-  frenetic-shopping:
-    build: frenetic-shopping/
-    volumes:
-      - ./frenetic-shopping:/code
   entrypoint:
     build: entrypoint/
     ports:
