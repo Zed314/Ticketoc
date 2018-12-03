@@ -1,11 +1,11 @@
 version: '3'
 services:
   dashboard:
-    build: ./../dashboard/
+    build: dashboard/
     ports:
       - '8080:80'
   entrypoint:
-    build: ./../entrypoint/
+    build: entrypoint/
     ports:
       - '4000:80'
   zookeeper:
