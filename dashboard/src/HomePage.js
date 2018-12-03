@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import SiteWrapper from "./SiteWrapper";
 import LocalSubscriber from "./LocalSubscriber";
+import NetworkStampCard from "./components/NetworkStampCard";
 import {
   Page,
   Grid,
-  StampCard,
   Alert
 } from "tabler-react";
 
@@ -16,6 +16,7 @@ class HomePage extends Component {
       connectionError: false,
       reconnecting: false,
       restartSeconds: null,
+      loading: true,
     }
   }
 
@@ -24,12 +25,16 @@ class HomePage extends Component {
   }
 
   startSockClient() {
+    this.setState({
+      loading: true,
+    })
     this.socketClient = new LocalSubscriber()
     this.socketClient.connectAction = () => {
       this.setState({
         connectionError: false,
         restartSeconds: null,
         reconnecting: false,
+        loading: false,
       })
     }
     this.socketClient.subscribe("sale-count", msg => {
@@ -40,6 +45,7 @@ class HomePage extends Component {
     this.socketClient.socket.onerror = () => {
       this.setState({
         connectionError: true,
+        loading: false,
         reconnecting: false,
         restartSeconds: 10,
       })
@@ -76,7 +82,8 @@ render() {
    {reconnectPart}
    <Grid.Row cards={true}>
    <Grid.Col>
-   <StampCard
+   <NetworkStampCard
+   loading={this.state.loading}
    color="blue"
    icon="shopping-cart"
    header={
@@ -86,7 +93,8 @@ render() {
   }/>
   </Grid.Col>
   <Grid.Col>
-  <StampCard
+  <NetworkStampCard
+  loading={this.state.loading}
   color="green"
   icon="dollar-sign"
   header={
@@ -96,7 +104,8 @@ render() {
   }/>
   </Grid.Col>
   <Grid.Col>
-  <StampCard
+  <NetworkStampCard
+  loading={this.state.loading}
   color="indigo"
   icon="layers"
   header={
@@ -106,7 +115,8 @@ render() {
   }/>
   </Grid.Col>
   <Grid.Col>
-  <StampCard
+  <NetworkStampCard
+  loading={this.state.loading}
   color="teal"
   icon="credit-card"
   header={
