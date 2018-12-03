@@ -51,6 +51,12 @@ docker stack rm ticketoc
 docker swarm leave --force
 ```
 
+If you want to rebuild an image, simply type
+
+```
+docker-compose build
+```
+
 Sometimes, shutting down is not enough, as it just stops the container, but does not delete them.
 Therefore, you may want to delete those.
 

@@ -72,7 +72,7 @@ class SiteWrapper extends Component {
                 {" "}
                 codecalm.net
               </a>, {" "}
-              project is Apache2 licensed
+              project is Apache2 licensed. Ticketock as no connection with the Disney(r)'s characters.
             </React.Fragment>
           ),
           nav: (
