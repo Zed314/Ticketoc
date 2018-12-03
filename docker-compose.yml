@@ -12,6 +12,10 @@ services:
     build: entrypoint/
     ports:
       - '4000:80'
+  cash-clasp:
+    build: cash-clasp/
+    ports:
+      - '40510:40510'
   zookeeper:
     image: 'bitnami/zookeeper:latest'
     ports:

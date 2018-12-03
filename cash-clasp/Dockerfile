@@ -3,4 +3,4 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . ./
-RUN node app.js
+ENTRYPOINT ["node", "app.js"]

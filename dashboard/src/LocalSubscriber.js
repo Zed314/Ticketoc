@@ -5,12 +5,14 @@ class LocalSubscriber {
 		this.connected = false
 		this.commandQueue = []
 		this.topicCallbacks = {}
-		this.socket = new WebSocket(`ws://${options.host}:${options.port}`);
+		this.connectAction = () => {}
+		this.socket = new WebSocket(`ws://${options.host}:${options.port}`)
 
 		// event emmited when connected
 		this.socket.onopen = () => {
 			console.log("Connected")
 			this.connected = true
+			this.connectAction()
 			for (let i = this.commandQueue.length - 1; i >= 0; i--) {
 				(this.commandQueue.pop())()
 			}
