@@ -50,3 +50,22 @@ To shutdown:
 docker stack rm ticketoc
 docker swarm leave --force
 ```
+
+Sometimes, shutting down is not enough, as it just stops the container, but does not delete them.
+Therefore, you may want to delete those.
+
+To do so, run this command :
+
+```
+docker rm $(docker ps -a -q)
+```
+
+The command above deletes the containers. However, for self generated images, you may want to delete them as well to rebuild them.
+To do so, just type :
+
+```
+docker image rm <imagename>
+docker image rm docker_dashboard:latest 
+```
+
+
