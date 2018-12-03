@@ -2,10 +2,12 @@ version: '3'
 services:
   dashboard:
     build: ./../dashboard/
-    #context: ./../dashboard/
-    #dockerfile: Dockerfile
     ports:
       - '8080:80'
+  entrypoint:
+    build: ./../entrypoint/
+    ports:
+      - '4000:80'
   zookeeper:
     image: 'bitnami/zookeeper:latest'
     ports:
@@ -23,3 +25,9 @@ services:
     image: mongo:latest
     ports:
       - '27017:27017'
+  spark:
+    image: 'sequenceiq/spark'
+    ports:
+      - '8088:8088'
+      - '8042:8042'
+
