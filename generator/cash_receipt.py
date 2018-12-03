@@ -50,7 +50,7 @@ def truncateFloat(r):
         return float(("%.2f"%(r)));
 def generateCashReceipt(cashReceiptid="1",storeid="1",terminalid="1",agentid="1",customerid="1",nblines=randint(1,5),timestamp=time()):
 	cashreceipt={
-                'cashReceiptID': cashReceiptid,
+        'cashReceiptID': cashReceiptid,
 		'storeID':storeid,
 		'terminalID':terminalid,
 		'agentID':agentid,
@@ -77,7 +77,7 @@ def generateCashReceipt(cashReceiptid="1",storeid="1",terminalid="1",agentid="1"
 	settlements=[]
 
 	nb_settlements=randint(1,2)
-	paymentsMechanismes=["CB","Especes"]
+	paymentsMechanismes=["CB","Espèces"]
 	if nb_settlements==1:
 		settlements.append({
 			'settlementAmount':grossTotal,
@@ -109,9 +109,9 @@ def generateCashReceipt(cashReceiptid="1",storeid="1",terminalid="1",agentid="1"
 	])
 	return CRECEIPT
 
-def writeJSON(jsonObject,destination) : ##+'\\'+'overallStatistiques.json'
-    with open(destination, 'wb') as outfile:
-        json.dump(jsonObject, outfile,indent=4)
+def writeJSON(jsonObject,destination) :
+    with open(destination, 'w+') as outfile:
+        json.dump(jsonObject, outfile, indent=4)
 
 
 cashRec=generateCashReceipt('1','1','1','1','1')
