@@ -20,6 +20,6 @@ services:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
   mongo:
-    image: mongo
+    image: mongo:latest
     ports:
       - '27017:27017'
