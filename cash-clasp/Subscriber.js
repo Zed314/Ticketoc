@@ -1,15 +1,22 @@
+const semaphoreFactory = require('semaphore')
+
 class Subscriber {
 	constructor(socket) {
 		this.socket = socket
 		this.subscribed = []
+		this.listBlocker = semaphoreFactory(1)
 
 		socket.on('message', message => {
 			message = JSON.parse(message)
 
 			if (message.type = "subscribe") {
-				this.subscribe(message.topic)
+				listBlocker.take(() => {
+					this.subscribe(message.topic)
+				})
 			} else if (message.type = "unsubscribe") {
-				this.unsubscribe(message.topic)
+				listBlocker.take(() => {
+					this.unsubscribe(message.topic)
+				})
 			}
 		})
 	}
@@ -66,6 +73,7 @@ class Subscriber {
 
 		this.socket.send(JSON.stringify({
 			type: "topic_message",
+			topic,
 			message
 		}))
 	}
