@@ -10,11 +10,11 @@ class Subscriber {
 			message = JSON.parse(message)
 
 			if (message.type = "subscribe") {
-				listBlocker.take(() => {
+				this.listBlocker.take(() => {
 					this.subscribe(message.topic)
 				})
 			} else if (message.type = "unsubscribe") {
-				listBlocker.take(() => {
+				this.listBlocker.take(() => {
 					this.unsubscribe(message.topic)
 				})
 			}
@@ -79,8 +79,8 @@ class Subscriber {
 	}
 
 	close() {
-		for (topic of this.subscribed) {
-			this.unsubscribe(topic, true)
+		for (var i = this.subscribed.length - 1; i >= 0; i--) {
+			this.unsubscribe(this.subscribed[i], true)
 		}
 	}
 }
