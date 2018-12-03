@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import SiteWrapper from "./SiteWrapper";
+import LocalSubscriber from "./LocalSubscriber";
 import {
   Page,
   Grid,
@@ -7,6 +8,24 @@ import {
 } from "tabler-react";
 
 class HomePage extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {saleCount: 0}
+  }
+
+  componentDidMount() {
+    this.socketClient = new LocalSubscriber()
+    this.socketClient.subscribe("sale-count", msg => {
+      this.setState({
+        saleCount: msg.message
+      })
+    })
+  }
+
+  componentWillUnmount() {
+    this.socketClient.close()
+  }
+
 	render() {
 		return (<SiteWrapper>
 			<Page.Content title="Dashboard">
@@ -17,7 +36,7 @@ class HomePage extends Component {
               icon="shopping-cart"
               header={
                 <a href="#">
-                  132 <small>Sales</small>
+                  {this.state.saleCount} <small>Sales</small>
                 </a>
               }/>
 			</Grid.Col>
