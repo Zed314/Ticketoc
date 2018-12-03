@@ -40,12 +40,7 @@ const accountDropdownProps = {
 };
 
 class SiteWrapper extends Component {
-  state = {
-    unreadCount: 2,
-  };
-
   render() {
-    const unreadCount = this.state.unreadCount || 0;
     return (
       <Site.Wrapper
         headerProps={{
@@ -58,12 +53,13 @@ class SiteWrapper extends Component {
         routerContextComponentType={withRouter(RouterContextProvider)}
         footerProps={{
           links: [
-            <a target="_blank" href="https://insa-lyon.fr/">A INSA Lyon project</a>,
+            <a target="_blank" href="https://insa-lyon.fr/" rel="noopener noreferrer">A INSA Lyon project</a>,
+            
           ],
           copyright: (
             <React.Fragment>
-              By <a href="//www.linkedin.com/in/adrienmoll/">Adrien Moll</a>, Pierrick Chauvet, Faycal Bziou, <a href="//www.linkedin.com/in/ziggy-vergne/">Ziggy Vergne</a>, and&nbsp;
-              <a href="//mha.ug" target="_blank">Martin Haug</a>. Theme by
+              By <a href="//www.linkedin.com/in/adrienmoll/" target="_blank" rel="noopener noreferrer">Adrien Moll</a>, Pierrick Chauvet, Faycal Bziou, <a href="//www.linkedin.com/in/ziggy-vergne/">Ziggy Vergne</a>, and&nbsp;
+              <a href="//mha.ug" target="_blank" rel="noopener noreferrer">Martin Haug</a>. <small>Theme by
               <a
                 href="https://codecalm.net"
                 target="_blank"
@@ -72,7 +68,7 @@ class SiteWrapper extends Component {
                 {" "}
                 codecalm.net
               </a>, {" "}
-              project is Apache2 licensed. Ticketock as no connection with the Disney(r)'s characters.
+              project is Apache2 licensed. Ticketock is not affiliated with the Disney's characters.</small>
             </React.Fragment>
           ),
           nav: (

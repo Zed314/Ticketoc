@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import SiteWrapper from "./SiteWrapper";
 import LocalSubscriber from "./LocalSubscriber";
 import NetworkStampCard from "./components/NetworkStampCard";
+import DiagramCard from "./components/DiagramCard";
 import {
   Page,
   Grid,
@@ -67,67 +68,77 @@ class HomePage extends Component {
     }
   }
 
-componentWillUnmount() {
-  this.socketClient.close()
-}
+  componentWillUnmount() {
+    this.socketClient.close()
+  }
 
-render() {
-  const countdownPart = this.state.restartSeconds !== null ? (<strong>Reconnecting in {this.state.restartSeconds}s</strong>) : null
-  const alertPart = this.state.connectionError ? <Alert type="danger">Connection to the server failed. {countdownPart}</Alert> : null;
-  const reconnectPart = this.state.reconnecting ? <Alert type="info">Reconnecting...</Alert> : null
+  render() {
+    const countdownPart = this.state.restartSeconds !== null ? (<strong>Reconnecting in {this.state.restartSeconds}s</strong>) : null
+    const alertPart = this.state.connectionError ? <Alert type="danger">Connection to the server failed. {countdownPart}</Alert> : null;
+    const reconnectPart = this.state.reconnecting ? <Alert type="info">Reconnecting...</Alert> : null
 
-  return (<SiteWrapper>
-   <Page.Content title="Dashboard">
-   {alertPart}
-   {reconnectPart}
-   <Grid.Row cards={true}>
-   <Grid.Col>
-   <NetworkStampCard
-   loading={this.state.loading}
-   color="blue"
-   icon="shopping-cart"
-   header={
-    <a href="#">
-    {this.state.saleCount} <small>Sales</small>
-    </a>
-  }/>
-  </Grid.Col>
-  <Grid.Col>
-  <NetworkStampCard
-  loading={this.state.loading}
-  color="green"
-  icon="dollar-sign"
-  header={
-    <a href="#">
-    132$ <small>total revenue</small>
-    </a>
-  }/>
-  </Grid.Col>
-  <Grid.Col>
-  <NetworkStampCard
-  loading={this.state.loading}
-  color="indigo"
-  icon="layers"
-  header={
-    <a href="#">
-    40 <small>cash payments</small>
-    </a>
-  }/>
-  </Grid.Col>
-  <Grid.Col>
-  <NetworkStampCard
-  loading={this.state.loading}
-  color="teal"
-  icon="credit-card"
-  header={
-    <a href="#">
-    40 <small>card payments</small>
-    </a>
-  }/>			</Grid.Col>
-  </Grid.Row>
-  </Page.Content>
-  </SiteWrapper>)
-}
+    return (<SiteWrapper>
+     <Page.Content title="Dashboard">
+     {alertPart}
+     {reconnectPart}
+     <Grid.Row cards={true}>
+     <Grid.Col>
+     <NetworkStampCard
+     loading={this.state.loading}
+     color="blue"
+     icon="shopping-cart"
+     count={this.state.saleCount}
+     label="Sales" />
+     </Grid.Col>
+     <Grid.Col>
+     <NetworkStampCard
+     loading={this.state.loading}
+     color="green"
+     icon="dollar-sign"
+     count="132$"
+     label="total revenue" />
+     </Grid.Col>
+     <Grid.Col>
+     <NetworkStampCard
+     loading={this.state.loading}
+     color="indigo"
+     icon="layers"
+     count="40"
+     label="cash payments" />
+     </Grid.Col>
+     <Grid.Col>
+     <NetworkStampCard
+     loading={this.state.loading}
+     color="teal"
+     icon="credit-card"
+     count="40"
+     label="card payments" />
+     </Grid.Col>
+
+     </Grid.Row>
+     <Grid.Row>
+     <Grid.Col>
+     <DiagramCard
+     color="#39CCCC"
+     data={[9, 6, 6, 7, 0, 3, 5, 7, 4, 6]}
+     label="trees planted" />
+     </Grid.Col>
+     <Grid.Col>
+     <DiagramCard
+     color="#7FDBFF"
+     data={[0, 8, 2, 7, 8, 7, 9, 9, 1, 7]}
+     label="carts ramsacked" />
+     </Grid.Col>
+     <Grid.Col>
+     <DiagramCard
+     color="#0074D9"
+     data={[5, 1, 0, 4, 7, 4, 2, 2, 9, 8]}
+     label="hammoks slept in" />
+     </Grid.Col>
+     </Grid.Row>
+     </Page.Content>
+     </SiteWrapper>)
+  }
 }
 
 export default HomePage
