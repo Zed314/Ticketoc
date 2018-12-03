@@ -5,11 +5,11 @@ import os
 
 app = Flask(__name__)
 
+KAFKA_CONNECT = os.environ['KAFKA_CONNECT']
+KAFKA_VERSION = tuple(map(int, os.environ['KAFKA_VERSION'].split('.')))
 ROUTE = os.environ['ROUTE']
 TOPIC_INPUT = os.environ['TOPIC_INPUT']
 VALUE_SERIALIZER = os.environ['VALUE_SERIALIZER']
-BOOTSTRAP_SERVERS = os.environ['BOOTSTRAP_SERVERS']
-KAFKA_VERSION = tuple(map(int, os.environ['KAFKA_VERSION'].split('.')))
 COMPRESSION = os.getenv('COMPRESSION')  # might return None
 
 
@@ -22,10 +22,12 @@ if VALUE_SERIALIZER == 'json':
 else:
 	raise ValueError("value_serializer_type must be 'json'")
 
+key_serializer = str.encode
+
 
 producer = KafkaProducer(
-	bootstrap_servers=BOOTSTRAP_SERVERS,
-	key_serializer=str.encode,
+	bootstrap_servers=KAFKA_CONNECT,
+	key_serializer=key_serializer,
 	value_serializer=value_serializer,
 	compression_type=COMPRESSION,
 	api_version=KAFKA_VERSION
@@ -41,14 +43,7 @@ def add():
 
 		if data is not None:
 
-			producer.send(
-				topic=TOPIC_INPUT,
-				key=None,
-				value=data,
-				headers=[
-					('content-type', b'application/json; charset=utf-8')
-				]
-			)
+			producer.send(topic=TOPIC_INPUT, key=None, value=data, headers=[('content-type', b'application/json; charset=utf-8')])
 
 		abort(400)
 

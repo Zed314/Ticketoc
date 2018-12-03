@@ -10,9 +10,9 @@ services:
       - '4000:80'
     environment:
       - KAFKA_VERSION=1.1
+      - KAFKA_CONNECT=kafka:9092
       - ROUTE=/v1/tickets
       - TOPIC_INPUT=input_tickets
-      - BOOTSTRAP_SERVERS=kafka:9092
       - VALUE_SERIALIZER=json
       - COMPRESSION=gzip
   cash-clasp:
@@ -33,7 +33,7 @@ services:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
   mongo:
-    image: mongo:latest
+    image: 'mongo:latest'
     ports:
       - '27017:27017'
   spark:
