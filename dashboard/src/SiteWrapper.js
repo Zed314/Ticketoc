@@ -58,11 +58,11 @@ class SiteWrapper extends Component {
         routerContextComponentType={withRouter(RouterContextProvider)}
         footerProps={{
           links: [
-            <a target="_blank" href="http://insa-lyon.fr/">A INSA Lyon project</a>,
+            <a target="_blank" href="https://insa-lyon.fr/">A INSA Lyon project</a>,
           ],
           copyright: (
             <React.Fragment>
-              By Adrien Moll, Pierrick Chauvet, Ziggy Vergne, and&nbsp;
+              By <a href="//www.linkedin.com/in/adrienmoll/">Adrien Moll</a>, Pierrick Chauvet, Faycal Bziou, <a href="//www.linkedin.com/in/ziggy-vergne/">Ziggy Vergne</a>, and&nbsp;
               <a href="//mha.ug" target="_blank">Martin Haug</a>. Theme by
               <a
                 href="https://codecalm.net"
@@ -78,7 +78,7 @@ class SiteWrapper extends Component {
           nav: (
             <React.Fragment>
                 <Button
-                  href="https://github.com/Zed314/Ticketoc"
+                  href="//github.com/Zed314/Ticketoc"
                   size="sm"
                   outline
                   color="primary"

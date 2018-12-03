@@ -30,12 +30,12 @@ And start it using the following command, you can check the status afterwards:
 sudo service docker start
 sudo service docker status
 ```
-__Attention:__ To use swarm, every used package has to be in a registry. Our dashboard is not, so for time being, you'll have to do `docker-compose -f ./docker/docker-compose.yml up` instead.
+__Attention:__ To use swarm, every used package has to be in a registry. Our dashboard is not, so for time being, you'll have to do `docker-compose -f docker-compose.yml up` instead.
 
 To init:
 ```
 docker swarm init
-docker stack deploy -c docker/docker-compose.yml ticketoc
+docker stack deploy -c docker-compose.yml ticketoc
 ```
 
 To check the status:
