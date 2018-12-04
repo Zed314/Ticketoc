@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import SiteWrapper from "./SiteWrapper";
 import LocalSubscriber from "./LocalSubscriber";
+import IntelligientTable from "./components/IntelligientTable";
 import NetworkStampCard from "./components/NetworkStampCard";
 import DiagramCard from "./components/DiagramCard";
 import {
   Page,
   Grid,
-  Alert
+  Alert,
+  Card
 } from "tabler-react";
 
 class HomePage extends Component {
@@ -135,6 +137,13 @@ class HomePage extends Component {
      data={[5, 1, 0, 4, 7, 4, 2, 2, 9, 8]}
      label="hammoks slept in" />
      </Grid.Col>
+     </Grid.Row>
+     <Grid.Row>
+     <Card>
+     <IntelligientTable
+      headings={[{'title': 'A thing', 'property': 'thing'}, {'title': 'Signification', 'property': 'signification'}]}
+      items={[{'thing': 'Table', 'signification': 'workplace'},{'thing': 'Seesaw', 'signification': <i>children are here</i> },{'thing': 'Bongo', 'signification': 'Music fills the place'}]} />
+     </Card>
      </Grid.Row>
      </Page.Content>
      </SiteWrapper>)
