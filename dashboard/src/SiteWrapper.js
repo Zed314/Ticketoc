@@ -14,8 +14,8 @@ const navBarItems = [
     icon: "box",
     subItems: [
       {
-        value: "Cards Design",
-        to: "/cards",
+        value: "Latest receipts",
+        to: "/receipts",
         LinkComponent: withRouter(NavLink),
       },
       { value: "Charts", to: "/charts", LinkComponent: withRouter(NavLink) },

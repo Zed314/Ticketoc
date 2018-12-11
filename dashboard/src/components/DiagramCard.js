@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import {
   StatsCard,
-  Dimmer,
 } from "tabler-react";
 import C3Chart from "react-c3js";
 
 class DiagramCard extends Component {
 
   render() {
-    console.log(this.props.data)
     const getPercent = (a,b) => {
       const percentage = Math.round((b-a) * 100 / a)
       return percentage < Infinity ? percentage : "+∞"

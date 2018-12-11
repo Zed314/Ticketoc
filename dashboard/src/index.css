@@ -13,3 +13,120 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.receipt {
+  max-width: 550px;
+}
+
+.receipt .receipt-date {
+  display: block;
+  font-style: italic;
+  font-size: 0.8em;
+}
+
+.receipt h3 {
+  font-weight: normal;
+  margin-bottom: -10px;
+}
+
+.receipt .sum {
+  font-weight: 900;
+  font-size: 4.8em;
+  font-style: italic;
+  color: #222;
+}
+
+.receipt .ticket-items td:first-child, .receipt .ticket-items th:first-child {
+  min-width: 45%;
+}
+
+
+.receipt .ticket-items td:nth-child(3), .receipt .ticket-items th:nth-child(3) {
+  max-width: 2em;
+  text-align: center;
+}
+
+.receipt .ticket-items td:nth-child(2), .receipt .ticket-items th:nth-child(2) {
+  text-align: right;
+}
+
+.receipt .ticket-items td:last-child, .receipt .ticket-items th:last-child {
+  text-align: right;
+  max-width: 2em;
+}
+
+.receipt .ticket-items tr:nth-last-child(3) td:last-child, .receipt .ticket-items tr:nth-last-child(3) td:nth-last-child(2),
+.receipt .ticket-items tr:nth-last-child(3) td:nth-last-child(3) {
+    position: relative;
+}
+
+.receipt .ticket-items tr:nth-last-child(3) td:last-child:before, .receipt .ticket-items tr:nth-last-child(3) td:nth-last-child(2):before,
+.receipt .ticket-items tr:nth-last-child(3) td:nth-last-child(3):before {
+  content: " ";
+  position: absolute;
+  top: -3px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-top: 1px solid #dee2e6;
+}
+
+.receipt .ticket-items tr:nth-last-child(3) td:not(:last-child):not(:nth-last-child(2)):not(:nth-last-child(3)),
+.receipt .ticket-items tr:nth-last-child(2) td:not(:last-child):not(:nth-last-child(2)):not(:nth-last-child(3)),
+.receipt .ticket-items tr:nth-last-child(1) td:not(:last-child):not(:nth-last-child(2)):not(:nth-last-child(3)) {
+  border: none;
+}
+
+.receipt .tooltip-avl {
+  text-decoration: underline;
+  text-decoration-style: dashed;
+}
+
+.receipt .customer {
+  text-align: center;
+  margin: 0em 5em 2em 5em;
+}
+
+.receipt .customer.loyality {
+  font-style: italic;
+  font-size: 1.4em;
+  margin-top: 1em;
+}
+
+.receipt .receipt-body > .details {
+  color: #777;
+  margin: 1em 2em 1em .9em;
+  font-size: .8em;
+}
+
+.receipt .receipt-body > .details > .row > .col:nth-child(2n) {
+  font-weight: bold;
+}
+
+.receipt .receipt-body > .details {
+  color: #777;
+  margin-right: 2em;
+  margin-left: .9em;
+  font-size: .8em;
+}
+
+.starring-total {
+  display: flex;
+  align-content: space-around;
+  align-items: flex-start;
+}
+
+table.payment-types {
+  margin-top: 2em;
+  margin-left: 2em;
+  flex-grow: 1;
+}
+
+table.payment-types > tr > td {
+  padding-left: 1em;
+  padding-bottom: 0.6em;
+}
+
+table.payment-types > tr > td:first-child {
+  text-align: center;
+}

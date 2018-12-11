@@ -4,7 +4,8 @@ import './App.css';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import {
   Error404,
-  Error500
+  Error500,
+  ReceiptOverview,
 } from "./pages";
 
 import HomePage from "./HomePage";
@@ -18,6 +19,7 @@ class App extends Component {
         <Router basename={process.env.PUBLIC_URL}>
           <Switch>
             <Route exact path="/" component={HomePage} />
+            <Route exact path="/receipts" component={ReceiptOverview} />
             <Route exact path="/500" component={Error500} />
             <Route component={Error404} />
           </Switch>
