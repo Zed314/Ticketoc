@@ -45,7 +45,7 @@ class SiteWrapper extends Component {
       <Site.Wrapper
         headerProps={{
           href: "/",
-          alt: "Ticketock",
+          alt: "Ticketoc",
           imageURL: "logo.svg",
           accountDropdown: accountDropdownProps,
         }}
@@ -54,12 +54,12 @@ class SiteWrapper extends Component {
         footerProps={{
           links: [
             <a target="_blank" href="https://insa-lyon.fr/" rel="noopener noreferrer">A INSA Lyon project</a>,
-            
+            //<a target="_blank" href="https://www.tu-berlin.de/" rel="noopener noreferrer">TU Berlin</a>            
           ],
           copyright: (
-            <React.Fragment>
+            <React.Fragment><div style={{textAlign: "left"}}>
               By <a href="//www.linkedin.com/in/adrienmoll/" target="_blank" rel="noopener noreferrer">Adrien Moll</a>, Pierrick Chauvet, Faycal Bziou, <a href="//www.linkedin.com/in/ziggy-vergne/">Ziggy Vergne</a>, and&nbsp;
-              <a href="//mha.ug" target="_blank" rel="noopener noreferrer">Martin Haug</a>. <small>Theme by
+              <a href="//mha.ug" target="_blank" rel="noopener noreferrer">Martin Haug</a>.<br /><small>Based on a theme by
               <a
                 href="https://codecalm.net"
                 target="_blank"
@@ -68,8 +68,8 @@ class SiteWrapper extends Component {
                 {" "}
                 codecalm.net
               </a>, {" "}
-              project is Apache2 licensed. Ticketock is not affiliated with the Disney's characters.</small>
-            </React.Fragment>
+              project is Apache2 licensed. Ticketoc is not affiliated with the Disney's characters.</small>
+            </div></React.Fragment>
           ),
           nav: (
             <React.Fragment>

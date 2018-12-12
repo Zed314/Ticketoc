@@ -16,6 +16,7 @@ code {
 
 .receipt {
   max-width: 550px;
+  position: relative;
 }
 
 .receipt .receipt-date {
@@ -55,6 +56,10 @@ code {
   max-width: 2em;
 }
 
+.receipt .ticket-items td:last-child  a:hover, .receipt .ticket-items th:last-child a:hover {
+  text-decoration: none;
+}
+
 .receipt .ticket-items tr:nth-last-child(3) td:last-child, .receipt .ticket-items tr:nth-last-child(3) td:nth-last-child(2),
 .receipt .ticket-items tr:nth-last-child(3) td:nth-last-child(3) {
     position: relative;
@@ -77,9 +82,33 @@ code {
   border: none;
 }
 
-.receipt .tooltip-avl {
+.tooltip-avl {
   text-decoration: underline;
   text-decoration-style: dashed;
+}
+
+.receipt .dialogue {
+  position: absolute;
+  z-index: 2;
+  margin: 6em 2em;
+  width: calc(100% - 4em);
+  transition: transform .3s, opacity .3s;
+}
+
+.receipt .dialogue .card-body > .row > .col:nth-child(2n) {
+  font-weight: bold;
+}
+
+.receipt .dialogue.hidden {
+  /* display: none; */
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.receipt .dialogue.open {
+  display: auto;
+  opacity: 1;
+  transform: scale(1);
 }
 
 .receipt .customer {
@@ -129,4 +158,50 @@ table.payment-types > tr > td {
 
 table.payment-types > tr > td:first-child {
   text-align: center;
+}
+
+.horizontalScroller {
+  position: relative;
+  display: flex;
+  overflow-y: hidden;
+  overflow-x: scroll;
+  flex-wrap: nowrap;
+}
+
+.horizontalScroller > * {
+  position: relative;
+  height: 100%;
+  flex-shrink: 0;
+  margin-right: 1em;
+  transition: margin .1s, width .5s, transform .3s, opacity .3s;
+}
+
+.horizontalScroller.awaits-action > *:not(:first-child) {
+  will-change: scroll-position;
+}
+
+.horizontalScroller > *:not(.hidden) {
+  width: 100%;
+  transform: scale(1);
+  opacity: 1;
+  transition: none;
+}
+
+.horizontalScroller > .hidden {
+  width: 100%;
+  overflow: hidden;
+  transform: scale(0.5);
+  opacity: 0;
+
+}
+
+.horizontalScroller > .hidden:not(.hidden-interm) {
+  width: 0%;
+  height: 0px;
+  margin-right: 0;
+  transition: none;
+}
+
+.payment-cb-dark {
+  background-image: url(cb-dark.svg) !important;
 }

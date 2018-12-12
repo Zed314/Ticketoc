@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import FinancialHelpers from '../FinancialHelpers';
-import {
-  Icon
-} from "tabler-react";
+import MyIcon from './MyIcon'
 
 class PaymentTypes extends Component {
   getMastercardOrVisa() {
@@ -16,10 +14,10 @@ class PaymentTypes extends Component {
     for (let i = 0; i < this.props.payments.length; i++) {
       let mecha = this.props.payments[i].paymentMechanism.toLowerCase()
       const cash = mecha === "especes" || mecha === "cash"
-      mecha = cash ? "loader" : (mecha === "cb" ? this.getMastercardOrVisa() : mecha);
+      mecha = cash ? "loader" : (mecha === "cb" ? "cb-dark" : mecha);
       tableRows.push(
         <tr>
-          <td><Icon payment={cash ? undefined : true} name={mecha} /></td>
+          <td><MyIcon payment={cash ? undefined : true} name={mecha} /></td>
           <td>€ {FinancialHelpers.toFinancialString(this.props.payments[i].settlementAmount)}</td>
         </tr>
         )
