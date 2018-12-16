@@ -1,5 +1,6 @@
 FROM python:3.7-alpine
-ADD . /code
-WORKDIR /code
+WORKDIR /app
+COPY requirements.txt /app
 RUN pip3 install -r requirements.txt
+COPY app.py /app
 ENTRYPOINT ["python", "app.py"]

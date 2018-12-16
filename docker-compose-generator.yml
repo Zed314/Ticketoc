@@ -1,6 +1,28 @@
 version: '3'
 services:
   frenetic-shopping:
-    build: frenetic-shopping/
+    build: frenetic-shopping/app
+    ports:
+      - "4000:4000"
+    environment:
+      - ENV=development
+      - PORT=4000
+      - DB=mongodb://mongodb:27017/todoDev
+    links:
+      - mongodb
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    environment:
+      - MONGO_DATA_DIR=/usr/data/db
+      - MONGO_LOG_DIR=/dev/null
     volumes:
-      - ./frenetic-shopping:/code
+      - ./frenetic-shopping/db:/usr/data/db
+    ports:
+      - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null
+
+  mongo_seed:
+    build: frenetic-shopping/db
+    links:
+      - mongodb
