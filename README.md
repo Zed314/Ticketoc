@@ -9,6 +9,7 @@ groups
 sudo usermod -a -G docker zvergne
 groups
 ```
+
 If you are not added to this group, it is because you have to type:
 
 ```
@@ -33,6 +34,7 @@ sudo service docker status
 __Attention:__ To use swarm, every used package has to be in a registry. Our dashboard is not, so for time being, you'll have to do `docker-compose -f docker-compose.yml up` instead.
 
 To init:
+
 ```
 docker swarm init
 docker stack deploy -c docker-compose.yml ticketoc
@@ -42,10 +44,11 @@ To check the status:
 
 ```
 docker service ps ticketoc_kafka
-docker  ps
+docker ps
 ```
 
 To shutdown:
+
 ```
 docker stack rm ticketoc
 docker swarm leave --force
@@ -74,4 +77,7 @@ docker image rm <imagename>
 docker image rm docker_dashboard:latest 
 ```
 
-
+To fix kafka volumes permissions:
+```
+sudo chown 1001:1001 -R volumes/kafka
+```

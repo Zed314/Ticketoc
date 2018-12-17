@@ -1,25 +1,45 @@
+from enum import Enum
 from flask import Flask, request, abort
 from kafka import KafkaProducer
 import json
 import os
 
+
+class SerializerType(Enum):
+	JSON = 'json'
+	AVRO = 'avro'
+	STRING = 'str'
+
+
 kafka_connect = os.environ['KAFKA_CONNECT']
 kafka_version = tuple(map(int, os.environ['KAFKA_VERSION'].split('.')))
 route = os.environ['ROUTE']
 topic = os.environ['TOPIC']
-value_serializer_type = os.environ['VALUE_SERIALIZER']
-compression = os.getenv('COMPRESSION')  # might return None
+value_serializer_type = SerializerType(os.environ['VALUE_SERIALIZER'])
+key_serializer_type = SerializerType.STRING
+compression = os.getenv('COMPRESSION')
 
 
 def json_serializer(data):
 	return json.dumps(data).encode('utf-8')
 
 
-if value_serializer_type != 'json' and value_serializer_type != 'protobuf':
-	raise ValueError("value_serializer_type must be 'json' or 'protobuf'")
+def string_serializer(data):
+	return str(data).encode('utf-8')
 
-value_serializer = json_serializer if value_serializer_type == 'json' else None
-key_serializer = str.encode
+
+def avro_serializer(data):
+	raise NotImplementedError()
+
+
+serializer = {
+	SerializerType.JSON: json_serializer,
+	SerializerType.AVRO: avro_serializer,
+	SerializerType.STRING: string_serializer
+}
+
+value_serializer = serializer[value_serializer_type]
+key_serializer = serializer[key_serializer_type]
 
 app = Flask(__name__)
 producer = KafkaProducer(
@@ -33,17 +53,20 @@ producer = KafkaProducer(
 
 @app.route(route, methods=['POST'])
 def add():
-	print("Test",sys.err)#just to do an error, because it takes too much time to timeout
-	if 'application/json' in request.content_type and value_serializer_type == 'json':
-		data = request.get_json()
-		if data is not None:
-			producer.send(topic=topic, key=None, value=data, headers=[('content-type', b'application/json; charset=utf-8')])
+	if value_serializer_type == SerializerType.JSON:
+		if request.is_json():
+			data = request.get_json()
+			if data:
+				producer.send(topic=topic, key=None, value=data, headers=[('content-type', b'application/json; charset=utf-8')])
+			else:
+				abort(400)
 		else:
 			abort(400)
+	elif value_serializer_type == SerializerType.AVRO:
+		raise NotImplementedError()
 	else:
 		abort(400)
 
 
 if __name__ == '__main__':
-
-	app.run(host='0.0.0.0', port=80)
+	app.run(host='0.0.0.0', port=80, threaded=True)
