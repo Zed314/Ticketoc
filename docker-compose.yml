@@ -1,23 +1,27 @@
-version: '3.2'
+version: '3.5'
 services:
   dashboard:
+    image: admo120104/ticketoc:dashboard
     build: dashboard/
     ports:
       - 8080:80
   entrypoint:
+    image: admo120104/ticketoc:entrypoint
     build: entrypoint/
     ports:
       - 4000:80
     environment:
-      KAFKA_VERSION: 1.1
-      KAFKA_CONNECT: kafka:9092
       ROUTE: /v1/tickets
-      TOPIC: input_tickets
-      VALUE_SERIALIZER: json
-      COMPRESSION: gzip
+      KAFKA_VERSION: 2.1
+      KAFKA_CONNECT: kafka:9092
+      KAFKA_TOPIC: input_tickets
+      KAFKA_VALUE_SERIALIZER: json
+      KAFKA_COMPRESSION: gzip
     networks:
+      - default # never forget the default network !
       - generator-net
   cash-clasp:
+    image: admo120104/ticketoc:cash-clasp
     build: cash-clasp/
     ports:
       - 40510:40510
@@ -28,12 +32,18 @@ services:
   kafka:
     image: wurstmeister/kafka:latest
     ports:
-      - 9092:9092
+      - 9094:9094
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_HOST_NAME: 172.17.0.1:9092
+      HOSTNAME_COMMAND: "docker info | grep ^Name: | cut -d' ' -f 2"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zookeeper
   mongo:
     image: mongo:latest
     ports:
@@ -41,8 +51,8 @@ services:
   spark:
     image: sequenceiq/spark:latest
     ports:
-      - '8088:8088'
-      - '8042:8042'
+      - 8088:8088
+      - 8042:8042
 networks:
   generator-net:
     driver: bridge

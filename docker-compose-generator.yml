@@ -1,15 +1,14 @@
-version: '3.2'
+version: '3.5'
 services:
   frenetic-shopping:
+    image: admo120104/ticketoc:frenetic-shopping-app
     build: frenetic-shopping/app
     links:
       - mongodb
     networks:
       - ticketoc_generator-net
-      - default
   mongodb:
     image: mongo:latest
-    container_name: "mongodb"
     environment:
       MONGO_DATA_DIR: /usr/data/db
       MONGO_LOG_DIR: /dev/null
@@ -18,14 +17,11 @@ services:
     ports:
       - 27018:27017
     command: mongod --smallfiles --logpath=/dev/null
-    networks:
-      - default
   mongo_seed:
+    image: admo120104/ticketoc:frenetic-shopping-db
     build: frenetic-shopping/db
     links:
       - mongodb
-    networks:
-      - default
 networks:
   ticketoc_generator-net:
     external: true
