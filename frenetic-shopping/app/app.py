@@ -1,35 +1,25 @@
 
 
-from random import randint,uniform,random, gauss, choice
+import argparse
+import datetime
 import json
 import math
+import pprint
 import sys
-import datetime
-import argparse
-from enum import Enum
-from time import time, sleep
 from collections import OrderedDict
+from enum import Enum
+from random import choice, gauss, randint, random, uniform
+from time import sleep, time
+
+import requests
+
 import pymongo
 from pymongo import MongoClient
-import pprint
 
-
-print("JEEEEJ")
 client = MongoClient('mongodb://mongodb:27017/')
 supermarketDB = client["supermarketDB"]
 products = supermarketDB["products"]
 
-#x = mycol.insert_one(mydict)
-x = products.find()
-for y in x:
-	pprint.pprint(y)
-
-print(x) 
-x = supermarketDB.products.aggregate([{ "$sample": { "size": 1 } }])
-print("RES")
-pprint.pprint(x)
-for y in x:
-	pprint.pprint(y)
 
 def getRandomProducts(nb):
 	products = supermarketDB.products.aggregate([{ "$sample": { "size": nb } }])
@@ -38,44 +28,12 @@ def getRandomProducts(nb):
 
 def generateLine(ind):
 	productCode = '000000'  + str(randint(10,20))
-#	categoryCode = ""
-#	productCategoryName = "categoryNamus"
-#	possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-#	possibleName=['Alimentation','Boissons','Cigarettes','DepotVentes','Confiseries','FranceTelecom','Grattage','Jounaux','Jouets','Jeux','Librairie','Loto',
-#					  'Papetrie','Piles','Paysafecard','PCS','Plans','Photocopies','TabacaRouler','Tabletterie','TicketsPremium','TimbresFiscaux','TimbresPoste','Telephonie','Transcash','UniversalMobile',
-#					  'Carterie','Cdiscount','Intercall','Kertel','	P.Q.N.','P.Q.R.','SFR','DeveloppementPhotos','Publications','Pains']
-	#possibleName=['Fruits','Legumes','Thé','Vin','Vêtements','Fleurs','Chocolats','Desserts',,]
-	# categoriesAndProducts = {
-	# 	'Fruits':{'products':['Apple','Pear','Banana','Mango','Grape','Kaki']},
-	# 	'Vegetables':{'products':['Potato','Salad']},
-	# 	'Meat':{'products':['Beef','Lamb','Duck','Snails']},
-	# 	'Fish':{'products':['Clownfish']},
-	# 	'Seafruits':{'products':['Oisters']},
-	# 	'Luxe':{'products':['Foie gras','Chocolate']},
-	# 	'Clothes':{'products':['Pants','Socks','Tshirt']},
-	# 	'Flowers':{'products':['Rose']},
-	# 	'Everydaylife':{'products':['Toilet paper']},
-	# 	'Greetings card':{'products':['Happy Birthday card','Merry Christmas card']},
-	# 	'Health':{'products':['Condoms','Nail cutter']},
-	# 	}
-	#for categories in categoriesAndProducts:
-	#	maxNbProducts = 0
-	#	if len(categoriesAndProducts[categories]['products'])>max:
-	#		maxNbProducts = len(categoriesAndProducts[categories]['products'])
-		
-	#productDescription='---'
 
-	#index = int(random() * len(possible))
-	#categoryCode += possible[index]
-	#supermarketDB.products.aggregate([{ "$sample": { "size": 1 } }])
-	#productCategoryName, products = choice(list(categoriesAndProducts.items()))
-	#product = choice(products["products"])
 	productFromDB = (getRandomProducts(1))[0]
 	product = productFromDB["_id"]
 	productCategoryName = productFromDB["category"]
 	productDescription = productFromDB["name"]
 	print(product)
-#	productCategoryName=categoriesAndProducts.keys()[int(random()*len(categoriesAndProducts))]
 	categoryCode = productCategoryName[0:2].upper()
 	taxPercentage=randint(6,20)
 	quantity = randint(1,3)
@@ -105,8 +63,6 @@ def fromTimeStampToDate(timestamp):
 
 def truncateFloat(r):
         return float(("%.2f"%(r)));
-
-#def generateFullOrder(nbOrders):
 
 
 def generateCashReceipt(storeid=1,terminalid=1,agentid=1,customerid=1,nbtotalproducts= randint(1,5),timestamp=time()):
@@ -192,8 +148,6 @@ def returnValueIfValueOrBelow(nb,value):
 	return nb
 
 
-print("lel")
-
 class PaymentMethod(Enum):     
     CASH = 1     
     CARD = 2     
@@ -244,6 +198,11 @@ while True:
 			print(order["finishTime"])
 			cashRec = generateCashReceipt(storeid=idOfStore,terminalid=i,agentid=i,customerid=200,nbtotalproducts=order["numberOfElements"],timestamp=time())
 			print(cashRec)
+			try:
+				r=requests.post('http://ticketoc_entrypoint_1:80/v1/tickets', json={"nique":"adidas"})#cashRec)
+				print(r)
+			finally:
+				pass
 			currentOrders[i] = generateApproximateOrder(cashiers[i])
 	sleep(0.01)
 writeJSON(cashRec,'cashreceipt.json')

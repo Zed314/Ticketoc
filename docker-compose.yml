@@ -15,6 +15,8 @@ services:
       - TOPIC=input_tickets
       - VALUE_SERIALIZER=json
       - COMPRESSION=gzip
+    networks:
+      - generator-net
   cash-clasp:
     build: cash-clasp/
     ports:
@@ -41,4 +43,6 @@ services:
     ports:
       - '8088:8088'
       - '8042:8042'
-
+networks:
+  generator-net:
+    driver: bridge

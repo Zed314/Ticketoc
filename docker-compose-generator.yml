@@ -2,14 +2,11 @@ version: '3'
 services:
   frenetic-shopping:
     build: frenetic-shopping/app
-    ports:
-      - "4000:4000"
-    environment:
-      - ENV=development
-      - PORT=4000
-      - DB=mongodb://mongodb:27017/todoDev
     links:
       - mongodb
+    networks:
+      - ticketoc_generator-net
+      - default
   mongodb:
     image: mongo:latest
     container_name: "mongodb"
@@ -19,10 +16,18 @@ services:
     volumes:
       - ./frenetic-shopping/db:/usr/data/db
     ports:
-      - 27017:27017
+      - 27018:27017
     command: mongod --smallfiles --logpath=/dev/null
+    networks:
+      - default
 
   mongo_seed:
     build: frenetic-shopping/db
     links:
       - mongodb
+    networks:
+      - default
+
+networks:
+  ticketoc_generator-net:
+    external: true

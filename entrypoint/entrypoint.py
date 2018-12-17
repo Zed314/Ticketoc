@@ -33,7 +33,8 @@ producer = KafkaProducer(
 
 @app.route(route, methods=['POST'])
 def add():
-	if request.content_type == 'application/json; charset=utf-8' and value_serializer_type == 'json':
+	print("Test",sys.err)#just to do an error, because it takes too much time to timeout
+	if 'application/json' in request.content_type and value_serializer_type == 'json':
 		data = request.get_json()
 		if data is not None:
 			producer.send(topic=topic, key=None, value=data, headers=[('content-type', b'application/json; charset=utf-8')])
