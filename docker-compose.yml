@@ -18,8 +18,11 @@ services:
       KAFKA_VALUE_SERIALIZER: json
       KAFKA_COMPRESSION: gzip
     networks:
-      - default # never forget the default network !
+      - default
       - generator-net
+    command: ["./wait-for-it.sh", "kafka:9092", "--", "python", "entrypoint.py"]
+    depends_on:
+      - kafka
   cash-clasp:
     image: admo120104/ticketoc:cash-clasp
     build: cash-clasp/

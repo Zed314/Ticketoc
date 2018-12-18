@@ -3,7 +3,6 @@ from flask import Flask, request, abort, jsonify
 from kafka import KafkaProducer
 import json
 import os
-import time
 import logging
 
 
@@ -43,7 +42,6 @@ serializers = {
 kafka_value_serializer = serializers[kafka_value_serializer_type]
 kafka_key_serializer = serializers[kafka_key_serializer_type]
 
-time.sleep(10)  # delay execution to give time to kafka
 
 app = Flask(__name__)
 producer = KafkaProducer(
@@ -68,15 +66,13 @@ def send():
 		if request.is_json:
 			data = request.get_json()
 			if data:
-				producer.send(
-					topic=kafka_topic,
-					key=None,
-					value=data,
-					headers=[('content-type', b'application/json; charset=utf-8')]
-				).add_errback(on_send_error)
+				headers = [('content-type', b'application/json; charset=utf-8')]
+				future = producer.send(topic=kafka_topic, value=data, key=None, headers=headers)
+				future.add_errback(on_send_error)
 				return jsonify({'success': True})
 
 	elif kafka_value_serializer_type == SerializerType.AVRO:
+
 		abort(501)
 
 	abort(400)

@@ -3,9 +3,10 @@ services:
   frenetic-shopping:
     image: admo120104/ticketoc:frenetic-shopping-app
     build: frenetic-shopping/app
-    links:
+    depends_on:
       - mongodb
     networks:
+      - default
       - ticketoc_generator-net
   mongodb:
     image: mongo:latest
@@ -20,7 +21,7 @@ services:
   mongo_seed:
     image: admo120104/ticketoc:frenetic-shopping-db
     build: frenetic-shopping/db
-    links:
+    depends_on:
       - mongodb
 networks:
   ticketoc_generator-net:
