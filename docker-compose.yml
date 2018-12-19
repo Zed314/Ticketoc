@@ -12,7 +12,6 @@ services:
       - 4000:80
     environment:
       ROUTE: /v1/tickets
-      KAFKA_VERSION: 2.1
       KAFKA_CONNECT: kafka:9092
       KAFKA_TOPIC: input_tickets
       KAFKA_VALUE_SERIALIZER: json

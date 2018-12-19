@@ -9,7 +9,7 @@ scripts/install.sh
 scripts/build.sh <dir: frenetic-shopping/app>
 scripts/start.sh
 scripts/stop.sh
-scripts/clean.sh
+scripts/clean.sh [--deep]
 ```
 
 ## Install docker
