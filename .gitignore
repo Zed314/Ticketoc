@@ -1,3 +1,7 @@
 cashreceipt.json
 generator/cashreceipt.json
 .vscode/
+volumes/
+.idea/
+spark/Infra/.idea
+spark/Infra/target/
