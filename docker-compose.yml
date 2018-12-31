@@ -16,6 +16,7 @@ services:
       KAFKA_TOPIC: input_tickets
       KAFKA_VALUE_SERIALIZER: json
       KAFKA_COMPRESSION: gzip
+      FLASK_ENV: development
     networks:
       - default
       - generator-net
