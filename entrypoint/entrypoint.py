@@ -4,8 +4,10 @@ from kafka import KafkaProducer
 from kafka.errors import KafkaTimeoutError
 import json
 import os
+import io
 import logging
-import avro
+import avro.schema
+from avro.io import DatumReader
 
 
 class SerializerType(Enum):
@@ -76,32 +78,168 @@ def send():
 			return jsonify({'success': True})
 	else:
 		print("Not json",flush=True)
-		# test_schema = '''
-		# {
-		# 	"namespace": "example.avro",
- 		# 	"type": "record",
- 		# 	"name": "User",
- 		# 	"fields": [
-    	# 			{"name": "name", "type": "string"},
-    	# 			{"name": "favorite_number",  "type": ["int", "null"]},
-		# 		     {"name": "favorite_color", "type": ["string", "null"]}
- 		# 		]
-		# 	}
-		# 	'''
+		test_schema = test_schema = '''
+{
+    "namespace": "avro.ticketoc",
+    "type": "record",
+    "name": "Receipt",
+    "fields": [
+        {
+            "name": "cashReceiptID",
+            "type": "string"
+        },
+		{
+			"name": "storeID",
+			"type": "string"
+		},
+        {
+            "name": "terminalID",
+            "type": "string"
+        },
+        {
+            "name": "agentID",
+            "type": "string"
+        },
+		{
+            "name": "customerID",
+            "type": "string"
+        },
+        {
+            "name": "date",
+            "type": "string"
+        },
+        {
+            "name": "documentTotal",
+			"type": {
+				"type": "record",
+				"name":"documentTotalBis",
+   			"fields": [
+      			{
+        		"name": "netTotal",
+        		"type": "float"
+      			},
+      			{
+        		"name": "taxPayable",
+        		"type": "float"
+      			},
+      			{
+        		"name": "grossTotal",
+        		"type": "float"
+      			}
+    		]
+			}
 
-		# 	schema = avro.schema.Parse(test_schema)
-		# 	#bytes_reader = io.BytesIO(raw_bytes)
-		# 	try:
-		# 		decoder = avro.io.BinaryDecoder(request.get_data())
-		# 	except Exception as ex:
-		# 		print("Error:")
-		# 		print(ex,flush=True) 
-		# 	print("Af gd",flush=True)
-		# 	reader = avro.io.DatumReader(schema)
-		# 	user1 = reader.read(decoder)
-		# 	user2 = reader.read(decoder)
-		# 	print(user1, flush=True)
-	
+
+        },
+        {
+            "name": "settlements",
+            "type": {
+                "type": "array",
+                "items": {
+                    "namespace": "avro.ticketoc",
+                    "name": "Line",
+                    "type": "record",
+                    "fields": [
+                        {
+                            "name": "paymentMechanism",
+                            "type": {
+                                "type": "enum",
+                                "name": "auie",
+                                "symbols": [
+                                    "Especes",
+                                    "CB"
+                                ]
+                            }
+                        },
+                        {
+                            "name": "settlementAmount",
+                            "type": "float"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "lines",
+            "type": {
+                "type": "array",
+                "items": {
+                    "namespace": "avro.ticketoc.Receipt",
+                    "name": "Line",
+                    "type": "record",
+                    "fields": [
+                        {
+                            "name": "lineNumber",
+                            "type": "int"
+                        },
+                        {
+                            "name": "productCode",
+                            "type": "string"
+                        },
+                        {
+                            "name": "productDescription",
+                            "type": "string"
+                        },
+                        {
+                            "name": "productCategoryCode",
+                            "type": "string"
+                        },
+                        {
+                            "name": "productCategoryName",
+                            "type": "string"
+                        },
+                        {
+                            "name": "quantity",
+                            "type": "int"
+                        },
+                        {
+                            "name": "unitOfMeasure",
+                            "type": "string"
+                        },
+                        {
+                            "name": "unitPrice",
+                            "type": "float"
+                        },
+                        {
+                            "name": "taxPercentage",
+                            "type": "int"
+                        },
+                        {
+                            "name": "creditAmount",
+                            "type": "float"
+                        },
+                        {
+                            "name": "settlementAmount",
+                            "type": "float"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
+'''
+		print("A",flush=True) 
+		schema = avro.schema.Parse(test_schema)
+		print("B") 
+		print(request.get_data(),flush=True) 
+		
+		bytes_reader = io.BytesIO(request.get_data())
+		decoder = avro.io.BinaryDecoder(bytes_reader)
+
+		print("Af gd",flush=True)
+		print("B2",flush=True)
+		reader = avro.io.DatumReader(schema)
+		print("C",flush=True)
+		user1 = reader.read(decoder)
+		print(user1, flush=True)
+		headers = [('content-type', b'application/json; charset=utf-8')]
+		try:
+			future = producer.send(topic=kafka_topic, value=user1, headers=headers)
+			future.add_errback(on_send_error)
+		except KafkaTimeoutError:
+			raise
+		return jsonify({'success': True})
 #	elif kafka_value_serializer_type == SerializerType.AVRO:
 #		print(request)
 #		abort(501)

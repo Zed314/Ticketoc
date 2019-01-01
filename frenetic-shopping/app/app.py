@@ -10,11 +10,11 @@ from collections import OrderedDict
 from enum import Enum
 from random import choice, gauss, randint, random, uniform
 from time import sleep, time
-#import avro.schema
-#from avro.io import DatumWriter
+import avro.schema
+from avro.io import DatumWriter
 import io
 import requests
-
+import re
 import pymongo
 from pymongo import MongoClient
 
@@ -22,44 +22,152 @@ from pymongo import MongoClient
 
 #print("TETETETETET")
 
+#todo settlementAmout et al.
+test_schema = '''
+{
+    "namespace": "avro.ticketoc",
+    "type": "record",
+    "name": "Receipt",
+    "fields": [
+        {
+            "name": "cashReceiptID",
+            "type": "string"
+        },
+		{
+			"name": "storeID",
+			"type": "string"
+		},
+        {
+            "name": "terminalID",
+            "type": "string"
+        },
+        {
+            "name": "agentID",
+            "type": "string"
+        },
+		{
+            "name": "customerID",
+            "type": "string"
+        },
+        {
+            "name": "date",
+            "type": "string"
+        },
+        {
+            "name": "documentTotal",
+			"type": {
+				"type": "record",
+				"name":"documentTotalBis",
+   			"fields": [
+      			{
+        		"name": "netTotal",
+        		"type": "float"
+      			},
+      			{
+        		"name": "taxPayable",
+        		"type": "float"
+      			},
+      			{
+        		"name": "grossTotal",
+        		"type": "float"
+      			}
+    		]
+			}
 
-# test_schema = '''
-# {
-# "namespace": "example.avro",
-#  "type": "record",
-#  "name": "User",
-#  "fields": [
-#      {"name": "name", "type": "string"},
-#      {"name": "favorite_number",  "type": ["int", "null"]},
-#      {"name": "favorite_color", "type": ["string", "null"]}
-#  ]
-# }
-# '''
 
-#schema = avro.schema.Parse(test_schema)
-#writer = avro.io.DatumWriter(schema)
+        },
+        {
+            "name": "settlements",
+            "type": {
+                "type": "array",
+                "items": {
+                    "namespace": "avro.ticketoc",
+                    "name": "Line",
+                    "type": "record",
+                    "fields": [
+                        {
+                            "name": "paymentMechanism",
+                            "type": {
+                                "type": "enum",
+                                "name": "auie",
+                                "symbols": [
+                                    "Especes",
+                                    "CB"
+                                ]
+                            }
+                        },
+                        {
+                            "name": "settlementAmount",
+                            "type": "float"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "lines",
+            "type": {
+                "type": "array",
+                "items": {
+                    "namespace": "avro.ticketoc.Receipt",
+                    "name": "Line",
+                    "type": "record",
+                    "fields": [
+                        {
+                            "name": "lineNumber",
+                            "type": "int"
+                        },
+                        {
+                            "name": "productCode",
+                            "type": "string"
+                        },
+                        {
+                            "name": "productDescription",
+                            "type": "string"
+                        },
+                        {
+                            "name": "productCategoryCode",
+                            "type": "string"
+                        },
+                        {
+                            "name": "productCategoryName",
+                            "type": "string"
+                        },
+                        {
+                            "name": "quantity",
+                            "type": "int"
+                        },
+                        {
+                            "name": "unitOfMeasure",
+                            "type": "string"
+                        },
+                        {
+                            "name": "unitPrice",
+                            "type": "float"
+                        },
+                        {
+                            "name": "taxPercentage",
+                            "type": "int"
+                        },
+                        {
+                            "name": "creditAmount",
+                            "type": "float"
+                        },
+                        {
+                            "name": "settlementAmount",
+                            "type": "float"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
+'''
 
+schema = avro.schema.Parse(test_schema)
+writer = avro.io.DatumWriter(schema)
 
-#bytes_writer = io.BytesIO()
-#encoder = avro.io.BinaryEncoder(bytes_writer)
-#writer.write({"name": "Alyssa", "favorite_number": 256}, encoder)
-#writer.write({"name": "Ben", "favorite_number": 7, "favorite_color": "red"}, encoder)
-
-#raw_bytes = bytes_writer.getvalue()
-#print(len(raw_bytes))
-#print(type(raw_bytes))
-
-#bytes_reader = io.BytesIO(raw_bytes)
-#decoder = avro.io.BinaryDecoder(bytes_reader)
-#reader = avro.io.DatumReader(schema)
-#user1 = reader.read(decoder)
-#user2 = reader.read(decoder)
-
-#print(user1)
-#print(user2)
-#print(bytes_writer.getvalue())
-#r = requests.post('http://ticketoc_entrypoint_1:80/v1/tickets',bytes_writer.getvalue())
-#print(r)
 
 client = MongoClient('mongodb://mongodb:27017/')
 supermarketDB = client["supermarketDB"]
@@ -208,6 +316,9 @@ def generateOrder(cashier, popularProducts=[]):
 		for i,product in enumerate(getRandomProducts(nblines)):
 			products.append((product,quantitiesProduct[i]))
 		order["products"] = products
+	else:
+		pass
+	#TOdo : find appropriate datastructure to add popular products
 	return order
 
 def returnValueIfValueOrBelow(nb,value):
@@ -215,6 +326,9 @@ def returnValueIfValueOrBelow(nb,value):
 		return value
 	return nb
 
+#def toAvro(input):
+	#toReturn = {}
+#	toReturn["cashReceiptID"]=input
 
 class PaymentMethod(Enum):     
     CASH = 1     
@@ -230,8 +344,13 @@ parser.add_argument("-c", "--checkoutnumber", type=int, default =100,
 parser.add_argument("-s","--storeID",type=int, default = "0",
 					help="id of the store")
 parser.add_argument("-p","--popular",type=str, default = "",
-					help="name of the popular product")
+					help="name of the popular product, separated by a comma and followed by the probability in percentage")
+
+#Todo : change
+useAvro = True
+						
 args = parser.parse_args()
+re.split('[-,]', args.popular)
 
 ticketsPerMinute = args.tpm
 numberOfCheckout = args.checkoutnumber
@@ -269,10 +388,17 @@ while True:
 			cashRec = generateCashReceipt(storeid=idOfStore,terminalid=i,agentid=i,customerid=200,order=order,timestamp=time())
 			print(cashRec)
 			try:
-				r=requests.post('http://ticketoc_entrypoint_1:80/v1/tickets',json=cashRec)
-				print(r)
+				if useAvro:
+					bytes_writer = io.BytesIO()
+					encoder = avro.io.BinaryEncoder(bytes_writer)
+					writer.write(dict(cashRec), encoder)
+					r = requests.post('http://ticketoc_entrypoint_1:80/v1/tickets',data = bytes_writer.getvalue(),
+                    headers={'Content-Type': 'application/octet-stream'})
+					print(r)
+				else :
+					r=requests.post('http://ticketoc_entrypoint_1:80/v1/tickets',json=cashRec)
+					print(r)
 			finally:
 				pass
 			currentOrders[i] = generateOrder(cashiers[i])
 	sleep(0.01)
-#writeJSON(cashRec,'cashreceipt.json')
