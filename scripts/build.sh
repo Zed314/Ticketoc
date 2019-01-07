@@ -3,7 +3,7 @@
 DIR=$1
 NAME=$(echo "$1" | sed -r 's/\//-/g')
 
-if [ -z "$DIR" -o -z "$NAME" ]
+if [[ -z "$DIR" || -z "$NAME" ]]
 then
 	>&2 echo "Error: Missing argument"
 	exit 1
