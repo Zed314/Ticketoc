@@ -5,8 +5,7 @@ from kafka.errors import KafkaTimeoutError
 import json
 import os
 import io
-import avro.schema
-from avro.io import DatumReader
+import avro
 
 
 class SerializerType(Enum):

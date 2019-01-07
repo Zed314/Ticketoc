@@ -32,7 +32,7 @@ services:
       - 40510:40510
     depends_on:
       - kafka
-	  - spark
+      - spark
   zookeeper:
     image: zookeeper:latest
     ports:
