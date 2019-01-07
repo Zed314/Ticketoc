@@ -5,7 +5,6 @@ from kafka.errors import KafkaTimeoutError
 import json
 import os
 import io
-import logging
 import avro.schema
 from avro.io import DatumReader
 
@@ -52,7 +51,7 @@ producer = make_producer()
 
 
 def on_send_error(error):
-	logging.error("Failed to send message with error '%s'", error)
+	app.logger.error("Failed to send message with error '%s'", error)
 
 
 @app.errorhandler(Exception)
