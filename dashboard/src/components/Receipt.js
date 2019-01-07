@@ -38,7 +38,7 @@ class Receipt extends Component {
     for (let i = 0; i < this.props.lines.length; i++) {
       tableRows.push(
         <Table.Row>
-          <Table.Col>{this.props.lines[i].productName}</Table.Col>
+          <Table.Col>{this.props.lines[i].productDescription}</Table.Col>
           <Table.Col>{FinancialHelpers.toFinancialString(this.props.lines[i].unitPrice * (100 + this.props.lines[i].taxPercentage) / 100)}</Table.Col>
           <Table.Col>&times;</Table.Col>
           <Table.Col>
@@ -60,7 +60,7 @@ class Receipt extends Component {
     return (
       <Card className={"receipt " + (this.props.className || "")}>
         <Card
-          title={"Article Details for " + (this.state.articlePopup.productName ? this.state.articlePopup.productName : "Line " +  this.state.articlePopup.lineNumber)}
+          title={"Article Details for " + (this.state.articlePopup.productDescription ? this.state.articlePopup.productDescription : "Line " +  this.state.articlePopup.lineNumber)}
           statusColor="blue"
           options={<a href="#" onClick={this.closeDialogue}><Icon name="x" /></a>}
           className={"dialogue " + (!this.state.popupOpen ? "hidden" : "open")} >
@@ -84,8 +84,6 @@ class Receipt extends Component {
               <Grid.Col>{this.state.articlePopup.taxPercentage + "%"}</Grid.Col>
             </Grid.Row>
             <Grid.Row>
-              <Grid.Col>Product Description</Grid.Col>
-              <Grid.Col>{this.state.articlePopup.productDescription}</Grid.Col>
               <Grid.Col>Product Category</Grid.Col>
               <Grid.Col><TooltipLine tooltip={"ID " + this.state.articlePopup.productCategoryCode}>{this.state.articlePopup.productCategoryName}</TooltipLine></Grid.Col>
             </Grid.Row>

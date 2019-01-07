@@ -28,6 +28,8 @@ services:
     build: cash-clasp/
     ports:
       - 40510:40510
+    depends_on:
+      - kafka
   zookeeper:
     image: zookeeper:latest
     ports:
