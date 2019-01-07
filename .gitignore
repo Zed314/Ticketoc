@@ -5,3 +5,4 @@ volumes/
 .idea/
 spark/Infra/.idea
 spark/Infra/target/
+spark/Infra/Infra.iml
