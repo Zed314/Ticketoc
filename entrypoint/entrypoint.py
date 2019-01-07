@@ -66,17 +66,19 @@ def error_handler(error):
 
 @app.route(route, methods=['POST'])
 def send():
-	if request.is_json:
-		data = request.get_json()
-		if data:
-			headers = [('content-type', b'application/json; charset=utf-8')]
-			try:
-				future = producer.send(topic=kafka_topic, value=data, headers=headers)
-				future.add_errback(on_send_error)
-			except KafkaTimeoutError:
-				raise
-			return jsonify({'success': True})
-	else:
+
+	if kafka_value_serializer_type == SerializerType.JSON:
+		if request.is_json:
+			data = request.get_json()
+			if data is not None:
+				headers = [('content-type', b'application/json; charset=utf-8')]
+				try:
+					future = producer.send(topic=kafka_topic, value=data, headers=headers)
+					future.add_errback(on_send_error)
+				except KafkaTimeoutError:
+					raise
+				return jsonify({'success': True})
+	elif kafka_value_serializer_type == SerializerType.AVRO:
 		print("Not json",flush=True)
 		test_schema = test_schema = '''
 {
