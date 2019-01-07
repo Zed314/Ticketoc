@@ -95,3 +95,11 @@ To fix kafka volumes permissions:
 ```
 sudo chown 1001:1001 -R volumes/kafka
 ```
+
+# Project Members and Roles
+
+Martin Haug : Dashboard WebUI & Cash-Clasp WebSocketServer
+Faycal Bziou : Spark Streaming
+Pierrick Chauvet : Spark Streaming 
+Adrien Moll : Kafka & Entrypoint
+Ziggy Vergne : Generator & Persistence MongoDB
