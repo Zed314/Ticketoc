@@ -14,7 +14,7 @@ services:
       ROUTE: /v1/tickets
       KAFKA_CONNECT: kafka:9092
       KAFKA_TOPIC: input_tickets
-      KAFKA_VALUE_SERIALIZER: json
+      KAFKA_VALUE_SERIALIZER: avro
       KAFKA_COMPRESSION: gzip
       FLASK_ENV: development
     networks:

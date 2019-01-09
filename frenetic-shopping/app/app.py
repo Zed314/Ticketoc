@@ -1,171 +1,26 @@
-
-
 import argparse
 import datetime
+import io
 import json
 import math
 import pprint
+import re
 import sys
 from collections import OrderedDict
 from enum import Enum
+from pathlib import Path
 from random import choice, gauss, randint, random, uniform
 from time import sleep, time
-import avro.schema
-from avro.io import DatumWriter
-import io
+
 import requests
-import re
+
+import avro.schema
 import pymongo
+from avro.io import DatumWriter
 from pymongo import MongoClient
 
 
-
-#print("TETETETETET")
-
-#todo settlementAmout et al.
-test_schema = '''
-{
-    "namespace": "avro.ticketoc",
-    "type": "record",
-    "name": "Receipt",
-    "fields": [
-        {
-            "name": "cashReceiptID",
-            "type": "string"
-        },
-		{
-			"name": "storeID",
-			"type": "string"
-		},
-        {
-            "name": "terminalID",
-            "type": "string"
-        },
-        {
-            "name": "agentID",
-            "type": "string"
-        },
-		{
-            "name": "customerID",
-            "type": "string"
-        },
-        {
-            "name": "date",
-            "type": "string"
-        },
-        {
-            "name": "documentTotal",
-			"type": {
-				"type": "record",
-				"name":"documentTotalBis",
-   			"fields": [
-      			{
-        		"name": "netTotal",
-        		"type": "float"
-      			},
-      			{
-        		"name": "taxPayable",
-        		"type": "float"
-      			},
-      			{
-        		"name": "grossTotal",
-        		"type": "float"
-      			}
-    		]
-			}
-
-
-        },
-        {
-            "name": "settlements",
-            "type": {
-                "type": "array",
-                "items": {
-                    "namespace": "avro.ticketoc",
-                    "name": "Line",
-                    "type": "record",
-                    "fields": [
-                        {
-                            "name": "paymentMechanism",
-                            "type": {
-                                "type": "enum",
-                                "name": "auie",
-                                "symbols": [
-                                    "Especes",
-                                    "CB"
-                                ]
-                            }
-                        },
-                        {
-                            "name": "settlementAmount",
-                            "type": "float"
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "name": "lines",
-            "type": {
-                "type": "array",
-                "items": {
-                    "namespace": "avro.ticketoc.Receipt",
-                    "name": "Line",
-                    "type": "record",
-                    "fields": [
-                        {
-                            "name": "lineNumber",
-                            "type": "int"
-                        },
-                        {
-                            "name": "productCode",
-                            "type": "string"
-                        },
-                        {
-                            "name": "productDescription",
-                            "type": "string"
-                        },
-                        {
-                            "name": "productCategoryCode",
-                            "type": "string"
-                        },
-                        {
-                            "name": "productCategoryName",
-                            "type": "string"
-                        },
-                        {
-                            "name": "quantity",
-                            "type": "int"
-                        },
-                        {
-                            "name": "unitOfMeasure",
-                            "type": "string"
-                        },
-                        {
-                            "name": "unitPrice",
-                            "type": "float"
-                        },
-                        {
-                            "name": "taxPercentage",
-                            "type": "int"
-                        },
-                        {
-                            "name": "creditAmount",
-                            "type": "float"
-                        },
-                        {
-                            "name": "settlementAmount",
-                            "type": "float"
-                        }
-                    ]
-                }
-            }
-        }
-    ]
-}
-'''
-
-schema = avro.schema.Parse(test_schema)
+schema = avro.schema.Parse(Path("./productSchema.json").read_text())
 writer = avro.io.DatumWriter(schema)
 
 
@@ -177,6 +32,8 @@ categories = supermarketDB["categories"]
 taxes = {}
 for category in categories.find({}) :
 	taxes[category["name"]] = category["tax"]
+
+
 
 def getRandomProducts(nb):
 	products = supermarketDB.products.aggregate([{ "$sample": { "size": nb } }])
@@ -392,9 +249,10 @@ while True:
 					bytes_writer = io.BytesIO()
 					encoder = avro.io.BinaryEncoder(bytes_writer)
 					writer.write(dict(cashRec), encoder)
+					print(bytes_writer.getvalue())
 					r = requests.post('http://ticketoc_entrypoint_1:80/v1/tickets',data = bytes_writer.getvalue(),
                     headers={'Content-Type': 'application/octet-stream'})
-					print(r)
+					print(r.content)
 				else :
 					r=requests.post('http://ticketoc_entrypoint_1:80/v1/tickets',json=cashRec)
 					print(r)
