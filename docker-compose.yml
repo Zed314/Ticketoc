@@ -5,6 +5,8 @@ services:
     build: dashboard/
     ports:
       - 8080:80
+    depends_on:
+      - cash-clasp
   entrypoint:
     image: admo120104/ticketoc:entrypoint
     build: entrypoint/
@@ -30,6 +32,7 @@ services:
       - 40510:40510
     depends_on:
       - kafka
+      - spark
   zookeeper:
     image: zookeeper:latest
     ports:
@@ -58,6 +61,8 @@ services:
     ports:
       - 8088:8088
       - 8042:8042
+    depends_on:
+      - kafka
 networks:
   generator-net:
     driver: bridge

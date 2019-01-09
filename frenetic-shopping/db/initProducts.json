@@ -96,7 +96,7 @@
 	},
 	{
 		"category": "seafruits",
-		"name": "oisters",
+		"name": "Oisters",
 		"unit": "dozen",
 		"price": 15
 	},
@@ -134,13 +134,14 @@
 		"category": "plants",
 		"name": "Roses",
 		"unit": "each",
-		"price": 2
+        "price": 2,
+        "holidays":["valentinesday","motherday"]
 	},
 	{
 		"category": "plants",
 		"name": "Lemon tree",
 		"unit": "each",
-		"price": 25
+        "price": 25
 	},
 	{
 		"category": "plants",
@@ -170,7 +171,8 @@
 		"category": "greetingscard",
 		"name": "Merry Christmas card",
 		"unit": "each",
-		"price": 2
+        "price": 2,
+        "holidays":["christmas"]
 	},
 	{
 		"category": "health",
@@ -201,5 +203,11 @@
 		"name": "Condoms (XXXL) (aka Trash bags)",
 		"unit": "each",
 		"price": 5
+	},
+	{
+		"category": "health",
+		"name": "Lubriant (1L)",
+		"unit": "each",
+		"price": 10
 	}
 ]

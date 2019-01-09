@@ -1,0 +1,139 @@
+{
+    "namespace": "avro.ticketoc",
+    "type": "record",
+    "name": "Receipt",
+    "fields": [
+        {
+            "name": "cashReceiptID",
+            "type": "string"
+        },
+		{
+			"name": "storeID",
+			"type": "string"
+		},
+        {
+            "name": "terminalID",
+            "type": "string"
+        },
+        {
+            "name": "agentID",
+            "type": "string"
+        },
+		{
+            "name": "customerID",
+            "type": "string"
+        },
+        {
+            "name": "date",
+            "type": "string"
+        },
+        {
+            "name": "documentTotal",
+			"type": {
+				"type": "record",
+				"name":"documentTotalBis",
+   			"fields": [
+      			{
+        		"name": "netTotal",
+        		"type": "float"
+      			},
+      			{
+        		"name": "taxPayable",
+        		"type": "float"
+      			},
+      			{
+        		"name": "grossTotal",
+        		"type": "float"
+      			}
+    		]
+			}
+
+
+        },
+        {
+            "name": "settlements",
+            "type": {
+                "type": "array",
+                "items": {
+                    "namespace": "avro.ticketoc",
+                    "name": "Line",
+                    "type": "record",
+                    "fields": [
+                        {
+                            "name": "paymentMechanism",
+                            "type": {
+                                "type": "enum",
+                                "name": "auie",
+                                "symbols": [
+                                    "Especes",
+                                    "CB"
+                                ]
+                            }
+                        },
+                        {
+                            "name": "settlementAmount",
+                            "type": "float"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "lines",
+            "type": {
+                "type": "array",
+                "items": {
+                    "namespace": "avro.ticketoc.Receipt",
+                    "name": "Line",
+                    "type": "record",
+                    "fields": [
+                        {
+                            "name": "lineNumber",
+                            "type": "int"
+                        },
+                        {
+                            "name": "productCode",
+                            "type": "string"
+                        },
+                        {
+                            "name": "productDescription",
+                            "type": "string"
+                        },
+                        {
+                            "name": "productCategoryCode",
+                            "type": "string"
+                        },
+                        {
+                            "name": "productCategoryName",
+                            "type": "string"
+                        },
+                        {
+                            "name": "quantity",
+                            "type": "int"
+                        },
+                        {
+                            "name": "unitOfMeasure",
+                            "type": "string"
+                        },
+                        {
+                            "name": "unitPrice",
+                            "type": "float"
+                        },
+                        {
+                            "name": "taxPercentage",
+                            "type": "int"
+                        },
+                        {
+                            "name": "creditAmount",
+                            "type": "float"
+                        },
+                        {
+                            "name": "settlementAmount",
+                            "type": "float"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
