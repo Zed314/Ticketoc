@@ -5,6 +5,8 @@ services:
     build: dashboard/
     ports:
       - 8080:80
+    depends_on:
+      - cash-clasp
   entrypoint:
     image: admo120104/ticketoc:entrypoint
     build: entrypoint/
@@ -14,7 +16,7 @@ services:
       ROUTE: /v1/tickets
       KAFKA_CONNECT: kafka:9092
       KAFKA_TOPIC: input_tickets
-      KAFKA_VALUE_SERIALIZER: avro
+      KAFKA_VALUE_SERIALIZER: json
       KAFKA_COMPRESSION: gzip
       FLASK_ENV: development
     networks:
@@ -28,6 +30,9 @@ services:
     build: cash-clasp/
     ports:
       - 40510:40510
+    depends_on:
+      - kafka
+      - spark
   zookeeper:
     image: zookeeper:latest
     ports:
@@ -56,6 +61,8 @@ services:
     ports:
       - 8088:8088
       - 8042:8042
+    depends_on:
+      - kafka
 networks:
   generator-net:
     driver: bridge

@@ -1,205 +1,213 @@
 [
-{
-
-    "category":"fruits",
-    "name" : "Apple",
-    "unit" : "kg",
-    "price" : 1.30
-},
-{
-
-    "category":"fruits",
-    "name" : "Pear",
-    "unit" : "kg",
-    "price" : 1.50
-},
-{
-
-    "category":"fruits",
-    "name" : "Banana",
-    "unit" : "kg",
-    "price" : 1.30
-},
-{
-
-    "category":"fruits",
-    "name" : "Mango",
-    "unit" : "each",
-    "price" : 2.5
-},
-{
-
-    "category":"fruits",
-    "name" : "Grape",
-    "unit" : "kg",
-    "price" : 2.5
-},
-{
-
-    "category":"fruits",
-    "name" : "Kaki",
-    "unit" : "each",
-    "price" : 2.5
-},
-{
-
-    "category":"vegetables",
-    "name" : "Kaki",
-    "unit" : "each",
-    "price" : 2.5
-},
-{
-
-    "category":"vegetables",
-    "name" : "Potatoes",
-    "unit" : "kg",
-    "price" : 1.5
-},
-{
-
-    "category":"vegetables",
-    "name" : "Salad",
-    "unit" : "each",
-    "price" : 1
-},
-{
-
-    "category":"meat",
-    "name" : "Beef",
-    "unit" : "kg",
-    "price" : 10
-},
-{
-    "category":"meat",
-    "name" : "Lamb",
-    "unit" : "kg",
-    "price" : 8
-},
-{
-
-    "category":"meat",
-    "name" : "Chicken",
-    "unit" : "kg",
-    "price" : 6
-},
-{
-    "category":"meat",
-    "name" : "Duck",
-    "unit" : "kg",
-    "price" : 9
-},
-{
-    "category":"fish",
-    "name" : "Clownfish",
-    "unit" : "each",
-    "price" : 15
-},
-{
-    "category":"seafruits",
-    "name" : "oisters",
-    "unit" : "dozen",
-    "price" : 15
-},
-{
-    "category":"luxery",
-    "name" : "Snails",
-    "unit" : "dozen",
-    "price" : 10
-},
-{
-    "category":"luxery",
-    "name" : "Foie gras",
-    "unit" : "each",
-    "price" : 20
-},
-{
-    "category":"clothes",
-    "name" : "Pants",
-    "unit" : "each",
-    "price" : 15
-},
-{
-    "category":"clothes",
-    "name" : "socks",
-    "unit" : "each",
-    "price" : 2
-},
-{
-    "category":"clothes",
-    "name" : "T-Shirts",
-    "unit" : "each",
-    "price" : 10
-},
-{
-    "category":"plants",
-    "name" : "Roses",
-    "unit" : "each",
-    "price" : 2
-},
-{
-    "category":"plants",
-    "name" : "Lemon tree",
-    "unit" : "each",
-    "price" : 25
-},
-{
-    "category":"plants",
-    "name" : "Apple tree",
-    "unit" : "each",
-    "price" : 30
-},
-{
-    "category":"plants",
-    "name" : "Cactus",
-    "unit" : "each",
-    "price" : 5
-},
-{
-    "category":"everydaylife",
-    "name" : "Toilet paper",
-    "unit" : "each",
-    "price" : 5
-},
-{
-    "category":"greetingscard",
-    "name" : "Happy Birthday card",
-    "unit" : "each",
-    "price" : 2
-},
-{
-    "category":"greetingscard",
-    "name" : "Merry Christmas card",
-    "unit" : "each",
-    "price" : 2
-},
-{
-    "category":"health",
-    "name" : "Condoms (S)",
-    "unit" : "each",
-    "price" : 5
-},
-{
-    "category":"health",
-    "name" : "Condoms (M)",
-    "unit" : "each",
-    "price" : 5
-},
-{
-    "category":"health",
-    "name" : "Condoms (XL)",
-    "unit" : "each",
-    "price" : 5
-},
-{
-    "category":"health",
-    "name" : "Condoms (XXL)",
-    "unit" : "each",
-    "price" : 5
-},
-{
-    "category":"health",
-    "name" : "Condoms (XXXL) (aka Trash bags)",
-    "unit" : "each",
-    "price" : 5
-}
+	{
+	
+		"category": "fruits",
+		"name": "Apple",
+		"unit": "kg",
+		"price": 1.30
+	},
+	{
+	
+		"category": "fruits",
+		"name": "Pear",
+		"unit": "kg",
+		"price": 1.50
+	},
+	{
+	
+		"category": "fruits",
+		"name": "Banana",
+		"unit": "kg",
+		"price": 1.30
+	},
+	{
+	
+		"category": "fruits",
+		"name": "Mango",
+		"unit": "each",
+		"price": 2.5
+	},
+	{
+	
+		"category": "fruits",
+		"name": "Grape",
+		"unit": "kg",
+		"price": 2.5
+	},
+	{
+	
+		"category": "fruits",
+		"name": "Kaki",
+		"unit": "each",
+		"price": 2.5
+	},
+	{
+	
+		"category": "vegetables",
+		"name": "Kaki",
+		"unit": "each",
+		"price": 2.5
+	},
+	{
+	
+		"category": "vegetables",
+		"name": "Potatoes",
+		"unit": "kg",
+		"price": 1.5
+	},
+	{
+	
+		"category": "vegetables",
+		"name": "Salad",
+		"unit": "each",
+		"price": 1
+	},
+	{
+	
+		"category": "meat",
+		"name": "Beef",
+		"unit": "kg",
+		"price": 10
+	},
+	{
+		"category": "meat",
+		"name": "Lamb",
+		"unit": "kg",
+		"price": 8
+	},
+	{
+	
+		"category": "meat",
+		"name": "Chicken",
+		"unit": "kg",
+		"price": 6
+	},
+	{
+		"category": "meat",
+		"name": "Duck",
+		"unit": "kg",
+		"price": 9
+	},
+	{
+		"category": "fish",
+		"name": "Clownfish",
+		"unit": "each",
+		"price": 15
+	},
+	{
+		"category": "seafruits",
+		"name": "Oisters",
+		"unit": "dozen",
+		"price": 15
+	},
+	{
+		"category": "luxery",
+		"name": "Snails",
+		"unit": "dozen",
+		"price": 10
+	},
+	{
+		"category": "luxery",
+		"name": "Foie gras",
+		"unit": "each",
+		"price": 20
+	},
+	{
+		"category": "clothes",
+		"name": "Pants",
+		"unit": "each",
+		"price": 15
+	},
+	{
+		"category": "clothes",
+		"name": "socks",
+		"unit": "each",
+		"price": 2
+	},
+	{
+		"category": "clothes",
+		"name": "T-Shirts",
+		"unit": "each",
+		"price": 10
+	},
+	{
+		"category": "plants",
+		"name": "Roses",
+		"unit": "each",
+        "price": 2,
+        "holidays":["valentinesday","motherday"]
+	},
+	{
+		"category": "plants",
+		"name": "Lemon tree",
+		"unit": "each",
+        "price": 25
+	},
+	{
+		"category": "plants",
+		"name": "Apple tree",
+		"unit": "each",
+		"price": 30
+	},
+	{
+		"category": "plants",
+		"name": "Cactus",
+		"unit": "each",
+		"price": 5
+	},
+	{
+		"category": "everydaylife",
+		"name": "Toilet paper",
+		"unit": "each",
+		"price": 5
+	},
+	{
+		"category": "greetingscard",
+		"name": "Happy Birthday card",
+		"unit": "each",
+		"price": 2
+	},
+	{
+		"category": "greetingscard",
+		"name": "Merry Christmas card",
+		"unit": "each",
+        "price": 2,
+        "holidays":["christmas"]
+	},
+	{
+		"category": "health",
+		"name": "Condoms (S)",
+		"unit": "each",
+		"price": 5
+	},
+	{
+		"category": "health",
+		"name": "Condoms (M)",
+		"unit": "each",
+		"price": 5
+	},
+	{
+		"category": "health",
+		"name": "Condoms (XL)",
+		"unit": "each",
+		"price": 5
+	},
+	{
+		"category": "health",
+		"name": "Condoms (XXL)",
+		"unit": "each",
+		"price": 5
+	},
+	{
+		"category": "health",
+		"name": "Condoms (XXXL) (aka Trash bags)",
+		"unit": "each",
+		"price": 5
+	},
+	{
+		"category": "health",
+		"name": "Lubriant (1L)",
+		"unit": "each",
+		"price": 10
+	}
 ]

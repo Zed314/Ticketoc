@@ -1,7 +1,10 @@
 const WebSocketServer = require('ws').Server,
 subscriberMod = require('semaphore')(1),
 readline = require('readline'),
-fake_news = require('./fake_news');
+fake_news = require('./fake_news'),
+kafka = require('kafka-node');
+
+const client = new kafka.KafkaClient({kafkaHost: 'kafka:9092'});
 
 const Subscriber = require('./Subscriber')
 

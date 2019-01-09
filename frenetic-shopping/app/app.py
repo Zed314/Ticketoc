@@ -33,7 +33,13 @@ taxes = {}
 for category in categories.find({}) :
 	taxes[category["name"]] = category["tax"]
 
+print("A")
+for match in products.find({}):
+	print(match)
 
+for match in products.find({ "holidays" : { "$in" : ["motherday"] } }):
+	print(match)
+print("B")
 
 def getRandomProducts(nb):
 	products = supermarketDB.products.aggregate([{ "$sample": { "size": nb } }])
@@ -204,7 +210,7 @@ parser.add_argument("-p","--popular",type=str, default = "",
 					help="name of the popular product, separated by a comma and followed by the probability in percentage")
 
 #Todo : change
-useAvro = True
+useAvro = False
 						
 args = parser.parse_args()
 re.split('[-,]', args.popular)

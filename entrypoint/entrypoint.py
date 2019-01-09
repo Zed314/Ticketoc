@@ -57,7 +57,7 @@ producer = make_producer()
 
 
 def on_send_error(error):
-    logging.error("Failed to send message with error '%s'", error)
+	app.logger.error("Failed to send message with error '%s'", error)
 
 
 @app.errorhandler(Exception)
@@ -73,27 +73,18 @@ def error_handler(error):
 def send():
 
     if kafka_value_serializer_type == SerializerType.JSON:
-        print("JSON serializer",flush= True)
         if request.is_json:
-            print("json",flush= True)
             data = request.get_json()
-            print(data,flush=True)
             if data is not None:
                 headers = [
                     ('content-type', b'application/json; charset=utf-8')]
                 try:
-                    print("try",flush= True)
                     future = producer.send(
                         topic=kafka_topic, value=data, headers=headers)
                     future.add_errback(on_send_error)
-                    print("sucess",flush= True)
-					
                 except KafkaTimeoutError:
-                    print("k te",flush= True)
                     raise
                 return jsonify({'success': True})
-            else :
-                print("Data is none",flush= True)
     elif kafka_value_serializer_type == SerializerType.AVRO:
         headers = [('content-type', b'application/octet-stream')]
         try:
