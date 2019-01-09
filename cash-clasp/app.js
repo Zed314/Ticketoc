@@ -2,6 +2,7 @@ const WebSocketServer = require('ws').Server,
 subscriberMod = require('semaphore')(1),
 readline = require('readline'),
 fake_news = require('./fake_news'),
+UpstreamConsumer = require('./UpstreamConsumer'),
 kafka = require('kafka-node');
 
 const client = new kafka.KafkaClient({kafkaHost: 'kafka:9092'});
@@ -10,7 +11,6 @@ const Subscriber = require('./Subscriber')
 
 const server = new WebSocketServer({port: 40510}),
 subscribers = []
-
 
 server.on('connection', socket => {
 	subscriber = new Subscriber(socket)
@@ -33,6 +33,8 @@ function notifySubscribers(topic, message) {
 		sub.sendTopicMessage(topic, message)
 	}
 }
+
+const upstreamConsumer = new UpstreamConsumer(client, notifySubscribers);
 
 // Debug repl
 const rl = readline.createInterface({

@@ -347,7 +347,7 @@ parser.add_argument("-p","--popular",type=str, default = "",
 					help="name of the popular product, separated by a comma and followed by the probability in percentage")
 
 #Todo : change
-useAvro = True
+useAvro = False
 						
 args = parser.parse_args()
 re.split('[-,]', args.popular)

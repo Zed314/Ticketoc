@@ -13,7 +13,7 @@ import {
 class Receipt extends Component {
   constructor(props) {
     super(props)
-    this.state = { articlePopup : this.props.lines[2], popupOpen: false };
+    this.state = { articlePopup : this.props.lines[0], popupOpen: false };
     this.closeDialogue = this.closeDialogue.bind(this);
   }
 

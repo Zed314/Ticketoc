@@ -15,6 +15,7 @@ class HomePage extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      totalRevenue: 0,
       saleCount: 0,
       connectionError: false,
       reconnecting: false,
@@ -43,6 +44,11 @@ class HomePage extends Component {
     this.socketClient.subscribe("sale-count", msg => {
       this.setState({
         saleCount: msg.message
+      })
+    })
+    this.socketClient.subscribe("gross_totals", msg => {
+      this.setState({
+        totalRevenue: msg.message
       })
     })
     this.socketClient.socket.onerror = () => {
@@ -97,7 +103,7 @@ class HomePage extends Component {
      loading={this.state.loading}
      color="green"
      icon="dollar-sign"
-     count="132$"
+     count={this.state.totalRevenue.toFixed(2) + " €"}
      label="total revenue" />
      </Grid.Col>
      <Grid.Col>

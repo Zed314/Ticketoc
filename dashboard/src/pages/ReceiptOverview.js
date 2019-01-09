@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import SiteWrapper from "../SiteWrapper";
 import ReceiptTimeline from "../components/ReceiptTimeline";
+import LocalSubscriber from "../LocalSubscriber";
 import {
   Page,
 } from "tabler-react";
@@ -8,209 +9,56 @@ import {
 class ReceiptOverview extends Component {
   constructor(props) {
     super(props)
-    this.state = { receipts: [
-      {
-          "cashReceiptID": "1", 
-          "storeID": "1", 
-          "terminalID": "1", 
-          "agentID": "1", 
-          "agentName": "Mindy Boldton",
-          "customerID": "1", 
-          "customerName": "Haug",
-          "customerTitle": "Mr.",
-          "date": "2017-11-18 20:39:32", 
-          "lines": [
-              {
-                  "unitOfMeasure": "measure", 
-                  "settlementAmount": 0.68, 
-                  "creditAmount": 0.62, 
-                  "lineNumber": 1, 
-                  "unitPrice": 0.31,
-                  "productDescription": "Sel Mt Blanche",
-                  "productCode": "00000010", 
-                  "taxPercentage": 10, 
-                  "productCategoryName": "Kertel", 
-                  "productCategoryCode": "3", 
-                  "quantity": 2
-              }, 
-              {
-                  "unitOfMeasure": "measure", 
-                  "settlementAmount": 2.36, 
-                  "creditAmount": 2.02, 
-                  "lineNumber": 2,
-                  "productDescription": "Müesli Milch",
-                  "unitPrice": 1.01, 
-                  "productCode": "00000018", 
-                  "taxPercentage": 17, 
-                  "productCategoryName": "P.Q.R.", 
-                  "productCategoryCode": "5", 
-                  "quantity": 2
-              }, 
-              {
-                  "unitOfMeasure": "measure", 
-                  "settlementAmount": 1.05, 
-                  "creditAmount": 0.95, 
-                  "lineNumber": 3, 
-                  "unitPrice": 0.95, 
-                  "productDescription": "Salty Pretzels",
-                  "productCode": "00000014", 
-                  "taxPercentage": 11, 
- 
-                  "productCategoryName": "Kertel", 
-                  "productCategoryCode": "3", 
-                  "quantity": 1
-              }, 
-              {
-                  "unitOfMeasure": "measure", 
-                  "settlementAmount": 0.76, 
-                  "creditAmount": 0.72, 
-                  "lineNumber": 4, 
-                  "unitPrice": 0.72, 
-                  "productDescription": "Eau minerale",
-                  "productCode": "00000013", 
-                  "taxPercentage": 6, 
-                  "productCategoryName": "Plans", 
-                  "productCategoryCode": "Q", 
-                  "quantity": 1
-              }, 
-              {
-                  "unitOfMeasure": "measure", 
-                  "settlementAmount": 1.11, 
-                  "creditAmount": 1.04, 
-                  "lineNumber": 5, 
-                  "unitPrice": 0.52, 
-                  "productDescription": "E-Voucher 5 UniCred's",
-                  "productCode": "00000020", 
-                  "taxPercentage": 7,  
-                  "productCategoryName": "UniversalMobile", 
-                  "productCategoryCode": "Z", 
-                  "quantity": 2
-              }
-          ], 
-          "documentTotal": {
-              "grossTotal": 5.96, 
-              "taxPayable": 0.61, 
-              "netTotal": 5.35
-          }, 
-          "settlements": [
-              {
-                  "paymentMechanism": "CB", 
-                  "settlementAmount": 5.71
-              }, 
-              {
-                  "paymentMechanism": "Especes", 
-                  "settlementAmount": 0.25
-              }
-          ]
-      },      {
-          "cashReceiptID": "1", 
-          "storeID": "1", 
-          "terminalID": "1", 
-          "agentID": "1", 
-          "customerID": "1", 
-          "date": "2017-11-18 20:39:32", 
-          "lines": [
-              {
-                  "unitOfMeasure": "measure", 
-                  "settlementAmount": 0.68, 
-                  "creditAmount": 0.62, 
-                  "lineNumber": 1, 
-                  "unitPrice": 0.31,
-                  "productDescription": "Sel Mt Blanche",
-                  "productCode": "00000010", 
-                  "taxPercentage": 10, 
- 
-                  "productCategoryName": "Kertel", 
-                  "productCategoryCode": "3", 
-                  "quantity": 2
-              }, 
-              {
-                  "unitOfMeasure": "measure", 
-                  "settlementAmount": 2.36, 
-                  "creditAmount": 2.02, 
-                  "lineNumber": 2,
-                  "productDescription": "Müesli Milch",
-                  "unitPrice": 1.01, 
-                  "productCode": "00000018", 
-                  "taxPercentage": 17, 
- 
-                  "productCategoryName": "P.Q.R.", 
-                  "productCategoryCode": "5", 
-                  "quantity": 2
-              }, 
-              {
-                  "unitOfMeasure": "measure", 
-                  "settlementAmount": 1.05, 
-                  "creditAmount": 0.95, 
-                  "lineNumber": 3, 
-                  "unitPrice": 0.95, 
-                  "productDescription": "Salty Pretzels",
-                  "productCode": "00000014", 
-                  "taxPercentage": 11, 
- 
-                  "productCategoryName": "Kertel", 
-                  "productCategoryCode": "3", 
-                  "quantity": 1
-              }, 
-              {
-                  "unitOfMeasure": "measure", 
-                  "settlementAmount": 0.76, 
-                  "creditAmount": 0.72, 
-                  "lineNumber": 4, 
-                  "unitPrice": 0.72, 
-                  "productDescription": "Eau minerale",
-                  "productCode": "00000013", 
-                  "taxPercentage": 6, 
- 
-                  "productCategoryName": "Plans", 
-                  "productCategoryCode": "Q", 
-                  "quantity": 1
-              }, 
-              {
-                  "unitOfMeasure": "measure", 
-                  "settlementAmount": 1.11, 
-                  "creditAmount": 1.04, 
-                  "lineNumber": 5, 
-                  "unitPrice": 0.52, 
-                  "productDescription": "E-Voucher 5 UniCred's",
-                  "productCode": "00000020", 
-                  "taxPercentage": 7, 
- 
-                  "productCategoryName": "UniversalMobile", 
-                  "productCategoryCode": "Z", 
-                  "quantity": 2
-              }
-          ], 
-          "documentTotal": {
-              "grossTotal": 5.96, 
-              "taxPayable": 0.61, 
-              "netTotal": 5.35
-          }, 
-          "settlements": [
-              {
-                  "paymentMechanism": "americanexpress", 
-                  "settlementAmount": 5.71
-              }, 
-              {
-                  "paymentMechanism": "Especes", 
-                  "settlementAmount": 0.25
-              }
-          ]
-      }
-      ] }
-  }
-
-  addTicket() {
-    setTimeout(()=>{
-      let receipts = this.state.receipts
-      receipts.push(receipts[0])
-      this.setState({receipts})
-      //this.addTicket()
-    },1200)
+    this.state = { receipts: [] }
   }
 
   componentDidMount() {
-    this.addTicket()
+    this.startSockClient()
+  }
+
+  startSockClient() {
+    this.setState({
+      loading: true,
+    })
+    this.socketClient = new LocalSubscriber()
+    this.socketClient.connectAction = () => {
+      this.setState({
+        connectionError: false,
+        restartSeconds: null,
+        reconnecting: false,
+        loading: false,
+      })
+    }
+    this.socketClient.subscribe("special_tickets", msg => {
+      const newArray = this.state.receipts.concat([ JSON.parse(msg.message) ]);
+      newArray.splice(0, newArray.length - 20);
+      this.setState({
+        receipts: newArray
+      });
+    })
+    this.socketClient.socket.onerror = () => {
+      this.setState({
+        connectionError: true,
+        loading: false,
+        reconnecting: false,
+        restartSeconds: 10,
+      })
+      const countdown = () => {
+        if (this.state.restartSeconds <= 0) {
+          this.setState({
+            connectionError: false,
+            reconnecting: true
+          })
+          this.startSockClient()
+        } else {
+          this.setState({
+            restartSeconds: this.state.restartSeconds - 1
+          })
+          setTimeout(countdown, 1000);
+        }
+      }
+      countdown()
+    }
   }
 
   render() {
