@@ -45,6 +45,8 @@ def getRandomProducts(nb):
 	products = supermarketDB.products.aggregate([{ "$sample": { "size": nb } }])
 
 	return list(products)
+def getProductByName(name):
+	return supermarketDB.products.find({ "name"  :name })[0]
 
 def generateLine(ind,productFromDB):
 	print(productFromDB)
@@ -97,9 +99,7 @@ def getListQuantities(nb):
 	
 
 def generateCashReceipt(storeid=1,terminalid=1,agentid=1,customerid=1,order=None,timestamp=time()):
-#	quantitiesProduct = getListQuantities(nbtotalproducts)
-#	nblines = len(quantitiesProduct)
-#	products = getRandomProducts(nblines)
+
 	cashreceipt={
         'cashReceiptID': str(storeid) + str(terminalid) + str(int(timestamp)),
 		'storeID':str(storeid),
@@ -167,7 +167,7 @@ def writeJSON(jsonObject,destination) :
 def estimateTimeRequired(order,cashier):
 	return cashier[order["billingMethod"]]+order["numberOfElements"]/cashier["elementPerSecond"]
 
-def generateOrder(cashier, popularProducts=[]):
+def generateOrder(cashier,popularProducts):
 	order = dict()
 	order["numberOfElements"] = returnValueIfValueOrBelow(int(gauss(munbelement, sigmanbelement)),1)
 	order["billingMethod"] = PaymentMethod.CASH
@@ -180,8 +180,38 @@ def generateOrder(cashier, popularProducts=[]):
 			products.append((product,quantitiesProduct[i]))
 		order["products"] = products
 	else:
-		pass
-	#TOdo : find appropriate datastructure to add popular products
+	
+		nbProducts = 0
+		productsToAddName = []
+		for elt in sorted(popularProducts, key=lambda x: x[1],reverse=True):
+			if elt[1] > uniform(0,100):
+				# add the product
+				productsToAddName.append(elt[0])
+
+			if len(productsToAddName) >= order["numberOfElements"]:
+				break
+		print(productsToAddName)
+
+		
+		quantitiesProduct = getListQuantities(order["numberOfElements"]-len(productsToAddName))
+		nblines = len(quantitiesProduct)
+		products = []
+		for i,product in enumerate(getRandomProducts(nblines)):
+			products.append([product,quantitiesProduct[i]])
+		
+		# Add the artificially added products
+		for name in productsToAddName:
+			found = False
+			for productInOrder in products:
+				if productInOrder[0]["name"]==name:
+					productInOrder[1]+=1
+					found = True
+					break
+			if not found :
+				products.append([getProductByName(name),1])
+
+		order["products"] = products
+
 	return order
 
 def returnValueIfValueOrBelow(nb,value):
@@ -189,9 +219,6 @@ def returnValueIfValueOrBelow(nb,value):
 		return value
 	return nb
 
-#def toAvro(input):
-	#toReturn = {}
-#	toReturn["cashReceiptID"]=input
 
 class PaymentMethod(Enum):     
     CASH = 1     
@@ -199,7 +226,7 @@ class PaymentMethod(Enum):
     BOTH = 3     
 
 parser = argparse.ArgumentParser(description='Generate some tickets.')
-
+parser.add_argument("-a", "--avro", help="use avro serialization (default : json)")
 parser.add_argument("-t", "--tpm", type=float, default =60,
                     help="ticket per minute on average")
 parser.add_argument("-c", "--checkoutnumber", type=int, default =100,
@@ -208,12 +235,17 @@ parser.add_argument("-s","--storeID",type=int, default = "0",
 					help="id of the store")
 parser.add_argument("-p","--popular",type=str, default = "",
 					help="name of the popular product, separated by a comma and followed by the probability in percentage")
+parser.add_argument('--holiday', choices=['motherday','christmas','newyearseve',"valentinesday","blackfriday"], help='Special testing value')
+
+	
+args = parser.parse_args()
+
+useAvro = args.avro
+popularProducts = re.split('[-,]', args.popular)
 
 #Todo : change
-useAvro = False
-						
-args = parser.parse_args()
-re.split('[-,]', args.popular)
+popularProducts = [("Roses",100),("Nutella",20)]
+					
 
 ticketsPerMinute = args.tpm
 numberOfCheckout = args.checkoutnumber
@@ -227,6 +259,8 @@ munbelement = 12.0
 sigmanbelement = 7.0
 
 cashiers = [{} for i in range(numberOfAgent)] 
+
+
 for i,cashier in enumerate(cashiers):
 	cashier["id"] = i
 	cashier["elementPerSecond"] = returnValueIfValueOrBelow(gauss(muspeedcashier, sigmaspeedcashier),0.5)
@@ -234,7 +268,7 @@ for i,cashier in enumerate(cashiers):
 	cashier[PaymentMethod.CASH] = returnValueIfValueOrBelow(gauss(muspeedcash, sigmaspeedcash),2)
 	cashier[PaymentMethod.BOTH] = cashier[PaymentMethod.CARD] + cashier[PaymentMethod.CASH] + 2
 
-currentOrders = [generateOrder(cashiers[i]) for i in range(numberOfCheckout)] 
+currentOrders = [generateOrder(cashiers[i], popularProducts) for i in range(numberOfCheckout)] 
 print("BEFORE")
 print(getRandomProducts(2))
 
@@ -264,5 +298,5 @@ while True:
 					print(r)
 			finally:
 				pass
-			currentOrders[i] = generateOrder(cashiers[i])
+			currentOrders[i] = generateOrder(cashiers[i], popularProducts)
 	sleep(0.01)
