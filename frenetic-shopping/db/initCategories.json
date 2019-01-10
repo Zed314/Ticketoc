@@ -46,5 +46,9 @@
     {
         "name": "bakery",
         "tax": 10
+    },
+    {
+        "name": "junk",
+        "tax": 30
     }
 ]

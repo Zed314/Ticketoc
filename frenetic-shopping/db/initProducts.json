@@ -1,5 +1,35 @@
 [
-	{
+    {
+        "category": "junk",
+        "name": "Nutella",
+        "unit": "kg",
+        "price": 4.0
+    },
+    {
+        "category": "meat",
+        "name": "Chicken Eggs",
+        "unit": "dozen",
+        "price": 5.0
+    },
+    {
+        "category": "meat",
+        "name": "Ducks Eggs",
+        "unit": "half-dozen",
+        "price": 5.0
+    },
+    {
+        "category": "meat",
+        "name": "Kangoroo",
+        "unit": "kg",
+        "price": 30
+    },
+    {
+        "category": "meat",
+        "name": "Dog",
+        "unit": "kg",
+        "price": 15
+    },
+    {
 	
 		"category": "fruits",
 		"name": "Apple",
@@ -65,6 +95,13 @@
 	{
 	
 		"category": "vegetables",
+		"name": "Topinambour",
+		"unit": "kg",
+		"price": 15.0
+	},
+	{
+	
+		"category": "vegetables",
 		"name": "Potatoes",
 		"unit": "kg",
 		"price": 1.5
@@ -75,6 +112,13 @@
 		"name": "Salad",
 		"unit": "each",
 		"price": 1
+    },
+    {
+	
+		"category": "vegetables",
+		"name": "Carrots",
+		"unit": "kg",
+		"price": 3.0
 	},
 	{
 	
