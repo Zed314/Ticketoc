@@ -42,5 +42,9 @@
     {
         "name": "health",
         "tax": 20
+    },
+    {
+        "name": "bakery",
+        "tax": 10
     }
 ]

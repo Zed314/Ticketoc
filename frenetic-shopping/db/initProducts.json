@@ -8,6 +8,27 @@
 	},
 	{
 	
+		"category": "bakery",
+		"name": "Baguette",
+		"unit": "each",
+		"price": 0.95
+	},
+	{
+	
+		"category": "bakery",
+		"name": "Toast",
+		"unit": "each",
+		"price": 1.30
+	},
+	{
+	
+		"category": "bakery",
+		"name": "Pain chocolat",
+		"unit": "each",
+		"price": 1.19
+	},
+	{
+	
 		"category": "fruits",
 		"name": "Pear",
 		"unit": "kg",
@@ -44,13 +65,6 @@
 	{
 	
 		"category": "vegetables",
-		"name": "Kaki",
-		"unit": "each",
-		"price": 2.5
-	},
-	{
-	
-		"category": "vegetables",
 		"name": "Potatoes",
 		"unit": "kg",
 		"price": 1.5
@@ -68,6 +82,18 @@
 		"name": "Beef",
 		"unit": "kg",
 		"price": 10
+	},
+	{
+		"category": "meat",
+		"name": "Sliced ham",
+		"unit": "each",
+		"price": 2.95
+	},
+	{
+		"category": "meat",
+		"name": "Sliced ham (organic)",
+		"unit": "each",
+		"price": 4.39
 	},
 	{
 		"category": "meat",
@@ -96,7 +122,7 @@
 	},
 	{
 		"category": "seafruits",
-		"name": "Oisters",
+		"name": "Oysters",
 		"unit": "dozen",
 		"price": 15
 	},
@@ -120,7 +146,7 @@
 	},
 	{
 		"category": "clothes",
-		"name": "socks",
+		"name": "Socks",
 		"unit": "each",
 		"price": 2
 	},
@@ -136,6 +162,13 @@
 		"unit": "each",
         "price": 2,
         "holidays":["valentinesday","motherday"]
+	},
+	{
+		"category": "bakery",
+		"name": "Galette des rois",
+		"unit": "each",
+        "price": 6.95,
+        "holidays":["epiphany"]
 	},
 	{
 		"category": "plants",
@@ -164,6 +197,12 @@
 	{
 		"category": "greetingscard",
 		"name": "Happy Birthday card",
+		"unit": "each",
+		"price": 2
+	},
+	{
+		"category": "greetingscard",
+		"name": "Marriage card",
 		"unit": "each",
 		"price": 2
 	},
