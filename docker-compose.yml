@@ -10,8 +10,6 @@ services:
   entrypoint:
     image: admo120104/ticketoc:entrypoint
     build: entrypoint/
-    ports:
-      - 4000:80
     environment:
       ROUTE: /v1/tickets
       KAFKA_CONNECT: kafka:9092
@@ -22,25 +20,23 @@ services:
     networks:
       - default
       - generator-net
-    command: ["./wait-for-it.sh", "kafka:9092", "--", "python", "entrypoint.py"]
+    command: ["./wait-for-it.sh", "kafka:9092", "--", "./wait-for-it.sh", "schema-registry:80", "--", "python", "entrypoint.py"]
     depends_on:
       - kafka
+      - schema-registry
+  schema-registry:
+    image: admo120104/ticketoc:schema-registry
+    build: schema-registry/
   cash-clasp:
     image: admo120104/ticketoc:cash-clasp
     build: cash-clasp/
-    ports:
-      - 40510:40510
     depends_on:
       - kafka
       - spark
   zookeeper:
     image: zookeeper:latest
-    ports:
-      - 2181:2181
   kafka:
     image: wurstmeister/kafka:latest
-    ports:
-      - 9094:9094
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       HOSTNAME_COMMAND: "docker info | grep ^Name: | cut -d' ' -f 2"
@@ -54,15 +50,11 @@ services:
       - zookeeper
   mongo:
     image: mongo:latest
-    ports:
-      - 27017:27017
   spark:
     image: sequenceiq/spark:latest
-    ports:
-      - 8088:8088
-      - 8042:8042
     depends_on:
       - kafka
+      - mongo
 networks:
   generator-net:
     driver: bridge

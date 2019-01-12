@@ -2,30 +2,27 @@ import argparse
 import datetime
 import io
 import json
-import math
-import pprint
 import re
-import sys
+import requests
+import avro.io
+import avro.schema
 from collections import OrderedDict
 from enum import Enum
-from pathlib import Path
-from random import choice, gauss, randint, random, uniform
+from random import gauss, randint, uniform
 from time import sleep, time
-
-import requests
-
-import avro.schema
-import pymongo
-from avro.io import DatumWriter
 from pymongo import MongoClient
 
 
-schema = avro.schema.Parse(Path("./productSchema.json").read_text())
+def getProductSchema():
+	return requests.get('http://schema-registry/v1/schemas/product').text
+
+
+schema = avro.schema.Parse(getProductSchema())
 writer = avro.io.DatumWriter(schema)
 
 
 client = MongoClient('mongodb://mongodb:27017/')
-supermarketDB = client["supermarketDB"]
+supermarketDB = client["supermarket"]
 products = supermarketDB["products"]
 categories = supermarketDB["categories"]
 
@@ -290,11 +287,11 @@ while True:
 					encoder = avro.io.BinaryEncoder(bytes_writer)
 					writer.write(dict(cashRec), encoder)
 					print(bytes_writer.getvalue())
-					r = requests.post('http://entrypoint:80/v1/tickets',data = bytes_writer.getvalue(),
-                    headers={'Content-Type': 'application/octet-stream'})
+					r = requests.post('http://entrypoint/v1/tickets',data = bytes_writer.getvalue(),
+                    headers={'Content-Type': 'application/avro'})
 					print(r.content)
 				else :
-					r=requests.post('http://entrypoint:80/v1/tickets',json=cashRec)
+					r=requests.post('http://entrypoint/v1/tickets',json=cashRec)
 					print(r)
 			finally:
 				pass

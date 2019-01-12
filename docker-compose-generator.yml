@@ -1,11 +1,11 @@
 version: '3.5'
 services:
-  frenetic-shopping:
-    image: admo120104/ticketoc:frenetic-shopping-app
-    build: frenetic-shopping/app
+  frenetic-shopping-generator:
+    image: admo120104/ticketoc:frenetic-shopping-generator
+    build: frenetic-shopping/generator
+    command: ["./wait-for-it.sh", "entrypoint:80", "--", "./wait-for-it.sh", "schema-registry:80", "--", "python", "generator.py"]
     depends_on:
-      - mongodb
-      - mongo-seed
+      - frenetic-shopping-db
     networks:
       - default
       - ticketoc_generator-net
@@ -16,10 +16,8 @@ services:
       MONGO_LOG_DIR: /dev/null
     volumes:
       - ./frenetic-shopping/db:/usr/data/db
-    ports:
-      - 27018:27017
     command: mongod --smallfiles --logpath=/dev/null
-  mongo-seed:
+  frenetic-shopping-db:
     image: admo120104/ticketoc:frenetic-shopping-db
     build: frenetic-shopping/db
     depends_on:

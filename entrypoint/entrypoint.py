@@ -1,15 +1,7 @@
-import io
 import json
-import logging
 import os
-import time
 from enum import Enum
-from pathlib import Path
-
 from flask import Flask, abort, jsonify, request
-
-import avro.schema
-from avro.io import DatumReader
 from kafka import KafkaProducer
 from kafka.errors import KafkaTimeoutError
 
@@ -22,8 +14,7 @@ class SerializerType(Enum):
 route = os.environ['ROUTE']
 kafka_connect = os.environ['KAFKA_CONNECT']
 kafka_topic = os.environ['KAFKA_TOPIC']
-kafka_value_serializer_type = SerializerType(
-    os.environ['KAFKA_VALUE_SERIALIZER'])
+kafka_value_serializer_type = SerializerType(os.environ['KAFKA_VALUE_SERIALIZER'])
 kafka_compression_type = os.getenv('KAFKA_COMPRESSION')
 
 
@@ -57,7 +48,7 @@ producer = make_producer()
 
 
 def on_send_error(error):
-	app.logger.error("Failed to send message with error '%s'", error)
+    app.logger.error("Failed to send message with error '%s'", error)
 
 
 @app.errorhandler(Exception)
@@ -70,26 +61,20 @@ def error_handler(error):
 
 
 @app.route(route, methods=['POST'])
-def send():
+def post_message():
 
+    data = None
+    headers = None
     if kafka_value_serializer_type == SerializerType.JSON:
-        if request.is_json:
-            data = request.get_json()
-            if data is not None:
-                headers = [
-                    ('content-type', b'application/json; charset=utf-8')]
-                try:
-                    future = producer.send(
-                        topic=kafka_topic, value=data, headers=headers)
-                    future.add_errback(on_send_error)
-                except KafkaTimeoutError:
-                    raise
-                return jsonify({'success': True})
+        data = request.get_json()
+        headers = [('content-type', b'application/json; charset=utf-8')]
     elif kafka_value_serializer_type == SerializerType.AVRO:
-        headers = [('content-type', b'application/octet-stream')]
+        data = request.get_data()
+        headers = [('content-type', b'application/avro')]
+
+    if data is not None:
         try:
-            future = producer.send(
-                topic=kafka_topic, value=request.get_data(), headers=headers)
+            future = producer.send(topic=kafka_topic, value=data, headers=headers)
             future.add_errback(on_send_error)
         except KafkaTimeoutError:
             raise
