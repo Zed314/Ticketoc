@@ -5,6 +5,7 @@ services:
     build: frenetic-shopping/app
     depends_on:
       - mongodb
+      - mongo-seed
     networks:
       - default
       - ticketoc_generator-net
@@ -18,7 +19,7 @@ services:
     ports:
       - 27018:27017
     command: mongod --smallfiles --logpath=/dev/null
-  mongo_seed:
+  mongo-seed:
     image: admo120104/ticketoc:frenetic-shopping-db
     build: frenetic-shopping/db
     depends_on:
