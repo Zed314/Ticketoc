@@ -290,11 +290,11 @@ while True:
 					encoder = avro.io.BinaryEncoder(bytes_writer)
 					writer.write(dict(cashRec), encoder)
 					print(bytes_writer.getvalue())
-					r = requests.post('http://ticketoc_entrypoint_1:80/v1/tickets',data = bytes_writer.getvalue(),
+					r = requests.post('http://entrypoint:80/v1/tickets',data = bytes_writer.getvalue(),
                     headers={'Content-Type': 'application/octet-stream'})
 					print(r.content)
 				else :
-					r=requests.post('http://ticketoc_entrypoint_1:80/v1/tickets',json=cashRec)
+					r=requests.post('http://entrypoint:80/v1/tickets',json=cashRec)
 					print(r)
 			finally:
 				pass
