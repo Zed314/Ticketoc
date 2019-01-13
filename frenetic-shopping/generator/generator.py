@@ -4,11 +4,12 @@ import io
 import json
 import re
 import requests
+
 import avro.io
 import avro.schema
 from collections import OrderedDict
 from enum import Enum
-from random import gauss, randint, uniform
+from random import gauss, randint, uniform, choice
 from time import sleep, time
 from pymongo import MongoClient
 
@@ -30,13 +31,13 @@ taxes = {}
 for category in categories.find({}) :
 	taxes[category["name"]] = category["tax"]
 
-print("A")
+
 for match in products.find({}):
 	print(match)
 
 for match in products.find({ "holidays" : { "$in" : ["motherday"] } }):
 	print(match)
-print("B")
+
 
 def getRandomProducts(nb):
 	products = supermarketDB.products.aggregate([{ "$sample": { "size": nb } }])
@@ -46,7 +47,7 @@ def getProductByName(name):
 	return supermarketDB.products.find({ "name"  :name })[0]
 
 def generateLine(ind,productFromDB):
-	print(productFromDB)
+	
 	productCode = str(productFromDB[0]["_id"])
 	product = productFromDB[0]["_id"]
 	productCategoryName = productFromDB[0]["category"]
@@ -164,18 +165,35 @@ def writeJSON(jsonObject,destination) :
 def estimateTimeRequired(order,cashier):
 	return cashier[order["billingMethod"]]+order["numberOfElements"]/cashier["elementPerSecond"]
 
-def generateOrder(cashier,popularProducts):
+def generateOrder(cashier,popularProducts,trendingProducts):
 	order = dict()
 	order["numberOfElements"] = returnValueIfValueOrBelow(int(gauss(munbelement, sigmanbelement)),1)
 	order["billingMethod"] = PaymentMethod.CASH
 	order["finishTime"] = estimateTimeRequired(order,cashier) + time()
+	doesThisOrderFollowTheTrend = uniform(0,100)<30
+	order["followTheTrend"] = doesThisOrderFollowTheTrend
 	if not popularProducts :
-		quantitiesProduct = getListQuantities(order["numberOfElements"])
-		nblines = len(quantitiesProduct)
-		products = []
-		for i,product in enumerate(getRandomProducts(nblines)):
-			products.append((product,quantitiesProduct[i]))
-		order["products"] = products
+		if not doesThisOrderFollowTheTrend:
+			quantitiesProduct = getListQuantities(order["numberOfElements"])
+			nblines = len(quantitiesProduct)
+			products = []
+			for i,product in enumerate(getRandomProducts(nblines)):
+				products.append((product,quantitiesProduct[i]))
+			order["products"] = products
+		else :
+			products = []
+			productDict = {}
+			productDictNameToProduct = {}
+			for i in range(order["numberOfElements"]):
+				choiceProduct = choice(trendingProducts)
+				if choiceProduct["name"] in productDict:
+					productDict[choiceProduct["name"]]+=1
+				else:
+					productDict[choiceProduct["name"]]=1
+					productDictNameToProduct[choiceProduct["name"]]=choiceProduct
+			for productName,nbOcc in productDict.items():
+				products.append([productDictNameToProduct[productName],nbOcc])
+			order["products"] = products
 	else:
 	
 		nbProducts = 0
@@ -187,14 +205,28 @@ def generateOrder(cashier,popularProducts):
 
 			if len(productsToAddName) >= order["numberOfElements"]:
 				break
-		print(productsToAddName)
-
 		
-		quantitiesProduct = getListQuantities(order["numberOfElements"]-len(productsToAddName))
-		nblines = len(quantitiesProduct)
 		products = []
-		for i,product in enumerate(getRandomProducts(nblines)):
-			products.append([product,quantitiesProduct[i]])
+		if not doesThisOrderFollowTheTrend:
+			quantitiesProduct = getListQuantities(order["numberOfElements"]-len(productsToAddName))
+			nblines = len(quantitiesProduct)
+			
+			for i,product in enumerate(getRandomProducts(nblines)):
+				products.append([product,quantitiesProduct[i]])
+			
+		else:
+			
+			productDict = {}
+			productDictNameToProduct = {}
+			for i in range(order["numberOfElements"]-len(productsToAddName)):
+				choiceProduct = choice(trendingProducts)
+				if choiceProduct["name"] in productDict:
+					productDict[choiceProduct["name"]]+=1
+				else:
+					productDict[choiceProduct["name"]]=1
+					productDictNameToProduct[choiceProduct["name"]]=choiceProduct
+			for productName,nbOcc in productDict.items():
+				products.append([productDictNameToProduct[productName],nbOcc])
 		
 		# Add the artificially added products
 		for name in productsToAddName:
@@ -206,9 +238,9 @@ def generateOrder(cashier,popularProducts):
 					break
 			if not found :
 				products.append([getProductByName(name),1])
-
 		order["products"] = products
-
+	print("Order:")
+	print(order)
 	return order
 
 def returnValueIfValueOrBelow(nb,value):
@@ -226,22 +258,35 @@ parser = argparse.ArgumentParser(description='Generate some tickets.')
 parser.add_argument("-a", "--avro", help="use avro serialization (default : json)")
 parser.add_argument("-t", "--tpm", type=float, default =60,
                     help="ticket per minute on average")
-parser.add_argument("-c", "--checkoutnumber", type=int, default =100,
+parser.add_argument("-c", "--checkoutnumber", type=int, default =10,
                     help="number of different checkout in one store")
 parser.add_argument("-s","--storeID",type=int, default = "0",
 					help="id of the store")
 parser.add_argument("-p","--popular",type=str, default = "",
 					help="name of the popular product, separated by a comma and followed by the probability in percentage")
-parser.add_argument('--holiday', choices=['motherday','christmas','newyearseve',"valentinesday","blackfriday"], help='Special testing value')
+parser.add_argument('--holiday', choices=['motherday','christmas','newyearseve',"valentinesday","blackfriday","easter"],default="blackfriday", help='Choose the holiday that will influence the clients')
 
 	
 args = parser.parse_args()
 
 useAvro = args.avro
-popularProducts = re.split('[-,]', args.popular)
+popularProductsToDecode = re.split('[-,]', args.popular)
+popularProducts = []
+
+if len(popularProductsToDecode)>=2:
+	for i,elt in enumerate(popularProductsToDecode):
+		if i % 2 == 0:
+			popularProducts.append([elt])
+		else :
+			popularProducts[len(popularProducts)-1].append(int(elt))
 
 #Todo : change
-popularProducts = [("Roses",100),("Nutella",20)]
+popularProducts = [("Roses",0),("Nutella",0)]
+trendingProducts = []
+if args.holiday:
+	for match in products.find({ "holidays" : { "$in" : [args.holiday] } }):
+		trendingProducts.append(match)
+
 					
 
 ticketsPerMinute = args.tpm
@@ -252,7 +297,7 @@ muspeedcashier = 1.0
 sigmaspeedcashier = 0.3
 muspeedcash = 7.0
 sigmaspeedcash = 4.0
-munbelement = 12.0
+munbelement = 20.0
 sigmanbelement = 7.0
 
 cashiers = [{} for i in range(numberOfAgent)] 
@@ -265,9 +310,8 @@ for i,cashier in enumerate(cashiers):
 	cashier[PaymentMethod.CASH] = returnValueIfValueOrBelow(gauss(muspeedcash, sigmaspeedcash),2)
 	cashier[PaymentMethod.BOTH] = cashier[PaymentMethod.CARD] + cashier[PaymentMethod.CASH] + 2
 
-currentOrders = [generateOrder(cashiers[i], popularProducts) for i in range(numberOfCheckout)] 
-print("BEFORE")
-print(getRandomProducts(2))
+currentOrders = [generateOrder(cashiers[i], popularProducts,trendingProducts) for i in range(numberOfCheckout)] 
+
 
 
 begin = True
@@ -277,23 +321,21 @@ while True:
 	for i,order in enumerate(currentOrders):
 		if order["finishTime"]<= time() or begin:
 			begin = False
-			print(cashiers[i])
-			print(order["finishTime"])
 			cashRec = generateCashReceipt(storeid=idOfStore,terminalid=i,agentid=i,customerid=200,order=order,timestamp=time())
-			print(cashRec)
+			
 			try:
 				if useAvro:
 					bytes_writer = io.BytesIO()
 					encoder = avro.io.BinaryEncoder(bytes_writer)
 					writer.write(dict(cashRec), encoder)
-					print(bytes_writer.getvalue())
+					
 					r = requests.post('http://entrypoint/v1/tickets',data = bytes_writer.getvalue(),
                     headers={'Content-Type': 'application/avro'})
 					print(r.content)
 				else :
 					r=requests.post('http://entrypoint/v1/tickets',json=cashRec)
-					print(r)
+					print(r.content)
 			finally:
 				pass
-			currentOrders[i] = generateOrder(cashiers[i], popularProducts)
+			currentOrders[i] = generateOrder(cashiers[i], popularProducts,trendingProducts)
 	sleep(0.01)

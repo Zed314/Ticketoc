@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.6'
 services:
   frenetic-shopping-generator:
     image: admo120104/ticketoc:frenetic-shopping-generator

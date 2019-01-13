@@ -39,6 +39,7 @@ def make_producer():
         bootstrap_servers=kafka_connect,
         value_serializer=kafka_value_serializer,
         compression_type=kafka_compression_type
+        
         # retries, linger_ms, acks...
     )  # a producer is threadsafe, but not a consumer
 

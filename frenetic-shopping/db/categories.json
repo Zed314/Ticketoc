@@ -50,5 +50,13 @@
     {
         "name": "junk",
         "tax": 30
+    },
+    {
+        "name": "consumerelectronics",
+        "tax":20
+    },
+    {
+        "name": "movie",
+        "tax":10
     }
 ]

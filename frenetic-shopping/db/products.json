@@ -1,10 +1,269 @@
 [
+	{
+		"category":"movie",
+		"name":"Matrix",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"Star Wars IV",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"Star Wars V",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"Star Wars VI",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"Star Wars VII",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"Star Wars VIII",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"Star Wars I",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"Star Wars II",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"Star Wars III",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"The Lord of the Rings: Thee Fellowship of the Ring",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"The Lord of the Rings:  The Two Towers",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"movie",
+		"name":"The Lord of the Rings: The Return of the King",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name":"4K TV 200 inches",
+		"unit":"each",
+		"holidays":["blackfriday"],
+		"price":2099.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name":"3D TV 100 inches",
+		"unit":"each",
+		"holidays":["blackfriday"],
+		"price":1499.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name":"CD player",
+		"unit":"each",
+		"price":20.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name":"DVD player",
+		"unit":"each",
+		"price":50.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Blu-ray player",
+		"unit":"each",
+		"price":100.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Raspberry Pi",
+		"unit":"each",
+		"price":40.0,
+		"frequentlyboughtwith":["Micro USB charger","MicroSD Card (16Gb)"]
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Micro USB charger",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "MicroSD Card (16Gb)",
+		"unit":"each",
+		"price":10.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "MicroSD Card (32Gb)",
+		"unit":"each",
+		"price":15.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "MicroSD Card (64Gb)",
+		"unit":"each",
+		"price":25.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "MicroSD Card (64Gb)",
+		"unit":"each",
+		"price":25.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Canon Camera",
+		"unit":"each",
+		"holidays":["blackfriday"],
+		"frequentlyboughtwith":["MicroSD Card (32Gb)"],
+		"price":499.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Sony Camera",
+		"unit":"each",
+		"holidays":["blackfriday"],
+		"frequentlyboughtwith":["MicroSD Card (32Gb)"],
+		"price":499.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Webcam",
+		"unit":"each",
+		"price":20.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "iPhone X",
+		"unit":"each",
+		"price":1230.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Galaxy S9",
+		"unit":"each",
+		"price":20.0,
+		"frequentlyboughtwith":["MicroSD Card (64Gb)"]
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Inkjet printer",
+		"unit":"each",
+		"price":50.99,
+		"frequentlyboughtwith":["Inkjet Cartdrige"]
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Inkjet Cartdrige",
+		"unit":"each",
+		"price":50.00
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Laser printer",
+		"unit":"each",
+		"price":300.99,
+		"frequentlyboughtwith":["Laser Cartdrige"]
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Laser Cartdrige",
+		"unit":"each",
+		"price":150.00
+	},
     {
         "category": "junk",
         "name": "Nutella",
         "unit": "kg",
-        "price": 4.0
-    },
+		"price": 4.0,
+		"frequentlyboughtwith":["Toast"]
+	},
+	{
+		"category": "junk",
+		"name": "Chocolate Egg (0% chocolate)",
+		"unit":"each",
+		"price": 5.0,
+		"holidays":["easter"]
+	},
+	{
+		"category": "junk",
+		"name": "Chocolate Egg (Fair trade chocolate)",
+		"unit":"each",
+		"price": 15.0,
+		"holidays":["easter"]
+	},
+	{
+		"category": "junk",
+		"name": "Chocolate House",
+		"unit":"each",
+		"price": 5.0,
+		"holidays":["easter"]
+	},
+	{
+		"category": "junk",
+		"name": "Santa claus in chocolate",
+		"unit":"each",
+		"price": 5.0,
+		"holidays":["christmas"]
+	},
+	{
+		"category": "junk",
+		"name": "Advent Calendar",
+		"unit":"each",
+		"price": 4.0,
+		"holidays":["christmas"]
+	},
+	{
+		"category": "junk",
+		"name": "Mon Chéri",
+		"unit":"each",
+		"price": 10.0,
+		"holidays":["valentinesday"]
+	},
+	{
+		"category": "junk",
+		"name": "Ferrero Rocher (with Extra Palm Oil)",
+		"unit":"each",
+		"price": 10.0,
+		"holidays":["easter","newyearseve","christmas"]
+	},
+	{
+		"category": "junk",
+		"name": "Ferrero Rocher",
+		"unit":"each",
+		"price": 15.0,
+		"holidays":["easter","newyearseve","christmas"]
+	},
     {
         "category": "meat",
         "name": "Chicken Eggs",
@@ -168,18 +427,21 @@
 		"category": "seafruits",
 		"name": "Oysters",
 		"unit": "dozen",
+		"holidays": ["christmas","newyearseve"],
 		"price": 15
 	},
 	{
 		"category": "luxery",
 		"name": "Snails",
 		"unit": "dozen",
+		"holidays": ["christmas","newyearseve"],
 		"price": 10
 	},
 	{
 		"category": "luxery",
 		"name": "Foie gras",
 		"unit": "each",
+		"holidays": ["christmas","newyearseve"],
 		"price": 20
 	},
 	{
@@ -258,39 +520,52 @@
         "holidays":["christmas"]
 	},
 	{
+		"category": "greetingscard",
+		"name": "New years card",
+		"unit": "each",
+		"price": 2,
+		"holidays":["newyearseve"]
+	},
+	{
 		"category": "health",
 		"name": "Condoms (S)",
 		"unit": "each",
+		"holidays":["valentinesday"],
 		"price": 5
 	},
 	{
 		"category": "health",
 		"name": "Condoms (M)",
 		"unit": "each",
+		"holidays":["valentinesday"],
 		"price": 5
 	},
 	{
 		"category": "health",
 		"name": "Condoms (XL)",
 		"unit": "each",
+		"holidays":["valentinesday"],
 		"price": 5
 	},
 	{
 		"category": "health",
 		"name": "Condoms (XXL)",
 		"unit": "each",
+		"holidays":["valentinesday"],
 		"price": 5
 	},
 	{
 		"category": "health",
 		"name": "Condoms (XXXL) (aka Trash bags)",
 		"unit": "each",
+		"holidays":["valentinesday"],
 		"price": 5
 	},
 	{
 		"category": "health",
 		"name": "Lubriant (1L)",
 		"unit": "each",
+		"holidays":["valentinesday"],
 		"price": 10
 	}
 ]

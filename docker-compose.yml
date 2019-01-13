@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.6'
 services:
   dashboard:
     image: admo120104/ticketoc:dashboard
@@ -33,6 +33,7 @@ services:
     depends_on:
       - kafka
       - spark
+      - entrypoint
   zookeeper:
     image: zookeeper:latest
   kafka:
