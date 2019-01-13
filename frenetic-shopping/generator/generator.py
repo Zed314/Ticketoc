@@ -7,11 +7,12 @@ import requests
 
 import avro.io
 import avro.schema
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 from enum import Enum
-from random import gauss, randint, uniform, choice
+from random import gauss, randint, uniform, choice, shuffle
 from time import sleep, time
 from pymongo import MongoClient
+
 
 
 def getProductSchema():
@@ -125,7 +126,7 @@ def generateCashReceipt(storeid=1,terminalid=1,agentid=1,customerid=1,order=None
 
 	settlements=[]
 
-	nb_settlements=randint(1,2)
+	nb_settlements=order["settlements"]
 	paymentsMechanismes=["CB","Especes"]
 	if nb_settlements==1:
 		settlements.append({
@@ -133,12 +134,22 @@ def generateCashReceipt(storeid=1,terminalid=1,agentid=1,customerid=1,order=None
 			'paymentMechanism':paymentsMechanismes[randint(0,1)]
 		})
 	else:
+		developpedPriceList = []
+		for product in order["products"]:
+		#dictPrices[product[0]["name"]] = product[0]["price"]
+			for i in range(product[1]):
+				developpedPriceList.append(product[0]["price"]*(1+taxes[product[0]["category"]]/100))
+		shuffle(developpedPriceList)
+		
+		division = [developpedPriceList[i::2] for i in range(2)]
+		prices = [sum(division[0]),sum(division[1])]
+		
 		settlements.append({
-			'settlementAmount':truncateFloat(grossTotal- float(("%.2f"%uniform(0.,grossTotal)))),
+			'settlementAmount':truncateFloat(prices[0]),
 			'paymentMechanism':paymentsMechanismes[0]
 		}),
 		settlements.append({
-			'settlementAmount':truncateFloat(grossTotal-settlements[0]['settlementAmount']),
+			'settlementAmount':truncateFloat(prices[1]),
 			'paymentMechanism':paymentsMechanismes[1]
 		})
 
@@ -165,6 +176,11 @@ def writeJSON(jsonObject,destination) :
 def estimateTimeRequired(order,cashier):
 	return cashier[order["billingMethod"]]+order["numberOfElements"]/cashier["elementPerSecond"]
 
+#def completeOrder(order,):
+
+#def addProductsToList(products,productsToAdd):
+
+
 def generateOrder(cashier,popularProducts,trendingProducts):
 	order = dict()
 	order["numberOfElements"] = returnValueIfValueOrBelow(int(gauss(munbelement, sigmanbelement)),1)
@@ -172,73 +188,90 @@ def generateOrder(cashier,popularProducts,trendingProducts):
 	order["finishTime"] = estimateTimeRequired(order,cashier) + time()
 	doesThisOrderFollowTheTrend = uniform(0,100)<30
 	order["followTheTrend"] = doesThisOrderFollowTheTrend
-	if not popularProducts :
-		if not doesThisOrderFollowTheTrend:
-			quantitiesProduct = getListQuantities(order["numberOfElements"])
-			nblines = len(quantitiesProduct)
-			products = []
-			for i,product in enumerate(getRandomProducts(nblines)):
-				products.append((product,quantitiesProduct[i]))
-			order["products"] = products
-		else :
-			products = []
-			productDict = {}
-			productDictNameToProduct = {}
-			for i in range(order["numberOfElements"]):
-				choiceProduct = choice(trendingProducts)
-				if choiceProduct["name"] in productDict:
-					productDict[choiceProduct["name"]]+=1
-				else:
-					productDict[choiceProduct["name"]]=1
-					productDictNameToProduct[choiceProduct["name"]]=choiceProduct
-			for productName,nbOcc in productDict.items():
-				products.append([productDictNameToProduct[productName],nbOcc])
-			order["products"] = products
-	else:
-	
-		nbProducts = 0
+	products = []
+	totalProducts = 0
+	if popularProducts:
 		productsToAddName = []
 		for elt in sorted(popularProducts, key=lambda x: x[1],reverse=True):
 			if elt[1] > uniform(0,100):
 				# add the product
 				productsToAddName.append(elt[0])
 
-			if len(productsToAddName) >= order["numberOfElements"]:
+			if totalProducts >= order["numberOfElements"]:
 				break
-		
-		products = []
-		if not doesThisOrderFollowTheTrend:
-			quantitiesProduct = getListQuantities(order["numberOfElements"]-len(productsToAddName))
-			nblines = len(quantitiesProduct)
-			
-			for i,product in enumerate(getRandomProducts(nblines)):
-				products.append([product,quantitiesProduct[i]])
-			
-		else:
-			
-			productDict = {}
-			productDictNameToProduct = {}
-			for i in range(order["numberOfElements"]-len(productsToAddName)):
-				choiceProduct = choice(trendingProducts)
-				if choiceProduct["name"] in productDict:
-					productDict[choiceProduct["name"]]+=1
-				else:
-					productDict[choiceProduct["name"]]=1
-					productDictNameToProduct[choiceProduct["name"]]=choiceProduct
-			for productName,nbOcc in productDict.items():
-				products.append([productDictNameToProduct[productName],nbOcc])
-		
-		# Add the artificially added products
 		for name in productsToAddName:
+			products.append([getProductByName(name),1])
+			totalProducts+=1
+	
+	if doesThisOrderFollowTheTrend and not order["numberOfElements"]==totalProducts and not order["numberOfElements"]==totalProducts+1:
+		
+		productDict = {}
+		productDictNameToProduct = {}
+		for i in range(randint(0,order["numberOfElements"]-totalProducts)):
+			choiceProduct = choice(trendingProducts)
+			if choiceProduct["name"] in productDictNameToProduct:
+				productDict[choiceProduct["name"]]+=1
+			else:
+				productDict[choiceProduct["name"]]=1
+				productDictNameToProduct[choiceProduct["name"]]=choiceProduct
+		for productName,nbOcc in productDict.items():
 			found = False
-			for productInOrder in products:
-				if productInOrder[0]["name"]==name:
-					productInOrder[1]+=1
+			for product in products:
+				if product[0]== productDictNameToProduct[productName]:
+					product[1]+=1
 					found = True
 					break
-			if not found :
-				products.append([getProductByName(name),1])
-		order["products"] = products
+			if not found:
+				products.append([productDictNameToProduct[productName],nbOcc])
+			totalProducts+=1
+	if totalProducts<order["numberOfElements"]:
+		#quantitiesProduct = getListQuantities(order["numberOfElements"]-len(productsToAddName))
+		#nblines = len(quantitiesProduct)
+		productsToAddName =[]
+		for product in products:
+			if "frequentlyboughtwith" in product[0]:
+				if product[0]["frequentlyboughtwith"]:
+					for name in product[0]["frequentlyboughtwith"]:
+						productsToAddName.append(name)
+
+		countProductsToAdd = Counter(productsToAddName)
+		
+		for nameProductToAdd in countProductsToAdd.most_common():
+			found = False
+			if totalProducts==order["numberOfElements"]:
+				break
+			for product in products:
+				if product[0]["name"]==nameProductToAdd:
+					found=True
+					break
+			if not found: #and if uniform(0,100)<60:
+				totalProducts+=1
+				products.append([getProductByName(nameProductToAdd[0]),1])
+		quantities=getListQuantities(order["numberOfElements"]-totalProducts)
+		for i,productToAdd in enumerate(getRandomProducts(len(quantities))):
+			found = False
+			if totalProducts==order["numberOfElements"]:
+				break
+			for product in products:
+				if product[0]["name"]==productToAdd["name"]:
+					product[1]+=quantities[i]
+					found=True
+					totalProducts+=quantities[i]
+					break
+			if not found: #and if uniform(0,100)<60:
+				products.append([productToAdd,quantities[i]])
+				totalProducts+=quantities[i]
+	else:
+		print("no more room")
+
+	order["products"] = products
+	
+	
+	nbSettle = randint(1,2)
+	order["settlements"]=nbSettle
+
+		#divide the order in two parts
+		
 	print("Order:")
 	print(order)
 	return order
@@ -250,9 +283,9 @@ def returnValueIfValueOrBelow(nb,value):
 
 
 class PaymentMethod(Enum):     
-    CASH = 1     
-    CARD = 2     
-    BOTH = 3     
+    CASH = 0     
+    CARD = 1     
+    BOTH = 2     
 
 parser = argparse.ArgumentParser(description='Generate some tickets.')
 parser.add_argument("-a", "--avro", help="use avro serialization (default : json)")
@@ -264,7 +297,7 @@ parser.add_argument("-s","--storeID",type=int, default = "0",
 					help="id of the store")
 parser.add_argument("-p","--popular",type=str, default = "",
 					help="name of the popular product, separated by a comma and followed by the probability in percentage")
-parser.add_argument('--holiday', choices=['motherday','christmas','newyearseve',"valentinesday","blackfriday","easter"],default="blackfriday", help='Choose the holiday that will influence the clients')
+parser.add_argument('--holiday', choices=['motherday','christmas','newyearseve',"valentinesday","blackfriday","easter"],default="valentinesday", help='Choose the holiday that will influence the clients')
 
 	
 args = parser.parse_args()
@@ -281,7 +314,7 @@ if len(popularProductsToDecode)>=2:
 			popularProducts[len(popularProducts)-1].append(int(elt))
 
 #Todo : change
-popularProducts = [("Roses",0),("Nutella",0)]
+popularProducts = [("Raspberry Pi",100),("Nutella",0)]
 trendingProducts = []
 if args.holiday:
 	for match in products.find({ "holidays" : { "$in" : [args.holiday] } }):
@@ -322,7 +355,7 @@ while True:
 		if order["finishTime"]<= time() or begin:
 			begin = False
 			cashRec = generateCashReceipt(storeid=idOfStore,terminalid=i,agentid=i,customerid=200,order=order,timestamp=time())
-			
+			print(cashRec)
 			try:
 				if useAvro:
 					bytes_writer = io.BytesIO()
