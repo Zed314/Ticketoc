@@ -23,6 +23,7 @@ server.on('connection', socket => {
 			if (subIndex < 0)
 				throw "Closed connection not found in subscribers"
 			subscribers.splice(subIndex, 1);
+			subscriberMod.leave();
 		})
 		console.log("Added subscriber")
 	})

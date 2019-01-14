@@ -10,8 +10,12 @@ class Subscriber {
 			message = JSON.parse(message)
 
 			if (message.type = "subscribe") {
+				console.log("Got sub request")
 				this.listBlocker.take(() => {
+					console.log("took lock")
 					this.subscribe(message.topic)
+					console.log("releasing lock")
+					this.listBlocker.leave();
 				})
 			} else if (message.type = "unsubscribe") {
 				this.listBlocker.take(() => {
@@ -38,6 +42,7 @@ class Subscriber {
 			result: 0,
 			note: "Subscribed to " + topic
 		}))
+		console.log("New subscriber on " + topic)
 	}
 
 	unsubscribe(topic, silent=false) {
