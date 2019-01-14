@@ -297,7 +297,7 @@ parser.add_argument("-s","--storeID",type=int, default = "0",
 					help="id of the store")
 parser.add_argument("-p","--popular",type=str, default = "",
 					help="name of the popular product, separated by a comma and followed by the probability in percentage")
-parser.add_argument('--holiday', choices=['motherday','christmas','newyearseve',"valentinesday","blackfriday","easter"],default="valentinesday", help='Choose the holiday that will influence the clients')
+parser.add_argument('--holiday', choices=['motherday','christmas','newyearseve',"valentinesday","blackfriday","easter"],default="blackfriday", help='Choose the holiday that will influence the clients')
 
 	
 args = parser.parse_args()
@@ -314,7 +314,7 @@ if len(popularProductsToDecode)>=2:
 			popularProducts[len(popularProducts)-1].append(int(elt))
 
 #Todo : change
-popularProducts = [("Raspberry Pi",100),("Nutella",0)]
+popularProducts = [("Raspberry Pi",0),("Nutella",70)]
 trendingProducts = []
 if args.holiday:
 	for match in products.find({ "holidays" : { "$in" : [args.holiday] } }):
