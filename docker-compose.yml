@@ -30,6 +30,8 @@ services:
   cash-clasp:
     image: admo120104/ticketoc:cash-clasp
     build: cash-clasp/
+    ports:
+      - 40510:40510
     depends_on:
       - kafka
       - spark

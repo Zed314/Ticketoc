@@ -12,6 +12,13 @@ const Subscriber = require('./Subscriber')
 const server = new WebSocketServer({port: 40510}),
 subscribers = []
 
+client.createTopics([{
+  topic: 'input_tickets',
+  partitions: 1
+}], (error, result) => {
+	const upstreamConsumer = new UpstreamConsumer(client, notifySubscribers);
+});
+
 server.on('connection', socket => {
 	subscriber = new Subscriber(socket)
 	subscribers.push(subscriber)
@@ -34,8 +41,6 @@ function notifySubscribers(topic, message) {
 		sub.sendTopicMessage(topic, message)
 	}
 }
-
-const upstreamConsumer = new UpstreamConsumer(client, notifySubscribers);
 
 // Debug repl
 const rl = readline.createInterface({

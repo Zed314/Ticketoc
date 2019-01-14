@@ -12,9 +12,7 @@ class Subscriber {
 			if (message.type = "subscribe") {
 				console.log("Got sub request")
 				this.listBlocker.take(() => {
-					console.log("took lock")
 					this.subscribe(message.topic)
-					console.log("releasing lock")
 					this.listBlocker.leave();
 				})
 			} else if (message.type = "unsubscribe") {
