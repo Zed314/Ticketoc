@@ -80,6 +80,26 @@ class HomePage extends Component {
     this.socketClient.close()
   }
 
+  nFormatter(num, digits) {
+    var si = [
+      { value: 1, symbol: "" },
+      { value: 1E3, symbol: "k" },
+      { value: 1E6, symbol: "M" },
+      { value: 1E9, symbol: "G" },
+      { value: 1E12, symbol: "T" },
+      { value: 1E15, symbol: "P" },
+      { value: 1E18, symbol: "E" }
+    ];
+    var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+    var i;
+    for (i = si.length - 1; i > 0; i--) {
+      if (num >= si[i].value) {
+        break;
+      }
+    }
+    return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
+  }
+
   render() {
     const countdownPart = this.state.restartSeconds !== null ? (<strong>Reconnecting in {this.state.restartSeconds}s</strong>) : null
     const alertPart = this.state.connectionError ? <Alert type="danger">Connection to the server failed. {countdownPart}</Alert> : null;
@@ -103,7 +123,7 @@ class HomePage extends Component {
      loading={this.state.loading}
      color="green"
      icon="dollar-sign"
-     count={this.state.totalRevenue.toFixed(2) + " €"}
+     count={this.nFormatter(this.state.totalRevenue, 2) + " €"}
      label="total revenue" />
      </Grid.Col>
      <Grid.Col>

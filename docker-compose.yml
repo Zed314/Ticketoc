@@ -20,7 +20,7 @@ services:
     networks:
       - default
       - generator-net
-    command: ["./wait-for-it.sh", "kafka:9094", "--", "./wait-for-it.sh", "schema-registry:80", "--", "python", "entrypoint.py"]
+    command: ["./wait-for-it.sh", "kafka:9092", "--", "./wait-for-it.sh", "schema-registry:80", "--", "python", "entrypoint.py"]
     depends_on:
       - kafka
       - schema-registry
@@ -55,6 +55,7 @@ services:
       - zookeeper
     ports:
       - 9094:9094
+      - 9092:9092
   mongo:
     image: mongo:latest
   spark:
