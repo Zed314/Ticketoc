@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Zed314/Ticketoc#readme",
   "dependencies": {
-    "kafka-node": "^4.0.0",
+    "kafka-node": "^3.0.1",
     "semaphore": "^1.1.0",
     "ws": "^6.1.2"
   }

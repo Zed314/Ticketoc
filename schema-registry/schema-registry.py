@@ -28,7 +28,7 @@ def get_schema(name):
     if name in schemas:
         return jsonify(schemas[name])
 
-    abort(400)
+    abort(404)
 
 
 if __name__ == '__main__':

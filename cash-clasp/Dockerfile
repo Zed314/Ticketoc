@@ -1,6 +1,6 @@
-FROM node:lts-alpine as build-deps
+FROM node:lts-alpine
+RUN apk add --no-cache bash
 WORKDIR /usr/src/app
-COPY package.json package-lock.json ./
-RUN npm install
 COPY . ./
-ENTRYPOINT ["node", "app.js"]
+RUN npm install
+CMD ["node", "app.js"]
