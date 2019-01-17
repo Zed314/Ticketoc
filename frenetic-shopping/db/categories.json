@@ -58,5 +58,9 @@
     {
         "name": "movie",
         "tax":10
-    }
+    },
+    {
+		"name": "animalbased",
+        "tax":10
+	}
 ]

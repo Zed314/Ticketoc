@@ -3,72 +3,84 @@
 		"category":"movie",
 		"name":"Matrix",
 		"unit":"each",
-		"price":10.0
+		"price":10.0,
+		"notwith":["Matrix"]
 	},
 	{
 		"category":"movie",
 		"name":"Star Wars IV",
 		"unit":"each",
-		"price":10.0
+		"price":10.0,
+		"notwith":["Star Wars IV"]
 	},
 	{
 		"category":"movie",
 		"name":"Star Wars V",
 		"unit":"each",
-		"price":10.0
+		"price":10.0,
+		"notwith":["Star Wars V"]
 	},
 	{
 		"category":"movie",
 		"name":"Star Wars VI",
 		"unit":"each",
+		"notwith":["Star Wars VI"],
 		"price":10.0
 	},
 	{
 		"category":"movie",
 		"name":"Star Wars VII",
 		"unit":"each",
+		"notwith":["Star Wars VII"],
 		"price":10.0
 	},
 	{
 		"category":"movie",
 		"name":"Star Wars VIII",
 		"unit":"each",
+		"notwith":["Star Wars VIII"],
 		"price":10.0
 	},
 	{
 		"category":"movie",
 		"name":"Star Wars I",
 		"unit":"each",
+		"notwith":["Star Wars I"],
 		"price":10.0
 	},
 	{
 		"category":"movie",
 		"name":"Star Wars II",
 		"unit":"each",
+		"notwith":["Star Wars II"],
 		"price":10.0
 	},
 	{
 		"category":"movie",
 		"name":"Star Wars III",
 		"unit":"each",
+		"notwith":["Star Wars III"],
 		"price":10.0
 	},
 	{
 		"category":"movie",
-		"name":"The Lord of the Rings: Thee Fellowship of the Ring",
+		"name":"The Lord of the Rings: The Fellowship of the Ring",
 		"unit":"each",
+		"notwith":["The Lord of the Rings: The Fellowship of the Ring"],
 		"price":10.0
 	},
 	{
 		"category":"movie",
 		"name":"The Lord of the Rings:  The Two Towers",
 		"unit":"each",
+		"notwith":["The Lord of the Rings: The Two Towers"],
 		"price":10.0
 	},
 	{
 		"category":"movie",
 		"name":"The Lord of the Rings: The Return of the King",
 		"unit":"each",
+		"notwith":["The Lord of the Rings: The Return of the King"],
 		"price":10.0
 	},
 	{
@@ -76,6 +88,7 @@
 		"name":"4K TV 200 inches",
 		"unit":"each",
 		"holidays":["blackfriday"],
+		"notwith":["4K TV 200 inches","3D TV 100 inches","Canon Camera","Sony Camera"],
 		"price":2099.0
 	},
 	{
@@ -83,6 +96,7 @@
 		"name":"3D TV 100 inches",
 		"unit":"each",
 		"holidays":["blackfriday"],
+		"notwith":["4K TV 200 inches","3D TV 100 inches","Canon Camera","Sony Camera"],
 		"price":1499.0
 	},
 	{
@@ -101,6 +115,7 @@
 		"category":"consumerelectronics",
 		"name": "Blu-ray player",
 		"unit":"each",
+		"notwith":["DVD player"],
 		"price":100.0
 	},
 	{
@@ -136,9 +151,9 @@
 	},
 	{
 		"category":"consumerelectronics",
-		"name": "MicroSD Card (64Gb)",
+		"name": "MicroSD Card (128Gb)",
 		"unit":"each",
-		"price":25.0
+		"price":50.0
 	},
 	{
 		"category":"consumerelectronics",
@@ -146,6 +161,7 @@
 		"unit":"each",
 		"holidays":["blackfriday"],
 		"frequentlyboughtwith":["MicroSD Card (32Gb)"],
+		"notwith":["Sony Camera","Canon Camera","4K TV 200 inches","3D TV 100 inches"],
 		"price":499.0
 	},
 	{
@@ -154,7 +170,16 @@
 		"unit":"each",
 		"holidays":["blackfriday"],
 		"frequentlyboughtwith":["MicroSD Card (32Gb)"],
+		"notwith":["Canon Camera","Sony Camera","4K TV 200 inches","3D TV 100 inches"],
 		"price":499.0
+	},
+	{
+		"category":"consumerelectronics",
+		"name": "Chintendo Vi",
+		"unit":"each",
+		"holidays":["christmas"],
+		"notwith":["Chintendo Vi"],
+		"price":10.99
 	},
 	{
 		"category":"consumerelectronics",
@@ -166,6 +191,7 @@
 		"category":"consumerelectronics",
 		"name": "iPhone X",
 		"unit":"each",
+		"notwith":["Galaxy S9","iPhone X"],
 		"price":1230.0
 	},
 	{
@@ -173,6 +199,7 @@
 		"name": "Galaxy S9",
 		"unit":"each",
 		"price":20.0,
+		"notwith":["iPhone X","Galaxy S9"],
 		"frequentlyboughtwith":["MicroSD Card (64Gb)"]
 	},
 	{
@@ -180,12 +207,14 @@
 		"name": "Inkjet printer",
 		"unit":"each",
 		"price":50.99,
-		"frequentlyboughtwith":["Inkjet Cartdrige"]
+		"frequentlyboughtwith":["Inkjet Cartdrige"],
+		"notwith":["Laser printer","Laser Cartdrige","Inkjet printer"]
 	},
 	{
 		"category":"consumerelectronics",
 		"name": "Inkjet Cartdrige",
 		"unit":"each",
+		"notwith":["Laser printer","Laser Cartdrige"],
 		"price":50.00
 	},
 	{
@@ -193,11 +222,13 @@
 		"name": "Laser printer",
 		"unit":"each",
 		"price":300.99,
+		"notwith":["Inkjet printer","Inkjet Cartdrige","Laser printer"],
 		"frequentlyboughtwith":["Laser Cartdrige"]
 	},
 	{
 		"category":"consumerelectronics",
 		"name": "Laser Cartdrige",
+		"notwith":["Inkjet printer","Inkjet Cartdrige"],
 		"unit":"each",
 		"price":150.00
 	},
@@ -213,6 +244,7 @@
 		"name": "Chocolate Egg (0% chocolate)",
 		"unit":"each",
 		"price": 5.0,
+		"restrictions":["christmas"],
 		"holidays":["easter"]
 	},
 	{
@@ -220,6 +252,7 @@
 		"name": "Chocolate Egg (Fair trade chocolate)",
 		"unit":"each",
 		"price": 15.0,
+		"restrictions":["christmas"],
 		"holidays":["easter"]
 	},
 	{
@@ -227,6 +260,7 @@
 		"name": "Chocolate House",
 		"unit":"each",
 		"price": 5.0,
+		"restrictions":["easter"],
 		"holidays":["easter"]
 	},
 	{
@@ -234,6 +268,7 @@
 		"name": "Santa claus in chocolate",
 		"unit":"each",
 		"price": 5.0,
+		"restrictions":["christmas"],
 		"holidays":["christmas"]
 	},
 	{
@@ -241,6 +276,7 @@
 		"name": "Advent Calendar",
 		"unit":"each",
 		"price": 4.0,
+		"restrictions":["christmas"],
 		"holidays":["christmas"]
 	},
 	{
@@ -265,13 +301,13 @@
 		"holidays":["easter","newyearseve","christmas"]
 	},
     {
-        "category": "meat",
+        "category": "animalbased",
         "name": "Chicken Eggs",
         "unit": "dozen",
         "price": 5.0
     },
     {
-        "category": "meat",
+        "category": "animalbased",
         "name": "Ducks Eggs",
         "unit": "half-dozen",
         "price": 5.0
@@ -371,16 +407,78 @@
 		"name": "Salad",
 		"unit": "each",
 		"price": 1
-    },
-    {
+	},
+	{
 	
+		"category": "vegetables",
+		"name": "Soup",
+		"unit": "L",
+		"price": 1
+	},
+	{
+	
+		"category": "everydaylife",
+		"name": "Pasta Linguine",
+		"unit": "kg",
+		"price": 2
+	},
+	{
+	
+		"category": "everydaylife",
+		"name": "Spaghetti",
+		"unit": "kg",
+		"frequentlyboughtwith":["Bolognese sauce"],
+		"price": 2
+	},
+	{
+	
+		"category": "everydaylife",
+		"name": "Spa'ghetto",
+		"unit": "each",
+		"frequentlyboughtwith":["Bolognese sauce"],
+		"notwith":["Spaghetti"],
+		"price": 0.10
+	},
+	{
+	
+		"category": "animalbased",
+		"name": "Bolognese sauce",
+		"unit": "kg",
+		"price": 3
+	},
+	{
+	
+		"category": "everydaylife",
+		"name": "Pesto sauce",
+		"unit": "kg",
+		"price": 4
+	},
+    {
 		"category": "vegetables",
 		"name": "Carrots",
 		"unit": "kg",
 		"price": 3.0
 	},
 	{
-	
+		"category": "everydaylife",
+		"name": "Grated cheese",
+		"unit": "kg",
+		"price": 3.0
+	},
+	{
+		"category": "vegetables",
+		"name": "Falafel ball",
+		"unit": "dozen",
+		"price": 5.0
+	},
+	{
+		"category": "vegetables",
+		"name": "Mashed potatoes",
+		"unit": "kg",
+		"frequentlyboughtwith":["Sliced ham","Sliced ham (organic)"],
+		"price": 0.5
+	},
+	{
 		"category": "meat",
 		"name": "Beef",
 		"unit": "kg",
@@ -441,6 +539,7 @@
 		"category": "luxery",
 		"name": "Foie gras",
 		"unit": "each",
+		"restrictions":["christmas","newyearseve"],
 		"holidays": ["christmas","newyearseve"],
 		"price": 20
 	},
@@ -473,7 +572,8 @@
 		"category": "bakery",
 		"name": "Galette des rois",
 		"unit": "each",
-        "price": 6.95,
+		"price": 6.95,
+		"restrictions":["epiphany"],
         "holidays":["epiphany"]
 	},
 	{
@@ -516,7 +616,8 @@
 		"category": "greetingscard",
 		"name": "Merry Christmas card",
 		"unit": "each",
-        "price": 2,
+		"price": 2,
+		"restrictions":["christmas"],
         "holidays":["christmas"]
 	},
 	{
@@ -531,6 +632,7 @@
 		"name": "Condoms (S)",
 		"unit": "each",
 		"holidays":["valentinesday"],
+		"notwith":["Condoms (M)","Condoms (XL)","Condoms (XXL)","Condoms (XXXL) (aka Trash bags)"],
 		"price": 5
 	},
 	{
@@ -538,6 +640,7 @@
 		"name": "Condoms (M)",
 		"unit": "each",
 		"holidays":["valentinesday"],
+		"notwith":["Condoms (S)","Condoms (XL)","Condoms (XXL)","Condoms (XXXL) (aka Trash bags)"],
 		"price": 5
 	},
 	{
@@ -545,6 +648,7 @@
 		"name": "Condoms (XL)",
 		"unit": "each",
 		"holidays":["valentinesday"],
+		"notwith":["Condoms (S)","Condoms (M)","Condoms (XXL)","Condoms (XXXL) (aka Trash bags)"],
 		"price": 5
 	},
 	{
@@ -552,6 +656,7 @@
 		"name": "Condoms (XXL)",
 		"unit": "each",
 		"holidays":["valentinesday"],
+		"notwith":["Condoms (S)","Condoms (M)","Condoms (XXXL) (aka Trash bags)","Condoms (XL)"],
 		"price": 5
 	},
 	{
@@ -559,6 +664,7 @@
 		"name": "Condoms (XXXL) (aka Trash bags)",
 		"unit": "each",
 		"holidays":["valentinesday"],
+		"notwith":["Condoms (S)","Condoms (M)","Condoms (XXL)","Condoms (XL)"],
 		"price": 5
 	},
 	{
@@ -567,5 +673,90 @@
 		"unit": "each",
 		"holidays":["valentinesday"],
 		"price": 10
+	},
+	{
+		"category": "junk",
+		"name": "Marple Syrup",
+		"unit": "each",
+		"price": 5
+	},
+	{
+		"category": "fruits",
+		"name": "Apple juice",
+		"unit": "each",
+		"price": 2
+	},
+	{
+		"category": "fruits",
+		"name": "Pear juice",
+		"unit": "each",
+		"price": 5
+	},
+	{
+		"category": "fruits",
+		"name": "Orange juice",
+		"unit": "each",
+		"price": 3
+	},
+	{
+		"category": "animalbased",
+		"name": "Emmental",
+		"unit":"each",
+		"price":4.0
+	},
+	{
+		"category": "animalbased",
+		"name": "Camembert",
+		"unit":"each",
+		"price":5.0
+	},
+	{
+		"category": "animalbased",
+		"name": "Omelette du fromage",
+		"unit":"each",
+		"price":4.38
+	},
+	{
+		"category": "junk",
+		"name": "Margherita Pizza",
+		"unit":"each",
+		"price":3.00
+	},
+	{
+		"category": "everydaylife",
+		"name": "Coffee",
+		"unit":"each",
+		"price":4.00
+	},
+	{
+		"category": "everydaylife",
+		"name": "Sugar",
+		"unit":"each",
+		"price":3.00
+	},
+	{
+		"category": "junk",
+		"name": "Chewing gum",
+		"unit":"each",
+		"price":2.00
+	},
+	{
+		"category": "health",
+		"name": "Toothbrush",
+		"unit":"each",
+		"price":3.00
+	},
+	{
+		"category": "health",
+		"name": "Electric Toothbrush",
+		"unit":"each",
+		"frequentlyboughtwith":["Extra brush for toothbrush"],
+		"price":15.00
+	},
+	{
+		"category": "health",
+		"name": "Extra brush for toothbrush",
+		"unit":"each",
+		"price":3.0
 	}
 ]
