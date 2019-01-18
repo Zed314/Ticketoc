@@ -62,5 +62,9 @@
     {
 		"name": "animalbased",
         "tax":10
-	}
+    },
+    {
+        "name":"generalfood",
+        "tax":10
+    }
 ]
