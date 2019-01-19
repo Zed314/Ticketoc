@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.5'
 services:
   dashboard:
     image: admo120104/ticketoc:dashboard
@@ -10,6 +10,8 @@ services:
   entrypoint:
     image: admo120104/ticketoc:entrypoint
     build: entrypoint/
+    ports:
+      - 4000:80
     environment:
       ROUTE: /v1/tickets
       KAFKA_CONNECT: kafka:9092
@@ -20,17 +22,12 @@ services:
     networks:
       - default
       - generator-net
-    command: ["./wait-for-it.sh", "kafka:9092", "--", "./wait-for-it.sh", "schema-registry:80", "--", "python", "entrypoint.py"]
+    command: ["./wait-for-it.sh", "kafka:9092", "--", "python", "entrypoint.py"]
     depends_on:
       - kafka
-      - schema-registry
-  schema-registry:
-    image: admo120104/ticketoc:schema-registry
-    build: schema-registry/
   cash-clasp:
     image: admo120104/ticketoc:cash-clasp
     build: cash-clasp/
-    command: ["./wait-for-it.sh", "kafka:9092", "--", "node", "app.js"]
     ports:
       - 40510:40510
     depends_on:
@@ -38,12 +35,14 @@ services:
       - spark
   zookeeper:
     image: zookeeper:latest
+    ports:
+      - 2181:2181
   kafka:
     image: wurstmeister/kafka:latest
+    ports:
+      - 9094:9094
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: input_tickets:1:1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
       HOSTNAME_COMMAND: "docker info | grep ^Name: | cut -d' ' -f 2"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094
@@ -55,11 +54,17 @@ services:
       - zookeeper
   mongo:
     image: mongo:latest
+    ports:
+      - 27017:27017
   spark:
-    image: sequenceiq/spark:latest
+    image: admo120104/ticketoc:spark
+    build: spark/
     depends_on:
       - kafka
-      - mongo
+    ports:
+      - 8088:8088
+      - 8042:8042
+
 networks:
   generator-net:
     driver: bridge
