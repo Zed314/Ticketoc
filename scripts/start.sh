@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 docker swarm init
 docker stack deploy -c docker-compose.yml ticketoc --with-registry-auth

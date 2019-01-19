@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.5'
 services:
   frenetic-shopping-generator:
     image: admo120104/ticketoc:frenetic-shopping-generator
@@ -18,7 +18,7 @@ services:
     networks:
       - default
       - ticketoc_generator-net
-  mongodb:
+  generator-db:
     image: mongo:latest
     environment:
       MONGO_DATA_DIR: /usr/data/db
@@ -30,7 +30,7 @@ services:
     image: admo120104/ticketoc:frenetic-shopping-db
     build: frenetic-shopping/db
     depends_on:
-      - mongodb
+      - generator-db
 networks:
   ticketoc_generator-net:
     external: true

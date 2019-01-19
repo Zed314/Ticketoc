@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 docker swarm leave --force
 docker service rm $(docker service ls -q)

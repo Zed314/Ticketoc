@@ -22,7 +22,7 @@ schema = avro.schema.Parse(getProductSchema())
 writer = avro.io.DatumWriter(schema)
 
 
-client = MongoClient('mongodb://mongodb:27017/')
+client = MongoClient('mongodb://generator-db:27017/')
 supermarketDB = client["supermarket"]
 products = supermarketDB["products"]
 categories = supermarketDB["categories"]

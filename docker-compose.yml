@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.5'
 services:
   dashboard:
     image: admo120104/ticketoc:dashboard
@@ -6,7 +6,7 @@ services:
     ports:
       - 8080:80
     depends_on:
-      - cash-clasp
+      - web-sockets-server
   entrypoint:
     image: admo120104/ticketoc:entrypoint
     build: entrypoint/
@@ -27,10 +27,14 @@ services:
   schema-registry:
     image: admo120104/ticketoc:schema-registry
     build: schema-registry/
-  cash-clasp:
-    image: admo120104/ticketoc:cash-clasp
-    build: cash-clasp/
-    command: ["./wait-for-it.sh", "kafka:9092", "--", "node", "app.js"]
+  web-sockets-server:
+    image: admo120104/ticketoc:web-sockets-server
+    build: web-sockets-server/
+    command: ["./wait-for-it.sh", "kafka:9092", "--", "python", "web-sockets-server.py"]
+    environment:
+      KAFKA_CONNECT: kafka:9092
+      KAFKA_TOPICS: input_tickets
+      KAFKA_VALUE_DESERIALIZER: json
     ports:
       - 40510:40510
     depends_on:
@@ -56,7 +60,8 @@ services:
   mongo:
     image: mongo:latest
   spark:
-    image: sequenceiq/spark:latest
+    image: admo120104/ticketoc:spark
+    build: spark/
     depends_on:
       - kafka
       - mongo
