@@ -9,6 +9,15 @@ services:
     networks:
       - default
       - ticketoc_generator-net
+  frenetic-shopping-generator-2:
+    image: admo120104/ticketoc:frenetic-shopping-generator
+    build: frenetic-shopping/generator
+    command: ["./wait-for-it.sh", "entrypoint:80", "--", "./wait-for-it.sh", "schema-registry:80", "--", "python", "generator.py", "-s", "1337"]
+    depends_on:
+      - frenetic-shopping-db
+    networks:
+      - default
+      - ticketoc_generator-net
   mongodb:
     image: mongo:latest
     environment:

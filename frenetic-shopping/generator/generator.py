@@ -200,7 +200,7 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 	#print(100.0 - probabilityOfOrder)
 	if randint(0,100)<(100 - probabilityOfOrder):
 		order["isAnOrder"]=False
-		print("not an order")
+		#print("not an order")
 		return order
 	order["isAnOrder"]=True
 
@@ -331,8 +331,8 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 		# 		totalProducts+=quantities[i]
 		# 		productNameSet.add(productToAdd["name"])
 	else:
-		print("no more room")
-
+		#print("no more room")
+		pass
 	order["products"] = products
 	
 	
@@ -341,8 +341,8 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 
 		#divide the order in two parts
 		
-	print("Order:")
-	print(order)
+	#print("Order:")
+	#print(order)
 	return order
 
 def returnValueIfValueOrBelow(nb,value):
@@ -383,7 +383,7 @@ if len(popularProductsToDecode)>=2:
 			popularProducts[len(popularProducts)-1].append(int(elt))
 
 #Todo : change
-popularProducts = [("Raspberry Pi",0),("Condoms (XXL)",100)]
+popularProducts = []#[("Raspberry Pi",0),("Condoms (XXL)",100)]
 trendingProducts = []
 if args.holiday:
 	for match in products.find({ "holidays" : { "$in" : [args.holiday] } }):
@@ -399,7 +399,7 @@ muspeedcashier = 1.0
 sigmaspeedcashier = 0.3
 muspeedcash = 7.0
 sigmaspeedcash = 4.0
-munbelement = 20.0
+munbelement = 10.0
 sigmanbelement = 7.0
 
 cashiers = [{} for i in range(numberOfAgent)] 
@@ -413,10 +413,10 @@ for i,cashier in enumerate(cashiers):
 	cashier[PaymentMethod.BOTH] = cashier[PaymentMethod.CARD] + cashier[PaymentMethod.CASH] + 2
 
 #Todo: change
-print("auie")
+#print("auie")
 probabilityOfOrder = 80
 currentOrders = [generateOrder(cashiers[i], popularProducts,trendingProducts,args.holiday,probabilityOfOrder) for i in range(numberOfCheckout)] 
-print("auie")
+#print("auie")
 
 
 
@@ -424,12 +424,12 @@ begin = True
 
 while True:
 	probabilityOfOrder= (cos(time()*2*pi*1/(2*2*60))+1)*100/2
-	print(probabilityOfOrder)
+	#print(probabilityOfOrder)
 	for i,order in enumerate(currentOrders):
 		if order["finishTime"]<= time() or begin:
 			begin = False
 			if not order["isAnOrder"]:
-				print("Not an order")
+				#print("Not an order")
 				currentOrders[i] = generateOrder(cashiers[i], popularProducts,trendingProducts,args.holiday,probabilityOfOrder)
 				continue
 			cashRec = generateCashReceipt(storeid=idOfStore,terminalid=i,agentid=i,customerid=200,order=order,timestamp=time())
