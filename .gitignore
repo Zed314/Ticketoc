@@ -6,3 +6,4 @@ volumes/
 spark/Infra/.idea
 spark/Infra/target/
 spark/Infra/Infra.iml
+.DS_Store

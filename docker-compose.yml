@@ -64,6 +64,9 @@ services:
     ports:
       - 8088:8088
       - 8042:8042
+  schema-registry:
+    image: admo120104/ticketoc:schema-registry
+    build: schema-registry/
 
 networks:
   generator-net:

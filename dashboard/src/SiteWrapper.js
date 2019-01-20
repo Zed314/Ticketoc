@@ -29,7 +29,7 @@ const navBarItems = [
 ];
 
 const accountDropdownProps = {
-  avatarURL: "./logo.svg",
+  avatarURL: "/logo.svg",
   name: "Reactive Person",
   description: "Administrator",
   options: [
@@ -46,7 +46,7 @@ class SiteWrapper extends Component {
         headerProps={{
           href: "/",
           alt: "Ticketoc",
-          imageURL: "logo.svg",
+          imageURL: "/logo.svg",
           accountDropdown: accountDropdownProps,
         }}
         navProps={{ itemsObjects: navBarItems }}

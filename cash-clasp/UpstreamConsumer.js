@@ -5,7 +5,6 @@ class UpstreamConsumer {
 		const Consumer = kafka.Consumer;
 		let num = 0;
 		let argent = 0;
-		console.log("TEST");
 		this.consumer = new Consumer(
 	        kafkaClient,
 	        [

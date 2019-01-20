@@ -36,7 +36,9 @@ setTimeout(() => {
         }
     }
 
-    const upstreamConsumer = new UpstreamConsumer(client, notifySubscribers);
+    client.createTopics([{ topic: "input_tickets", partitions: 1, replicationFactor: 1 }], (error, result) => {
+        const upstreamConsumer = new UpstreamConsumer(client, notifySubscribers);
+    });
 
 // Debug repl
     const rl = readline.createInterface({

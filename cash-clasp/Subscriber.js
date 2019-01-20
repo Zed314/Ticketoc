@@ -5,6 +5,7 @@ class Subscriber {
 		this.socket = socket
 		this.subscribed = []
 		this.listBlocker = semaphoreFactory(1)
+		this.closed = false
 
 		socket.on('message', message => {
 			message = JSON.parse(message)
@@ -24,6 +25,7 @@ class Subscriber {
 	}
 
 	subscribe(topic) {
+		if (this.closed) return;
 		if (this.subscribed.includes(topic)) {
 			this.socket.send(JSON.stringify({
 				type: "action_answer",
@@ -46,7 +48,7 @@ class Subscriber {
 	unsubscribe(topic, silent=false) {
 		const topicIndex = this.subscribed.indexOf(topic)
 
-		if (topicIndex < 0) {
+		if (topicIndex < 0 && !this.closed) {
 			this.socket.send(JSON.stringify({
 				type: "action_answer",
 				result: 2,
@@ -71,17 +73,25 @@ class Subscriber {
 	}
 
 	sendTopicMessage(topic, message) {
+		if (this.closed) return;
 		if (!this.subscribed.includes(topic))
 			return
 
-		this.socket.send(JSON.stringify({
-			type: "topic_message",
-			topic,
-			message
-		}))
+		try {
+			this.socket.send(JSON.stringify({
+				type: "topic_message",
+				topic,
+				message
+			}))
+		} catch (_) {
+			// user has disconnected
+			this.close();
+		}
+
 	}
 
 	close() {
+		this.closed = true;
 		for (var i = this.subscribed.length - 1; i >= 0; i--) {
 			this.unsubscribe(this.subscribed[i], true)
 		}
