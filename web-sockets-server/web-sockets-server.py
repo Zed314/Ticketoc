@@ -3,9 +3,15 @@ import json
 import asyncio
 import websockets
 import threading
-from collections  import namedtuple
-from kafka        import KafkaConsumer
-from asgiref.sync import sync_to_async
+import logging
+from websockets.exceptions import ConnectionClosed
+from collections           import namedtuple
+from kafka                 import KafkaConsumer
+from asgiref.sync          import sync_to_async
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
 
 kafka_connect                 = os.environ['KAFKA_CONNECT']
 kafka_topics                  = os.environ['KAFKA_TOPICS']
@@ -125,23 +131,37 @@ class Controller:
 
     async def _client_to_subscriptions(self):
 
-        async for message in self._client:
+        try:
 
-            message = self._parse_message(message)
+            async for message in self._client:
 
-            if message.type == 'subscribe':
-                await self._send_to_client(await self._handle_subscribe(message))
+                message = self._parse_message(message)
 
-            if message.type == 'unsubscribe':
-                await self._send_to_client(await self._handle_unsubscribe(message))
+                logger.info("_client_to_subscriptions: '{message}'".format(message=message))
+
+                if message.type == 'subscribe':
+                    await self._send_to_client(await self._handle_subscribe(message))
+
+                if message.type == 'unsubscribe':
+                    await self._send_to_client(await self._handle_unsubscribe(message))
+
+        except ConnectionClosed:
+            pass
 
     async def _subscriptions_to_client(self):
 
-        while True:
+        try:
 
-            record = await self._subscriptions.getone()
+            while True:
 
-            await self._send_to_client(self._message_record(record.topic, record.value))
+                record = await self._subscriptions.getone()
+
+                logger.info("_subscriptions_to_client: '{record_topic}'".format(record_topic=record.topic))
+
+                await self._send_to_client(self._message_record(record.topic, record.value))
+
+        except ConnectionClosed:
+            pass
 
     async def _send_to_client(self, message):
 
@@ -210,9 +230,15 @@ class Controller:
         return {'type': 'topic_message', 'topic': topic, 'message': value}
 
 
-async def connection(socket, path):
-    controller = Controller(socket)
+async def connection(websocket, path):
+
+    address = websocket.remote_address
+    logger.info("new connection: '{address}'".format(address=address))
+
+    controller = Controller(websocket)
     await controller.run()
+
+    logger.info("closed connection: '{address}'".format(address=address))
 
 
 start_server = websockets.serve(connection, '0.0.0.0', 40510)
