@@ -13,7 +13,6 @@ ENV SPARK_HOME /usr/local/spark
 ENV HOME /usr/local
 WORKDIR $HOME
 
-
 # Install Java
 RUN add-apt-repository ppa:webupd8team/java -y  && \
     apt-get update && \
@@ -32,7 +31,6 @@ RUN wget https://dl.bintray.com/sbt/native-packages/sbt/${SBT_VERSION}/sbt-${SBT
     tar -xvzf sbt-${SBT_VERSION}.tgz && \
     rm sbt-${SBT_VERSION}.tgz
 
-
 # Install Spark
 RUN cd /tmp && \
     wget http://d3kbcqa49mib13.cloudfront.net/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
@@ -43,15 +41,11 @@ RUN cd /usr/local && ln -s spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION} sp
 # Configure environment variables
 ENV PATH $HOME/scala/bin:$HOME/sbt/bin:$SPARK_HOME/bin:$SPARK_HOME/sbin:$PATH
 
-
 # Spark Kafka Streaming
 RUN cd /tmp && \
     wget http://repo1.maven.org/maven2/org/apache/spark/spark-streaming-kafka-0-8-assembly_${SCALA_VERSION}/${SPARK_VERSION}/spark-streaming-kafka-0-8-assembly_${SCALA_VERSION}-${SPARK_VERSION}.jar && \
     mv spark-streaming-kafka-0-8-assembly_${SCALA_VERSION}-${SPARK_VERSION}.jar /usr/local/spark/jars
     
 ADD connexion $SPARK_HOME/connexion
-
-
-
 
 EXPOSE 8088 8042

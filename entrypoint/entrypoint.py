@@ -1,21 +1,13 @@
-import json
 import os
-from enum import Enum
+import json
 from flask import Flask, abort, jsonify, request
 from kafka import KafkaProducer
-from kafka.errors import KafkaTimeoutError
 
-
-class SerializerType(Enum):
-    JSON = 'json'
-    AVRO = 'avro'
-
-
-route = os.environ['ROUTE']
-kafka_connect = os.environ['KAFKA_CONNECT']
-kafka_topic = os.environ['KAFKA_TOPIC']
-kafka_value_serializer_type = SerializerType(os.environ['KAFKA_VALUE_SERIALIZER'])
-kafka_compression_type = os.getenv('KAFKA_COMPRESSION')
+route                       = os.environ['ROUTE']
+kafka_connect               = os.environ['KAFKA_CONNECT']
+kafka_topic                 = os.environ['KAFKA_TOPIC']
+kafka_value_serializer_type = os.environ['KAFKA_VALUE_SERIALIZER']
+kafka_compression_type      = os.getenv( 'KAFKA_COMPRESSION')
 
 
 def json_serializer(data):
@@ -26,37 +18,27 @@ def avro_serializer(data):
     return data
 
 
-serializers = {
-    SerializerType.JSON: json_serializer,
-    SerializerType.AVRO: avro_serializer,
-}
-
-kafka_value_serializer = serializers[kafka_value_serializer_type]
-
-
-def make_producer():
-    return KafkaProducer(
-        bootstrap_servers=kafka_connect,
-        value_serializer=kafka_value_serializer,
-        compression_type=kafka_compression_type
-        
-        # retries, linger_ms, acks...
-    )  # a producer is threadsafe, but not a consumer
+if kafka_value_serializer_type == 'json':
+    kafka_value_serializer = json_serializer
+elif kafka_value_serializer_type == 'avro':
+    kafka_value_serializer = avro_serializer
+else:
+    raise ValueError("unknown value '{value}' for kafka_value_serializer_type".format(value=kafka_value_serializer_type))
 
 
 app = Flask(__name__)
-producer = make_producer()
+producer = KafkaProducer(bootstrap_servers=kafka_connect, value_serializer=kafka_value_serializer, compression_type=kafka_compression_type)
 
 
 def on_send_error(error):
     app.logger.error("Failed to send message with error '%s'", error)
 
 
-@app.errorhandler(Exception)
 @app.errorhandler(404)
 @app.errorhandler(400)
 @app.errorhandler(501)
 @app.errorhandler(500)
+@app.errorhandler(Exception)
 def error_handler(error):
     return jsonify({'error': str(error)}), getattr(error, 'code', 500)
 
@@ -66,19 +48,16 @@ def post_message():
 
     data = None
     headers = None
-    if kafka_value_serializer_type == SerializerType.JSON:
+    if kafka_value_serializer_type == 'json':
         data = request.get_json()
         headers = [('content-type', b'application/json; charset=utf-8')]
-    elif kafka_value_serializer_type == SerializerType.AVRO:
+    elif kafka_value_serializer_type == 'avro':
         data = request.get_data()
         headers = [('content-type', b'application/avro')]
 
     if data is not None:
-        try:
-            future = producer.send(topic=kafka_topic, value=data, headers=headers)
-            future.add_errback(on_send_error)
-        except KafkaTimeoutError:
-            raise
+        future = producer.send(topic=kafka_topic, value=data, headers=headers)
+        future.add_errback(on_send_error)
         return jsonify({'success': True})
 
     abort(400)
