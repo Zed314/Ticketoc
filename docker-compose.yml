@@ -15,12 +15,14 @@ services:
       KAFKA_CONNECT: kafka:9092
       KAFKA_TOPIC: input_tickets
       KAFKA_VALUE_SERIALIZER: json
-      KAFKA_COMPRESSION: gzip
-      FLASK_ENV: development
     networks:
       - default
       - generator-net
-    command: ["./wait-for-it.sh", "kafka:9092", "--", "./wait-for-it.sh", "schema-registry:80", "--", "python", "entrypoint.py"]
+    command: [
+      "./wait-for-it.sh", "kafka:9092",         "--",
+      "./wait-for-it.sh", "schema-registry:80", "--",
+      "python", "entrypoint.py"
+    ]
     depends_on:
       - kafka
       - schema-registry
@@ -30,7 +32,10 @@ services:
   web-sockets-server:
     image: admo120104/ticketoc:web-sockets-server
     build: web-sockets-server/
-    command: ["./wait-for-it.sh", "kafka:9092", "--", "python", "web-sockets-server.py"]
+    command: [
+      "./wait-for-it.sh", "kafka:9092",         "--",
+      "python", "web-sockets-server.py"
+    ]
     environment:
       KAFKA_CONNECT: kafka:9092
       KAFKA_TOPICS: input_tickets
@@ -46,7 +51,7 @@ services:
     image: wurstmeister/kafka:latest
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: input_tickets:1:1
+      KAFKA_CREATE_TOPICS: input_tickets:4:1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
       HOSTNAME_COMMAND: "docker info | grep ^Name: | cut -d' ' -f 2"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT

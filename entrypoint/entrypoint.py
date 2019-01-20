@@ -7,7 +7,6 @@ route                       = os.environ['ROUTE']
 kafka_connect               = os.environ['KAFKA_CONNECT']
 kafka_topic                 = os.environ['KAFKA_TOPIC']
 kafka_value_serializer_type = os.environ['KAFKA_VALUE_SERIALIZER']
-kafka_compression_type      = os.getenv( 'KAFKA_COMPRESSION')
 
 
 def json_serializer(data):
@@ -27,7 +26,12 @@ else:
 
 
 app = Flask(__name__)
-producer = KafkaProducer(bootstrap_servers=kafka_connect, value_serializer=kafka_value_serializer, compression_type=kafka_compression_type)
+producer = KafkaProducer(
+    bootstrap_servers=kafka_connect,
+    value_serializer=kafka_value_serializer,
+    compression_type='gzip',
+    retries=2,
+)
 
 
 def on_send_error(error):

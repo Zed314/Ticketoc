@@ -2,6 +2,7 @@ import os
 import json
 import asyncio
 import websockets
+import threading
 from collections  import namedtuple
 from kafka        import KafkaConsumer
 from asgiref.sync import sync_to_async
@@ -23,74 +24,122 @@ else:
     raise ValueError("unknown value '{value}' for kafka_value_deserializer_type".format(value=kafka_value_deserializer_type))
 
 
-class Subscription:
+class Subscriptions:
 
     def __init__(self):
         self._topics = set()
-        self._consumer = KafkaConsumer(bootstrap_servers=kafka_connect, value_deserializer=kafka_value_deserializer)
+        self._consumer = None
         self._ready = asyncio.Event()
+        self._lock = threading.Lock()
 
-    async def poll(self):
-        await self._ready.wait()
-        record = await self._poll()
+    @sync_to_async
+    def start(self):
+        with self._lock:
+            self._new_consumer()
+
+    async def getone(self):
+        record = None
+        while record is None:
+            await self._ready.wait()
+            record = await self._poll()
         return record
 
     @sync_to_async
     def _poll(self):
-        return next(self._consumer)
+        with self._lock:
+            if self._ready.is_set():
+                record = self._consumer.poll(max_records=1, timeout_ms=1000).values()
+                if len(record):
+                    return next(iter(record))[0]
+                else:
+                    return None
+            else:
+                return None
 
+    @sync_to_async
     def add(self, topic):
-        self._topics.add(topic)
-        self._consumer.subscribe(list(self._topics))
-        self._ready.set()
+        with self._lock:
+            self._topics.add(topic)
+            self._new_consumer(self._topics)
 
+    @sync_to_async
     def remove(self, topic):
-        self._topics.remove(topic)
-
-        if len(self._topics):
-            self._consumer.subscribe(list(self._topics))
-        else:
-            self._consumer.unsubscribe()
-            self._ready.clear()
+        with self._lock:
+            self._topics.remove(topic)
+            if len(self._topics):
+                self._new_consumer(self._topics)
+            else:
+                self._new_consumer()
 
     def __contains__(self, topic):
         return topic in self._topics
 
-    def exist(self, topic):
-        return topic in self._consumer.topics()
-
     def __len__(self):
         return len(self._topics)
 
-    def close(self):
-        self._consumer.close()
+    def subscribed_topics(self):
+        return self._topics.copy()
+
+    @sync_to_async
+    def existing_topics(self):
+        return self._consumer.topics()
+
+    def _new_consumer(self, topics=None):
+
+        if self._consumer is not None:
+            self._consumer.close()
+
+        self._consumer = KafkaConsumer(*(topics or []), bootstrap_servers=kafka_connect, value_deserializer=kafka_value_deserializer)
+
+        if topics:
+            self._ready.set()
+        else:
+            self._ready.clear()
+
+    @sync_to_async
+    def stop(self):
+        with self._lock:
+            self._consumer.close()
 
 
 class Controller:
 
     Message = namedtuple('Message', ['type', 'topic'])
 
-    def __init__(self, client, subscription):
+    def __init__(self, client):
         self._client = client
-        self._subscription = subscription
+        self._subscriptions = Subscriptions()
 
-    async def client_to_subscription(self):
+    async def run(self):
+
+        await self._subscriptions.start()
+
+        client_to_subscription = asyncio.ensure_future(self._client_to_subscriptions())
+        subscription_to_client = asyncio.ensure_future(self._subscriptions_to_client())
+
+        done, pending = await asyncio.wait([client_to_subscription, subscription_to_client], return_when=asyncio.FIRST_COMPLETED)
+
+        for task in pending: task.cancel()
+
+        await  self._subscriptions.stop()
+
+    async def _client_to_subscriptions(self):
 
         async for message in self._client:
 
             message = self._parse_message(message)
 
             if message.type == 'subscribe':
-                await self._send_to_client(self._handle_subscribe(message))
+                await self._send_to_client(await self._handle_subscribe(message))
 
             if message.type == 'unsubscribe':
-                await self._send_to_client(self._handle_unsubscribe(message))
+                await self._send_to_client(await self._handle_unsubscribe(message))
 
-    async def subscription_to_client(self):
+    async def _subscriptions_to_client(self):
 
         while True:
 
-            record = await self._subscription.poll()
+            record = await self._subscriptions.getone()
 
             await self._send_to_client(self._message_record(record.topic, record.value))
 
@@ -101,24 +150,27 @@ class Controller:
 
         await self._client.send(message)
 
-    def _handle_subscribe(self, message):
+    async def _handle_subscribe(self, message):
 
-        if message.topic not in kafka_topics or not self._subscription.exist(message.topic):
+        if message.topic not in kafka_topics:
             return self._message_not_advertised(message.topic)
 
-        if message.topic in self._subscription:
+        if message.topic not in await self._subscriptions.existing_topics():
+            return self._message_not_exist(message.topic)
+
+        if message.topic in self._subscriptions:
             return self._message_already_subscribed(message.topic)
 
-        self._subscription.add(message.topic)
+        await self._subscriptions.add(message.topic)
 
         return self._message_subscribed(message.topic)
 
-    def _handle_unsubscribe(self, message):
+    async def _handle_unsubscribe(self, message):
 
-        if message.topic not in self._subscription:
+        if message.topic not in self._subscriptions:
             return self._message_not_subscribed(message.topic)
 
-        self._subscription.remove(message.topic)
+        await self._subscriptions.remove(message.topic)
 
         return self._message_unsubscribed(message.topic)
 
@@ -142,6 +194,10 @@ class Controller:
         return {'type': 'action_answer', 'result': 2, 'note': "Topic '{topic}' is not advertised".format(topic=topic)}
 
     @staticmethod
+    def _message_not_exist(topic):
+        return {'type': 'action_answer', 'result': 2, 'note': "Topic '{topic}' doesn't exist".format(topic=topic)}
+
+    @staticmethod
     def _message_subscribed(topic):
         return {'type': 'action_answer', 'result': 0, 'note': "Subscribed to '{topic}'".format(topic=topic)}
 
@@ -153,24 +209,10 @@ class Controller:
     def _message_record(topic, value):
         return {'type': 'topic_message', 'topic': topic, 'message': value}
 
-    def close(self):
-        self._client.close()
-        self._subscription.close()
-
 
 async def connection(socket, path):
-
-    controller = Controller(socket, Subscription())
-
-    client_to_subscription = asyncio.ensure_future(controller.client_to_subscription())
-    subscription_to_client = asyncio.ensure_future(controller.subscription_to_client())
-
-    done, pending = await asyncio.wait([client_to_subscription, subscription_to_client], return_when=asyncio.FIRST_COMPLETED)
-
-    for task in pending:
-        task.cancel()
-
-    controller.close()
+    controller = Controller(socket)
+    await controller.run()
 
 
 start_server = websockets.serve(connection, '0.0.0.0', 40510)

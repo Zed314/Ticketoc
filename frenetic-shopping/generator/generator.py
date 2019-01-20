@@ -4,6 +4,7 @@ import io
 import json
 import re
 import requests
+import os
 
 import avro.io
 import avro.schema
@@ -14,15 +15,21 @@ from time import sleep, time
 from pymongo import MongoClient
 from math import cos, pi
 
+
+entrypoint      = os.environ['ENTRYPOINT']
+schema_registry = os.environ['SCHEMA_REGISTRY']
+generator_db    = os.environ['GENERATOR_DB']
+
+
 def getProductSchema():
-	return requests.get('http://schema-registry/v1/schemas/product').text
+	return requests.get('http://{address}/v1/schemas/product'.format(address=schema_registry)).text
 
 
 schema = avro.schema.Parse(getProductSchema())
 writer = avro.io.DatumWriter(schema)
 
 
-client = MongoClient('mongodb://generator-db:27017/')
+client = MongoClient('mongodb://{address}/'.format(address=generator_db))
 supermarketDB = client["supermarket"]
 products = supermarketDB["products"]
 categories = supermarketDB["categories"]
@@ -441,11 +448,11 @@ while True:
 					encoder = avro.io.BinaryEncoder(bytes_writer)
 					writer.write(dict(cashRec), encoder)
 					
-					r = requests.post('http://entrypoint/v1/tickets',data = bytes_writer.getvalue(),
+					r = requests.post('http://{address}/v1/tickets'.format(address=entrypoint),data = bytes_writer.getvalue(),
                     headers={'Content-Type': 'application/avro'})
 					#print(r.content)
 				else :
-					r=requests.post('http://entrypoint/v1/tickets',json=cashRec)
+					r=requests.post('http://{address}/v1/tickets'.format(address=entrypoint),json=cashRec)
 					#print(r.content)
 			finally:
 				pass
