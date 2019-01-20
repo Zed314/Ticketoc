@@ -48,7 +48,7 @@ def error_handler(error):
 
 
 @app.route(route, methods=['POST'])
-def post_message():
+def resource_send():
 
     data = None
     headers = None

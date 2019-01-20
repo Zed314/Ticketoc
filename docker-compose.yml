@@ -33,7 +33,7 @@ services:
     image: admo120104/ticketoc:web-sockets-server
     build: web-sockets-server/
     command: [
-      "./wait-for-it.sh", "kafka:9092",         "--",
+      "./wait-for-it.sh", "kafka:9092", "--",
       "python", "web-sockets-server.py"
     ]
     environment:
@@ -60,16 +60,43 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./volumes/kafka:/kafka
     depends_on:
       - zookeeper
-  mongo:
+  backend:
+    image: admo120104/ticketoc:backend
+    build: backend/
+    command: [
+      "./wait-for-it.sh", "database:27017", "--",
+      "python", "backend.py",
+    ]
+    environment:
+      DATABASE: database:27017
+    depends_on:
+      - database-init
+      - database
+  database:
     image: mongo:latest
+    volumes:
+    - ./volumes/database:/data/db
+  database-init:
+    image: admo120104/ticketoc:database-init
+    build: database/init/
+    depends_on:
+      - database
   spark:
     image: admo120104/ticketoc:spark
     build: spark/
+#    command: [
+#      "./wait-for-it.sh", "schema-registry:80", "--",
+#      "./wait-for-it.sh", "database:27017",     "--",
+#      "cmd to launch", "spark job"
+#    ]
     depends_on:
       - kafka
-      - mongo
+      - database
+      - database-init
+      - schema-registry
 networks:
   generator-net:
     driver: bridge

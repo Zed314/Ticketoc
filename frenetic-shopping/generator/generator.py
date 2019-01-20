@@ -16,9 +16,9 @@ from pymongo import MongoClient
 from math import cos, pi
 
 
-entrypoint      = os.environ['ENTRYPOINT']
-schema_registry = os.environ['SCHEMA_REGISTRY']
-generator_db    = os.environ['GENERATOR_DB']
+entrypoint                 = os.environ['ENTRYPOINT']
+schema_registry            = os.environ['SCHEMA_REGISTRY']
+frenetic_shopping_database = os.environ['FRENETIC_SHOPPING_DATABASE']
 
 
 def getProductSchema():
@@ -29,7 +29,7 @@ schema = avro.schema.Parse(getProductSchema())
 writer = avro.io.DatumWriter(schema)
 
 
-client = MongoClient('mongodb://{address}/'.format(address=generator_db))
+client = MongoClient('mongodb://{address}/'.format(address=frenetic_shopping_database))
 supermarketDB = client["supermarket"]
 products = supermarketDB["products"]
 categories = supermarketDB["categories"]
