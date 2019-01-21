@@ -4,6 +4,8 @@ import asyncio
 import websockets
 import threading
 import logging
+import jwt
+import urllib.request
 from websockets.exceptions import ConnectionClosed
 from collections           import namedtuple
 from kafka                 import KafkaConsumer
@@ -170,7 +172,20 @@ class Controller:
 
         await self._client.send(message)
 
+    async def _check_token(self, token):
+        records = jwt.decode(token, verify=False)
+        url = "https://id.centrallink.de/{}/?client_id={}&token={}".format(records["id"], "6d8e67f3-a575-49ac-9df1-c3136046dc21", token)
+        with urllib.request.urlopen(url) as f:
+            print(f.read().decode('utf-8'))
+        return True
+
+
     async def _handle_subscribe(self, message):
+
+        authorized = self._check_token(message.token)
+
+        if not authorized:
+            return self._message_unauthorized(message.topic)
 
         if message.topic not in kafka_topics:
             return self._message_not_advertised(message.topic)
@@ -212,6 +227,10 @@ class Controller:
     @staticmethod
     def _message_not_advertised(topic):
         return {'type': 'action_answer', 'result': 2, 'note': "Topic '{topic}' is not advertised".format(topic=topic)}
+
+    @staticmethod
+    def _message_unauthorized(topic):
+        return {'type': 'action_answer', 'result': 2, 'note': "Message for topic '{topic}' unauthorized".format(topic=topic)}
 
     @staticmethod
     def _message_not_exist(topic):
