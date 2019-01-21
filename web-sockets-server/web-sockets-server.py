@@ -179,7 +179,7 @@ class Controller:
 
         records = jwt.decode(token, verify=False)
 
-        url = 'https://id.centrallink.de/{id}/?client_id={client_id}&token={token}'
+        url = 'https://id.centrallink.de/api/{id}/?client_id={client_id}&token={token}'
         url = url.format(id=records['id'], client_id='6d8e67f3-a575-49ac-9df1-c3136046dc21', token=token)
 
         try:
