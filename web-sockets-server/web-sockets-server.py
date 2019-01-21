@@ -6,6 +6,7 @@ import threading
 import logging
 import jwt
 import urllib.request
+from urllib.request        import HTTPError
 from websockets.exceptions import ConnectionClosed
 from collections           import namedtuple
 from kafka                 import KafkaConsumer
@@ -172,18 +173,23 @@ class Controller:
 
         await self._client.send(message)
 
-    async def _check_token(self, token):
+    @staticmethod
+    @sync_to_async
+    def _check_token(token):
+
         records = jwt.decode(token, verify=False)
-        url = "https://id.centrallink.de/api/{}/?client_id={}&token={}".format(records["id"], "6d8e67f3-a575-49ac-9df1-c3136046dc21", token)
+
+        url = 'https://id.centrallink.de/{id}/?client_id={client_id}&token={token}'
+        url = url.format(id=records['id'], client_id='6d8e67f3-a575-49ac-9df1-c3136046dc21', token=token)
+
         try:
-            with urllib.request.urlopen(url) as f:
+            with urllib.request.urlopen(url):
                 logger.info("Authorized request")
-        except urllib.error.HTTPError as e:
-            print(e)
+        except HTTPError:
             logger.warning("Reject request due to wrong token")
             return False
-        return True
 
+        return True
 
     async def _handle_subscribe(self, message):
 

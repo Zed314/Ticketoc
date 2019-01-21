@@ -1,7 +1,7 @@
 
 
 class LocalSubscriber {
-	constructor(token, options={host: "localhost", port: 40510}) {
+	constructor(token, options={host: "127.0.0.1", port: 40510}) {
 		this.token = token
 		this.connected = false
 		this.commandQueue = []

@@ -11,10 +11,10 @@ services:
     image: admo120104/ticketoc:frenetic-shopping-generator
     build: frenetic-shopping/generator/
     command: [
-      "./wait-for-it.sh", "entrypoint:80",                    "--",
-      "./wait-for-it.sh", "schema-registry:80",               "--",
-      "./wait-for-it.sh", "frenetic-shopping-database:27017", "--",
-      "python", "generator.py","-p","Condoms (XXL),10","-f","2"
+      "./wait-for-it.sh", "entrypoint:80",                    "--timeout=60", "--",
+      "./wait-for-it.sh", "schema-registry:80",               "--timeout=60", "--",
+      "./wait-for-it.sh", "frenetic-shopping-database:27017", "--timeout=60", "--",
+      "python", "generator.py"
     ]
     environment:
       ENTRYPOINT: entrypoint:80

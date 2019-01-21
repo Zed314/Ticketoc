@@ -2,4 +2,4 @@
 
 docker stack rm ticketoc
 docker stack rm frenetic-shopping
-docker swarm leave --force
+docker swarm leave
