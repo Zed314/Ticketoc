@@ -37,24 +37,47 @@ categories = supermarketDB["categories"]
 taxes = {}
 for category in categories.find({}) :
 	taxes[category["name"]] = category["tax"]
+allProducts = {}
+for product in products.find({}) :
+	allProducts[product["name"]] = product
 
 
 
 def getRandomProduct(exclusionList):
-
 	return getRandomProducts(1,exclusionList)[0]
-def getRandomProducts(nb,exclusionList):
-	idList = []
-	for elt in exclusionList:
-		idList.append(elt["_id"])
-	products = supermarketDB.products.aggregate([{"$match":{ "_id":{"$nin":idList}}},{ "$sample": { "size": nb }} ])
+def getRandomProducts(nb,exclusionList,requestDB=False):
+	if requestDB:
+		idList = []
+		for elt in exclusionList:
+			idList.append(elt["_id"])
+		products = supermarketDB.products.aggregate([{"$match":{ "_id":{"$nin":idList}}},{ "$sample": { "size": nb }} ])
 
-	return list(products)
-def getProductByName(name):
-	return supermarketDB.products.find({ "name"  :name })[0]
+		return list(products)
+	else:
+		idList = []
 
-def getProductsByName(names):
-	return list(supermarketDB.products.find({ "name"  :{"$in":names} }))
+		products = []
+		for elt in exclusionList:
+			idList.append(elt["_id"])
+		for i in range(nb):
+			products.append(choice([a for a in allProducts.values() if a["_id"] not in idList]))
+		return products
+	
+def getProductByName(name,useDB = False):
+	if useDB:
+		return supermarketDB.products.find({ "name"  :name })[0]
+	else:
+		return allProducts[name]
+
+def getProductsByName(names, useDB=False):
+	
+	if useDB:
+		return list(supermarketDB.products.find({ "name"  :{"$in":names} }))
+	else:
+		products = []
+		for name in names:
+			products.append(allProducts[name])
+		return products
 
 def getProductsNotCompatible(season):
 	return list(supermarketDB.products.find( { "$and": [ { "restrictions": { "$nin":[season] } }, { "restrictions": { "$exists": True } } ] }))
@@ -200,7 +223,10 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 	order["numberOfElements"] = returnValueIfValueOrBelow(int(gauss(munbelement, sigmanbelement)),1)
 	order["billingMethod"] = PaymentMethod.CASH
 	order["finishTime"] = estimateTimeRequired(order,cashier) + time()
-	doesThisOrderFollowTheTrend = uniform(0,100)<30
+	if len(trendingProducts)==0:
+		doesThisOrderFollowTheTrend = False
+	else:
+		doesThisOrderFollowTheTrend = uniform(0,100)<30
 	order["followTheTrend"] = doesThisOrderFollowTheTrend
 	exclusionList = []
 	#print(probabilityOfOrder)
@@ -365,24 +391,32 @@ class PaymentMethod(Enum):
 
 parser = argparse.ArgumentParser(description='Generate some tickets.')
 parser.add_argument("-a", "--avro", help="use avro serialization (default : json)")
+parser.add_argument("-f", "--force", type=int,
+                    help="for a number of tickets per second")
 parser.add_argument("-t", "--tpm", type=float, default =60,
                     help="ticket per minute on average")
-parser.add_argument("-c", "--checkoutnumber", type=int, default =100,
+parser.add_argument("-c", "--checkoutnumber", type=int, default =20,
                     help="number of different checkout in one store")
 parser.add_argument("-s","--storeID",type=int, default = "0",
 					help="id of the store")
-parser.add_argument("-p","--popular",type=str, default = "",
+parser.add_argument("-p","--popular",type=str, default = "r",
 					help="name of the popular product, separated by a comma and followed by the probability in percentage")
-parser.add_argument('--holiday', choices=['motherday','christmas','newyearseve',"valentinesday","blackfriday","easter"],default="blackfriday", help='Choose the holiday that will influence the clients')
+parser.add_argument('--holiday', choices=['motherday','christmas','newyearseve',"valentinesday","blackfriday","easter"],default="", help='Choose the holiday that will influence the clients')
 
 	
 args = parser.parse_args()
 
 useAvro = args.avro
-popularProductsToDecode = re.split('[-,]', args.popular)
+force = args.force
+
+popularProductsToDecode =  args.popular.split(",")
+
+
 popularProducts = []
 
 if len(popularProductsToDecode)>=2:
+	if len(popularProductsToDecode)%2 != 0:
+		print("Bad formatting of the popular products")
 	for i,elt in enumerate(popularProductsToDecode):
 		if i % 2 == 0:
 			popularProducts.append([elt])
@@ -390,7 +424,7 @@ if len(popularProductsToDecode)>=2:
 			popularProducts[len(popularProducts)-1].append(int(elt))
 
 #Todo : change
-popularProducts = []#[("Raspberry Pi",0),("Condoms (XXL)",100)]
+#popularProducts = []#[("Raspberry Pi",0),("Condoms (XXL)",100)]
 trendingProducts = []
 if args.holiday:
 	for match in products.find({ "holidays" : { "$in" : [args.holiday] } }):
@@ -398,12 +432,12 @@ if args.holiday:
 
 					
 
-ticketsPerMinute = args.tpm
+#ticketsPerMinute = args.tpm
 numberOfCheckout = args.checkoutnumber
 numberOfAgent = args.checkoutnumber
 idOfStore = args.storeID
-muspeedcashier = 1.0
-sigmaspeedcashier = 0.3
+muspeedcashier = 0.3
+sigmaspeedcashier = 0.6
 muspeedcash = 7.0
 sigmaspeedcash = 4.0
 munbelement = 10.0
@@ -429,9 +463,19 @@ currentOrders = [generateOrder(cashiers[i], popularProducts,trendingProducts,arg
 
 begin = True
 
+ticketsPerSecond = 0
+begSec = time()
+
+#if force:
+#	while True:
+#		probabilityOfOrder= 1
+#		cashRec = generateCashReceipt(storeid=idOfStore,terminalid=randint(10),agentid=randint(10),customerid=randint(100),order=order,timestamp=time())
+
 while True:
 	probabilityOfOrder= (cos(time()*2*pi*1/(2*2*60))+1)*100/2
 	#print(probabilityOfOrder)
+	
+	#print(popularProducts)
 	for i,order in enumerate(currentOrders):
 		if order["finishTime"]<= time() or begin:
 			begin = False
@@ -439,6 +483,7 @@ while True:
 				#print("Not an order")
 				currentOrders[i] = generateOrder(cashiers[i], popularProducts,trendingProducts,args.holiday,probabilityOfOrder)
 				continue
+			
 			cashRec = generateCashReceipt(storeid=idOfStore,terminalid=i,agentid=i,customerid=200,order=order,timestamp=time())
 			#print(cashRec)
 			
@@ -457,4 +502,10 @@ while True:
 			finally:
 				pass
 			currentOrders[i] = generateOrder(cashiers[i], popularProducts,trendingProducts,args.holiday,probabilityOfOrder)
+			ticketsPerSecond += 1
 	sleep(0.01)
+#	print(ticketsPerSecond,flush=True)
+	if time()-begSec >=1:
+		print(ticketsPerSecond,flush=True)
+		ticketsPerSecond = 0
+		begSec = time()

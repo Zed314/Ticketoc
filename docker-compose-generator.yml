@@ -7,26 +7,7 @@ services:
       "./wait-for-it.sh", "entrypoint:80",                    "--",
       "./wait-for-it.sh", "schema-registry:80",               "--",
       "./wait-for-it.sh", "frenetic-shopping-database:27017", "--",
-      "python", "generator.py",
-    ]
-    environment:
-      ENTRYPOINT: entrypoint:80
-      SCHEMA_REGISTRY: schema-registry:80
-      FRENETIC_SHOPPING_DATABASE: frenetic-shopping-database:27017
-    depends_on:
-      - frenetic-shopping-init
-      - frenetic-shopping-database
-    networks:
-      - default
-      - ticketoc_generator-net
-  frenetic-shopping-generator-2:
-    image: admo120104/ticketoc:frenetic-shopping-generator
-    build: frenetic-shopping/generator/
-    command: [
-      "./wait-for-it.sh", "entrypoint:80",                    "--",
-      "./wait-for-it.sh", "schema-registry:80",               "--",
-      "./wait-for-it.sh", "frenetic-shopping-database:27017", "--",
-      "python", "generator.py", "-s", "1337"
+      "python", "generator.py","-p","Condoms (XXL),100"
     ]
     environment:
       ENTRYPOINT: entrypoint:80

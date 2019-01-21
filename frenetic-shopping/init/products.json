@@ -91,7 +91,7 @@
 	},
 	{
 		"category": "movie",
-		"name": "The Lord of the Rings:  The Two Towers",
+		"name": "The Lord of the Rings: The Two Towers",
 		"unit": "each",
 		"notwith": [
 			"The Lord of the Rings: The Two Towers"
@@ -227,7 +227,7 @@
 			"MicroSD Card (32Gb)"
 		],
 		"notwith": [
-			"Canon Camera",
+			"Canon Camera",
 			"Sony Camera",
 			"4K TV 200 inches",
 			"3D TV 100 inches"
@@ -6885,121 +6885,121 @@
 	},
 	{
 		"name": "Lotus confort papier hygienique rose aquatube rouleau x24",
-		"category": "generalfood",
+		"category": "everydaylife",
 		"price": 7.94,
 		"unit": "each"
 	},
 	{
 		"name": "Auchan papier hygienique 3 plis extra doux coton blanc x12",
-		"category": "generalfood",
+		"category": "everydaylife",
 		"price": 4.13,
 		"unit": "each"
 	},
 	{
 		"name": "Renova papier toilette yorissime rouleau x48 +24offerts",
-		"category": "generalfood",
+		"category": "everydaylife",
 		"price": 21.5,
 		"unit": "each"
 	},
 	{
 		"name": "Auchan mouchoirs home blancs 3 plis boite x100",
-		"category": "generalfood",
+		"category": "health",
 		"price": 1.05,
 		"unit": "each"
 	},
 	{
 		"name": "Auchan essuie tout blanc maxi rouleau x6",
-		"category": "generalfood",
+		"category": "housecleaning",
 		"price": 6.01,
 		"unit": "each"
 	},
 	{
 		"name": "Auchan papier toilette blanc maxi rouleaux 280 feuilles x6",
-		"category": "generalfood",
+		"category": "everydaylife",
 		"price": 2.12,
 		"unit": "each"
 	},
 	{
 		"name": "Auchan papier toilette blanc maxi rouleau 216 feuilles x12",
-		"category": "generalfood",
+		"category": "everydaylife",
 		"price": 4.05,
 		"unit": "each"
 	},
 	{
 		"name": "Auchan mouchoirs hello blancs 2 plis boite x100",
-		"category": "generalfood",
+		"category": "health",
 		"price": 0.83,
 		"unit": "each"
 	},
 	{
 		"name": "Auchan papier toilette blanc 5plis 90 feuilles rouleau x6",
-		"category": "generalfood",
+		"category": "everydaylife",
 		"price": 3.34,
 		"unit": "each"
 	},
 	{
 		"name": "Sopalin essuie tout sur mesure rouleau x5 +1offert",
-		"category": "generalfood",
+		"category": "housecleaning",
 		"price": 7.95,
 		"unit": "each"
 	},
 	{
 		"name": "Auchan essuie tout blanc maxi 90 feuilles rouleau x4",
-		"category": "generalfood",
+		"category": "housecleaning",
 		"price": 4.23,
 		"unit": "each"
 	},
 	{
 		"name": "Auchan environnement papier toilette blanc rouleau x16",
-		"category": "generalfood",
+		"category": "everydaylife",
 		"price": 6.15,
 		"unit": "each"
 	},
 	{
 		"name": "Lotus papier toilette confort rose ou blanc aquatube x12",
-		"category": "generalfood",
+		"category": "everydaylife",
 		"price": 3.48,
 		"unit": "each"
 	},
 	{
 		"name": "Okay essuie tout decor 3 rouleaux",
-		"category": "generalfood",
+		"category": "housecleaning",
 		"price": 1.99,
 		"unit": "each"
 	},
 	{
 		"name": "Sopalin essuie tout sur mesure blanc x3 = 6 rouleaux",
-		"category": "generalfood",
+		"category": "housecleaning",
 		"price": 4.79,
 		"unit": "each"
 	},
 	{
 		"name": "Omo lessive tropique magnolia 2 en 1 ecodose x 30 -0,723l",
-		"category": "generalfood",
+		"category": "housecleaning",
 		"price": 9.5,
 		"unit": "each"
 	},
 	{
 		"name": "Omo lessive diluee fleurs des tropiques 40 lavages 2l",
-		"category": "generalfood",
+		"category": "housecleaning",
 		"price": 6.99,
 		"unit": "each"
 	},
 	{
 		"name": "Auchan lessive liquide air de printemps 37lavages 2l",
-		"category": "generalfood",
+		"category": "housecleaning",
 		"price": 6.01,
 		"unit": "each"
 	},
 	{
 		"name": "Eau Ecarlate decolor stop 3x25lingettes",
-		"category": "generalfood",
+		"category": "housecleaning",
 		"price": 13.64,
 		"unit": "each"
 	},
 	{
 		"name": "Super Croix Bora Bora ecodose x30 -0,75l",
-		"category": "generalfood",
+		"category": "housecleaning",
 		"price": 9.15,
 		"unit": "each"
 	},

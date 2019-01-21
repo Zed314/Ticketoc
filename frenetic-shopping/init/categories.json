@@ -8,6 +8,10 @@
         "tax": 5
     },
     {
+        "name": "housecleaning",
+        "tax": 5
+    },
+    {
         "name": "meat",
         "tax": 10
     },
