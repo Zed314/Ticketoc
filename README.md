@@ -6,7 +6,7 @@ Some utility scripts to enable docker when doing a fresh install, to start and s
 
 ```
 scripts/install.sh
-scripts/build.sh <dir: frenetic-shopping/app>
+scripts/build.sh [--push]
 scripts/start.sh
 scripts/stop.sh
 scripts/clean.sh [--deep]
@@ -98,8 +98,8 @@ sudo chown 1001:1001 -R volumes/kafka
 
 # Project Members and Roles
 
-Martin Haug : Dashboard WebUI & Cash-Clasp WebSocketServer
-Faycal Bziou : Spark Streaming
-Pierrick Chauvet : Spark Streaming 
-Adrien Moll : Kafka & Entrypoint
-Ziggy Vergne : Generator & Persistence MongoDB
+- Martin Haug : Dashboard WebUI & Cash-Clasp WebSocketServer
+- Faycal Bziou : Spark Streaming
+- Pierrick Chauvet : Spark Streaming 
+- Adrien Moll : Kafka & Entrypoint
+- Ziggy Vergne : Generator & Persistence MongoDB

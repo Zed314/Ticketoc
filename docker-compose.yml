@@ -48,7 +48,7 @@ services:
     environment:
       DATABASE: database:27017
     ports:
-      - 9000:80
+      - 10000:80
     depends_on:
       - database
     deploy:
@@ -79,6 +79,8 @@ services:
       "./wait-for-it.sh", "schema-registry:80", "--",
       "python", "entrypoint.py"
     ]
+    ports:
+      - 8000:80
     depends_on:
       - kafka
       - schema-registry
@@ -91,6 +93,8 @@ services:
   schema-registry:
     image: admo120104/ticketoc:schema-registry
     build: schema-registry/
+    ports:
+      - 9000:80
     networks:
       - default
       - extra-net

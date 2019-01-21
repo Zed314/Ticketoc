@@ -8,7 +8,7 @@ then
 
     if ! [[ $(cat ~/.docker/config.json | grep "https://index.docker.io/v1/") ]]
     then
-        docker login
+        docker login || exit 1
     fi
 
 	docker-compose -f docker-compose.yml           push
