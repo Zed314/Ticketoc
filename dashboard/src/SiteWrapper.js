@@ -47,9 +47,9 @@ class SiteWrapper extends Component {
           href: "/",
           alt: "Ticketoc",
           imageURL: "/logo.svg",
-          accountDropdown: accountDropdownProps,
+          accountDropdown: !this.props.loggedOut ? accountDropdownProps : { className: "hidden", name: "Logged out" },
         }}
-        navProps={{ itemsObjects: navBarItems }}
+        navProps={{ itemsObjects: !this.props.loggedOut ? navBarItems : [{ value: "Start", to: "/landing", icon: "log-in", LinkComponent: withRouter(NavLink) }] }}
         routerContextComponentType={withRouter(RouterContextProvider)}
         footerProps={{
           links: [

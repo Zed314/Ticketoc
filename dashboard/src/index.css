@@ -205,3 +205,35 @@ table.payment-types > tr > td:first-child {
 .payment-cb-dark {
   background-image: url(cb-dark.svg) !important;
 }
+
+.landing-page h2 {
+  margin-top: 60px;
+  text-align: center;
+  font-weight: bolder;
+}
+
+.landing-page h2 small {
+  display: block;
+}
+
+.login img {
+  height: 1.3rem;
+  padding-bottom: 2px;
+  width: auto;
+  margin-right: 10px;
+  transition: 0.15s filter;
+}
+
+.login.btn {
+ font-size: 1rem;
+}
+
+.login.btn:hover img, .login.btn:active img {
+ font-size: 1rem;
+ filter: invert(1);
+}
+
+.landing-page .cta {
+  text-align: center;
+  padding: 10px 20px 40px 20px;
+}
