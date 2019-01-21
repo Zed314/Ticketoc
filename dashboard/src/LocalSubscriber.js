@@ -1,7 +1,8 @@
 
 
 class LocalSubscriber {
-	constructor(options={host: "localhost", port: 40510}) {
+	constructor(token, options={host: "localhost", port: 40510}) {
+		this.token = token
 		this.connected = false
 		this.commandQueue = []
 		this.topicCallbacks = {}
@@ -49,7 +50,7 @@ class LocalSubscriber {
 			this.topicCallbacks[topic] = []
 		
 		this.topicCallbacks[topic].push(action)
-		this.socket.send(JSON.stringify({ type:"subscribe", topic }))
+		this.socket.send(JSON.stringify({ type:"subscribe", topic, token: this.token }))
 		console.log(`Sent subscription request for ${topic}`)
 	}
 
@@ -60,7 +61,7 @@ class LocalSubscriber {
 		}
 
 		delete this.topicCallbacks[topic]
-		this.socket.send(JSON.stringify({ type:"unsubscribe", topic }))
+		this.socket.send(JSON.stringify({ type:"unsubscribe", topic, token: this.token }))
 	}
 
 	close() {

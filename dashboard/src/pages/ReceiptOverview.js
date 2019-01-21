@@ -13,14 +13,14 @@ class ReceiptOverview extends Component {
   }
 
   componentDidMount() {
-    this.startSockClient()
+    this.startSockClient(window.localStorage.getItem('token'))
   }
 
-  startSockClient() {
+  startSockClient(token) {
     this.setState({
       loading: true,
     })
-    this.socketClient = new LocalSubscriber()
+    this.socketClient = new LocalSubscriber(token)
     this.socketClient.connectAction = () => {
       this.setState({
         connectionError: false,

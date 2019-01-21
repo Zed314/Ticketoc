@@ -7,6 +7,8 @@ import {
   Error500,
   Landing,
   ReceiptOverview,
+  Auth,
+  Logout,
 } from "./pages";
 
 import HomePage from "./HomePage";
@@ -21,6 +23,8 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={HomePage} />
             <Route exact path="/landing" component={Landing} />
+            <Route exact path="/logout" component={Logout} />
+            <Route exact path="/auth" component={Auth} />
             <Route exact path="/receipts" component={ReceiptOverview} />
             <Route exact path="/500" component={Error500} />
             <Route component={Error404} />

@@ -1,5 +1,6 @@
 import React, {Component} from "react";
-import { NavLink, withRouter } from "react-router-dom";
+import AuthHelpers from "./AuthHelpers";
+import { NavLink, withRouter, Redirect } from "react-router-dom";
 
 import {
   Site,
@@ -28,19 +29,36 @@ const navBarItems = [
   },
 ];
 
-const accountDropdownProps = {
-  avatarURL: "/logo.svg",
-  name: "Reactive Person",
-  description: "Administrator",
-  options: [
-    { icon: "user", value: "Profile" },
-    { icon: "settings", value: "Settings" },
-    { icon: "log-out", value: "Sign out" },
-  ],
-};
 
 class SiteWrapper extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { loggedIn: undefined, tokenInfo: null };
+  }
+
+  componentDidMount() {
+    const token = window.localStorage.getItem('token');
+    this.setState({ loggedIn: token !== null });
+    if (token !== null) {
+      this.setState({ tokenInfo: AuthHelpers.getInfo(token) });
+    }
+  }
+
   render() {
+    let redir = null;
+    if (this.state.loggedIn === false && !this.props.loggedOut) {
+      redir = (<Redirect to='/landing#login_required' />);
+    }
+    const accountDropdownProps = {
+      avatarURL: this.state.tokenInfo ? "https://id.centrallink.de" + this.state.tokenInfo.profile_picture : null,
+      name: this.state.tokenInfo ? this.state.tokenInfo.username : "Loading",
+      description: "Administrator",
+      options: [
+        { icon: "log-out", value: "Sign out", to: "/logout" },
+      ],
+    };
+
+
     return (
       <Site.Wrapper
         headerProps={{
@@ -86,6 +104,7 @@ class SiteWrapper extends Component {
           ),
         }}
       >
+        {redir}
         {this.props.children}
       </Site.Wrapper>
     );
