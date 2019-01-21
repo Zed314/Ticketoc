@@ -1,9 +1,11 @@
+import Infra.TicketAccumulator
 import org.apache.spark._
-import org.apache.spark.sql.{ForeachWriter, SparkSession ,  Row}
+import org.apache.spark.sql.{ForeachWriter, Row, SparkSession}
 import org.apache.spark.streaming._
-import org.apache.spark.sql.functions._ 
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DataTypes
 import org.apache.spark.sql.types.StructType
+import org.apache.spark.streaming.kafka010.{HasOffsetRanges, KafkaUtils}
 
 
 object StreamingKafka
@@ -35,11 +37,38 @@ object StreamingKafka
     
 
 
-
+    /*** https://spark.apache.org/docs/latest/streaming-kafka-0-10-integration.html ***/
 
 
 
     /*** Traitement data ***/
+
+    var somme = new TicketAccumulator()
+
+    /*
+    val stream = KafkaUtils.createDirectStream[String, String](
+      spark,
+      PreferConsistent,
+      Assign[String, String](fromOffsets.keys.toList, kafkaParams, fromOffsets)
+    )
+
+    stream.foreachRDD { rdd =>
+      val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
+
+      val results = yourCalculation(rdd)
+
+      // begin your transaction
+
+      // update results
+      // update offsets where the end of existing offsets matches the beginning of this batch of offsets
+      // assert that offsets were updated correctly
+
+      // end your transaction
+    }
+*/
+
+
+
 
     val consoleOutput = inputDf.writeStream
       .outputMode("append")
