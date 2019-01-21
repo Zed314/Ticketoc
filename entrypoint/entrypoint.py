@@ -25,7 +25,7 @@ else:
     raise ValueError("unknown value '{value}' for kafka_value_serializer_type".format(value=kafka_value_serializer_type))
 
 
-app = Flask(__name__)
+app = Flask('entrypoint')
 producer = KafkaProducer(
     bootstrap_servers=kafka_connect,
     value_serializer=kafka_value_serializer,
@@ -69,4 +69,4 @@ def resource_send():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, threaded=True)
-    producer.close(timeout=60)
+    producer.close()

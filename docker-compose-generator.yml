@@ -1,5 +1,12 @@
 version: '3.5'
+
+# Rule for attributes ordering :
+# image > build  > cmd > env > ports > volumes > depends_on > networks > deploy
+# placement > restart_policy > replicas
+
 services:
+
+########## GENERATOR ##########
   frenetic-shopping-generator:
     image: admo120104/ticketoc:frenetic-shopping-generator
     build: frenetic-shopping/generator/
@@ -7,25 +14,27 @@ services:
       "./wait-for-it.sh", "entrypoint:80",                    "--",
       "./wait-for-it.sh", "schema-registry:80",               "--",
       "./wait-for-it.sh", "frenetic-shopping-database:27017", "--",
-      "python", "generator.py","-p","Condoms (XXL),100"
+      "python", "generator.py"
     ]
     environment:
       ENTRYPOINT: entrypoint:80
       SCHEMA_REGISTRY: schema-registry:80
       FRENETIC_SHOPPING_DATABASE: frenetic-shopping-database:27017
     depends_on:
-      - frenetic-shopping-init
       - frenetic-shopping-database
     networks:
       - default
-      - ticketoc_generator-net
+      - ticketoc_extra-net
+    deploy:
+      replicas: 2
+
+########## DATABASE ##########
   frenetic-shopping-database:
     image: mongo:latest
-  frenetic-shopping-init:
-    image: admo120104/ticketoc:frenetic-shopping-init
-    build: frenetic-shopping/init/
-    depends_on:
-      - frenetic-shopping-database
+    volumes:
+        - ./frenetic-shopping/database:/docker-entrypoint-initdb.d
+
+########## NETWORKS ##########
 networks:
-  ticketoc_generator-net:
+  ticketoc_extra-net:
     external: true
