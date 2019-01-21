@@ -112,7 +112,7 @@ class Subscriptions:
 
 class Controller:
 
-    Message = namedtuple('Message', ['type', 'topic'])
+    Message = namedtuple('Message', ['type', 'topic', 'token'])
 
     def __init__(self, client):
         self._client = client
@@ -174,15 +174,20 @@ class Controller:
 
     async def _check_token(self, token):
         records = jwt.decode(token, verify=False)
-        url = "https://id.centrallink.de/{}/?client_id={}&token={}".format(records["id"], "6d8e67f3-a575-49ac-9df1-c3136046dc21", token)
-        with urllib.request.urlopen(url) as f:
-            print(f.read().decode('utf-8'))
+        url = "https://id.centrallink.de/api/{}/?client_id={}&token={}".format(records["id"], "6d8e67f3-a575-49ac-9df1-c3136046dc21", token)
+        try:
+            with urllib.request.urlopen(url) as f:
+                logger.info("Authorized request")
+        except urllib.error.HTTPError as e:
+            print(e)
+            logger.warning("Reject request due to wrong token")
+            return False
         return True
 
 
     async def _handle_subscribe(self, message):
 
-        authorized = self._check_token(message.token)
+        authorized = await self._check_token(message.token)
 
         if not authorized:
             return self._message_unauthorized(message.topic)
@@ -214,7 +219,7 @@ class Controller:
         if isinstance(message, str):
             message = json.loads(message, encoding='utf-8')
 
-        return self.Message(type=message['type'], topic=message['topic'])
+        return self.Message(type=message['type'], topic=message['topic'], token=message['token'])
 
     @staticmethod
     def _message_already_subscribed(topic):
