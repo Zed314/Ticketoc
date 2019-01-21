@@ -463,14 +463,36 @@ currentOrders = [generateOrder(cashiers[i], popularProducts,trendingProducts,arg
 
 begin = True
 
-ticketsPerSecond = 0
+effectiveTicketsPerSecond = 0
 begSec = time()
 
-#if force:
-#	while True:
-#		probabilityOfOrder= 1
-#		cashRec = generateCashReceipt(storeid=idOfStore,terminalid=randint(10),agentid=randint(10),customerid=randint(100),order=order,timestamp=time())
+if force:
+	while True:
+		probabilityOfOrder= 100
+		cashier = {}
+		cashier["id"] = 1
+		cashier["elementPerSecond"] = returnValueIfValueOrBelow(gauss(muspeedcashier, sigmaspeedcashier),0.5)
+		cashier[PaymentMethod.CARD] = 8
+		cashier[PaymentMethod.CASH] = returnValueIfValueOrBelow(gauss(muspeedcash, sigmaspeedcash),2)
+		cashier[PaymentMethod.BOTH] = cashier[PaymentMethod.CARD] + cashier[PaymentMethod.CASH] + 2
 
+		order = generateOrder(cashiers[i], popularProducts,trendingProducts,args.holiday,probabilityOfOrder)
+		cashRec = generateCashReceipt(storeid=idOfStore,terminalid=randint(0,10),agentid=randint(0,10),customerid=randint(0,100),order=order,timestamp=time())
+		try:
+			if useAvro:
+				bytes_writer = io.BytesIO()
+				encoder = avro.io.BinaryEncoder(bytes_writer)
+				writer.write(dict(cashRec), encoder)
+			
+				r = requests.post('http://{address}/v1/tickets'.format(address=entrypoint),data = bytes_writer.getvalue(),
+            	headers={'Content-Type': 'application/avro'})
+					#print(r.content)
+			else :
+				r=requests.post('http://{address}/v1/tickets'.format(address=entrypoint),json=cashRec)
+				#print(r.content)
+		finally:
+			pass
+		sleep(1/force)		
 while True:
 	probabilityOfOrder= (cos(time()*2*pi*1/(2*2*60))+1)*100/2
 	#print(probabilityOfOrder)
@@ -502,10 +524,10 @@ while True:
 			finally:
 				pass
 			currentOrders[i] = generateOrder(cashiers[i], popularProducts,trendingProducts,args.holiday,probabilityOfOrder)
-			ticketsPerSecond += 1
+			effectiveTicketsPerSecond += 1
 	sleep(0.01)
 #	print(ticketsPerSecond,flush=True)
 	if time()-begSec >=1:
-		print(ticketsPerSecond,flush=True)
-		ticketsPerSecond = 0
+		print(effectiveTicketsPerSecond,flush=True)
+		effectiveTicketsPerSecond = 0
 		begSec = time()
