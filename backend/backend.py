@@ -4,7 +4,7 @@ from pymongo import MongoClient
 
 database = os.environ['DATABASE']
 
-app = Flask(__name__)
+app = Flask('backend')
 mongo = MongoClient('mongodb://{address}/'.format(address=database))
 
 

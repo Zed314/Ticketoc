@@ -1,5 +1,12 @@
 version: '3.5'
+
+# Rule for attributes ordering :
+# image > build  > cmd > env > ports > volumes > depends_on > networks > deploy
+# placement > restart_policy > replicas
+
 services:
+
+########## APPLICATION ##########
   dashboard:
     image: admo120104/ticketoc:dashboard
     build: dashboard/
@@ -7,28 +14,10 @@ services:
       - 8080:80
     depends_on:
       - web-sockets-server
-  entrypoint:
-    image: admo120104/ticketoc:entrypoint
-    build: entrypoint/
-    environment:
-      ROUTE: /v1/tickets
-      KAFKA_CONNECT: kafka:9092
-      KAFKA_TOPIC: input_tickets
-      KAFKA_VALUE_SERIALIZER: json
-    networks:
-      - default
-      - generator-net
-    command: [
-      "./wait-for-it.sh", "kafka:9092",         "--",
-      "./wait-for-it.sh", "schema-registry:80", "--",
-      "python", "entrypoint.py"
-    ]
-    depends_on:
-      - kafka
-      - schema-registry
-  schema-registry:
-    image: admo120104/ticketoc:schema-registry
-    build: schema-registry/
+    deploy:
+      replicas: 2
+
+
   web-sockets-server:
     image: admo120104/ticketoc:web-sockets-server
     build: web-sockets-server/
@@ -45,8 +34,73 @@ services:
     depends_on:
       - kafka
       - spark
+    deploy:
+      replicas: 2
+
+
+  backend:
+    image: admo120104/ticketoc:backend
+    build: backend/
+    command: [
+      "./wait-for-it.sh", "database:27017", "--",
+      "python", "backend.py",
+    ]
+    environment:
+      DATABASE: database:27017
+    ports:
+      - 9000:80
+    depends_on:
+      - database
+    deploy:
+      replicas: 2
+
+########## DATABASE ##########
+  database:
+    image: mongo:latest
+    volumes:
+    - ./volumes/database:/data/
+    - ./database:/docker-entrypoint-initdb.d
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+########## INGESTION ##########
+  entrypoint:
+    image: admo120104/ticketoc:entrypoint
+    build: entrypoint/
+    environment:
+      ROUTE: /v1/tickets
+      KAFKA_CONNECT: kafka:9092
+      KAFKA_TOPIC: input_tickets
+      KAFKA_VALUE_SERIALIZER: json
+    command: [
+      "./wait-for-it.sh", "kafka:9092",         "--",
+      "./wait-for-it.sh", "schema-registry:80", "--",
+      "python", "entrypoint.py"
+    ]
+    depends_on:
+      - kafka
+      - schema-registry
+    networks:
+      - default
+      - extra-net
+    deploy:
+      replicas: 2
+
+  schema-registry:
+    image: admo120104/ticketoc:schema-registry
+    build: schema-registry/
+    networks:
+      - default
+      - extra-net
+    deploy:
+      replicas: 2
+
+########## MESSAGE BROKER ##########
   zookeeper:
     image: zookeeper:latest
+
   kafka:
     image: wurstmeister/kafka:latest
     environment:
@@ -63,27 +117,12 @@ services:
       - ./volumes/kafka:/kafka
     depends_on:
       - zookeeper
-  backend:
-    image: admo120104/ticketoc:backend
-    build: backend/
-    command: [
-      "./wait-for-it.sh", "database:27017", "--",
-      "python", "backend.py",
-    ]
-    environment:
-      DATABASE: database:27017
-    depends_on:
-      - database-init
-      - database
-  database:
-    image: mongo:latest
-    volumes:
-    - ./volumes/database:/data/db
-  database-init:
-    image: admo120104/ticketoc:database-init
-    build: database/init/
-    depends_on:
-      - database
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+########## SPARK ##########
   spark:
     image: admo120104/ticketoc:spark
     build: spark/
@@ -95,8 +134,21 @@ services:
     depends_on:
       - kafka
       - database
-      - database-init
       - schema-registry
+
+########## VISUALIZER ##########
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - 7000:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      replicas: 2
+
+########## NETWORKS ##########
 networks:
-  generator-net:
-    driver: bridge
+  extra-net:
