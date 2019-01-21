@@ -22,7 +22,7 @@ services:
     image: admo120104/ticketoc:web-sockets-server
     build: web-sockets-server/
     command: [
-      "./wait-for-it.sh", "kafka:9092", "--",
+      "./wait-for-it.sh", "kafka:9092", "--timeout=60", "--",
       "python", "web-sockets-server.py"
     ]
     environment:
@@ -42,7 +42,7 @@ services:
     image: admo120104/ticketoc:backend
     build: backend/
     command: [
-      "./wait-for-it.sh", "database:27017", "--",
+      "./wait-for-it.sh", "database:27017", "--timeout=60", "--",
       "python", "backend.py",
     ]
     environment:
@@ -75,8 +75,8 @@ services:
       KAFKA_TOPIC: input_tickets
       KAFKA_VALUE_SERIALIZER: json
     command: [
-      "./wait-for-it.sh", "kafka:9092",         "--",
-      "./wait-for-it.sh", "schema-registry:80", "--",
+      "./wait-for-it.sh", "kafka:9092",         "--timeout=60", "--",
+      "./wait-for-it.sh", "schema-registry:80", "--timeout=60", "--",
       "python", "entrypoint.py"
     ]
     ports:
@@ -131,8 +131,8 @@ services:
     image: admo120104/ticketoc:spark
     build: spark/
 #    command: [
-#      "./wait-for-it.sh", "schema-registry:80", "--",
-#      "./wait-for-it.sh", "database:27017",     "--",
+#      "./wait-for-it.sh", "schema-registry:80", "--timeout=60", "--",
+#      "./wait-for-it.sh", "database:27017",     "--timeout=60", "--",
 #      "cmd to launch", "spark job"
 #    ]
     depends_on:
