@@ -35,7 +35,7 @@ class Landing extends Component {
           <Button
             color="primary"
             outline
-            href="https://id.centrallink.de/?client_id=6d8e67f3-a575-49ac-9df1-c3136046dc21&prompt=1&scope=username,email,profile_picture&response_type=token&redirect_uri=http%3A%2F%2Flocalhost:3000%2Fauth"
+            href="https://id.centrallink.de/?client_id=6d8e67f3-a575-49ac-9df1-c3136046dc21&prompt=1&scope=username,email,profile_picture&response_type=token&redirect_uri=http%3A%2F%2Flocalhost:8080%2Fauth"
             RootComponent="a"
             className="login">
             <img src="/cid.svg" alt="Identification using central_id" />Sign in or register
