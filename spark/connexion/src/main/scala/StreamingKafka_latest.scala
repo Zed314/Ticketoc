@@ -34,12 +34,9 @@ object StreamingKafka
 	)
 
 	stream.foreachRDD { rdd =>
-	  // Get the offset ranges in the RDD
-	  val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
-	  for (o <- offsetRanges) {
-	    println(s"${o.topic} ${o.partition} offsets: ${o.fromOffset} to ${o.untilOffset}")
+	     rdd.foreach(println)
 	  }
-	}
+	
 
 
         
