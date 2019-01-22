@@ -30,12 +30,7 @@ producer = KafkaProducer(
     bootstrap_servers=kafka_connect,
     value_serializer=kafka_value_serializer,
     compression_type='gzip',
-    retries=2,
 )
-
-
-def on_send_error(error):
-    app.logger.error("Failed to send message with error '%s'", error)
 
 
 @app.errorhandler(404)
@@ -60,8 +55,7 @@ def resource_send():
         headers = [('content-type', b'application/avro')]
 
     if data is not None:
-        future = producer.send(topic=kafka_topic, value=data, headers=headers)
-        future.add_errback(on_send_error)
+        producer.send(topic=kafka_topic, value=data, headers=headers).get()
         return jsonify({'success': True})
 
     abort(400)

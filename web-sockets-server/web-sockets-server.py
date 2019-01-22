@@ -225,7 +225,7 @@ class Controller:
         if isinstance(message, str):
             message = json.loads(message, encoding='utf-8')
 
-        return self.Message(type=message['type'], topic=message['topic'], token=message['token'])
+        return self.Message(type=message['type'], topic=message['topic'], token=message.get('token', None))
 
     @staticmethod
     def _message_already_subscribed(topic):
