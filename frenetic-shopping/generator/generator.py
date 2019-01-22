@@ -35,10 +35,26 @@ products = supermarketDB["products"]
 #categories = supermarketDB["categories"]
 
 
-
+exclusionDict = {}
+exclusionDict["frozen"] = []
+exclusionDict["meat"] = []
+exclusionDict["alcool"] =[]
+exclusionDict["non-bio"]=[]
+exclusionDict["non-vegan"]=[]
 allProducts = {}
 for product in products.find({}) :
 	allProducts[product["name"]] = product
+	if not product["isBio"]:
+		exclusionDict["non-bio"].append(product)
+	if product["alcool"]:
+		exclusionDict["alcool"].append(product)
+	if product["containsMeat"]:
+		exclusionDict["meat"].append(product)
+	if not product["vegan"]:
+		exclusionDict["non-vegan"].append(product)
+	if product["isFrozen"]:
+		exclusionDict["frozen"].append(product)
+	
 
 
 
@@ -219,6 +235,36 @@ def estimateTimeRequired(order,cashier):
 
 def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfOrder):
 	order = dict()
+	order["vegan"]= False #randint(0,1)==1
+	if(order["vegan"]):
+		order["meat"]=False
+	else:
+		order["meat"]= randint(0,1)==1
+
+	order["alcool"]=randint(0,1)==1
+	order["onlyBio"]=randint(0,1)==1
+	order["notFrozen"]=randint(0,1)==1
+	order["meat"]= False
+	order["alcool"]= True
+	order["onlyBio"]=True
+	order["notFrozen"]=False
+	exclusionList = []
+
+	
+	if order["onlyBio"]:
+		exclusionList += exclusionDict["non-bio"]
+	if not order["alcool"]:
+		exclusionList += exclusionDict["alcool"]
+	if not order["meat"]:
+		exclusionList += exclusionDict["meat"]
+	if order["vegan"]:
+		exclusionList += exclusionDict["non-vegan"]
+	if order["notFrozen"]:
+		exclusionList += exclusionDict["frozen"]
+	
+	print(order)
+	#print(exclusionList)
+
 	order["numberOfElements"] = returnValueIfValueOrBelow(int(gauss(munbelement, sigmanbelement)),1)
 	order["billingMethod"] = PaymentMethod.CASH
 	order["finishTime"] = estimateTimeRequired(order,cashier) + time()
@@ -227,7 +273,7 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 	else:
 		doesThisOrderFollowTheTrend = uniform(0,100)<30
 	order["followTheTrend"] = doesThisOrderFollowTheTrend
-	exclusionList = []
+	
 	#print(probabilityOfOrder)
 	#print(100.0 - probabilityOfOrder)
 	if randint(0,100)<(100 - probabilityOfOrder):
@@ -237,7 +283,7 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 	order["isAnOrder"]=True
 
 	#Init the exclusion list
-	exclusionList = getProductsNotCompatible(season)
+	exclusionList += getProductsNotCompatible(season)
 
 
 	products = []
@@ -324,7 +370,7 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 			if not found and uniform(0,100)<60:
 				totalProducts+=1
 				products.append([getProductByName(nameProductToAdd[0]),1])
-	
+		productsToAdd = {}
 		while totalProducts<order["numberOfElements"]:
 			productToAdd = getRandomProduct(exclusionList)
 			found = False
@@ -345,6 +391,22 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 				eltsToExclude = getProductsByName(nameToExclude)
 				for elt in eltsToExclude:
 					exclusionList.append(elt)
+			#if totalProducts<order["numberOfElements"]:
+
+			if "frequentlyboughtwith" in productToAdd:
+				for name in productToAdd["frequentlyboughtwith"]:
+					if totalProducts>=order["numberOfElements"]:
+						break
+					found = False
+					for product in products:
+						if product[0]["name"]==name:
+							found=True
+							break
+					if not found and uniform(0,100)<60:
+						totalProducts+=1
+						products.append([getProductByName(name),1])
+
+		#		
 
 		# quantities=getListQuantities(order["numberOfElements"]-totalProducts)
 		
@@ -374,7 +436,7 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 		#divide the order in two parts
 		
 	#print("Order:")
-	#print(order)
+	print(order["products"])
 	return order
 
 def returnValueIfValueOrBelow(nb,value):
