@@ -91,7 +91,8 @@ class Subscriptions:
 
     @sync_to_async
     def existing_topics(self):
-        return self._consumer.topics()
+        with self._lock:
+            return self._consumer.topics()
 
     def _new_consumer(self, topics=None):
 
@@ -225,7 +226,7 @@ class Controller:
         if isinstance(message, str):
             message = json.loads(message, encoding='utf-8')
 
-        return self.Message(type=message['type'], topic=message['topic'], token=message['token'])
+        return self.Message(type=message['type'], topic=message['topic'], token=message.get('token', None))
 
     @staticmethod
     def _message_already_subscribed(topic):

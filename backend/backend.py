@@ -5,11 +5,11 @@ from pymongo import MongoClient
 database = os.environ['DATABASE']
 
 app = Flask('backend')
-mongo = MongoClient('mongodb://{address}/'.format(address=database))
+database = MongoClient('mongodb://{address}/'.format(address=database))
 
 
 def get_ticket_by_cash_receipt_id(cash_receipt_id):
-    return mongo['ticketoc']['tickets'].find_one({"cashReceiptID": cash_receipt_id})
+    return database['ticketoc']['tickets'].find_one({"cashReceiptID": cash_receipt_id})
 
 
 @app.errorhandler(404)
@@ -32,4 +32,4 @@ def resource_get_ticket_by_cash_receipt_id(cash_receipt_id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, threaded=True)
-    mongo.close()
+    database.close()
