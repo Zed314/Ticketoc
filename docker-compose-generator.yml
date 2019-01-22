@@ -14,7 +14,7 @@ services:
       "./wait-for-it.sh", "entrypoint:80",                    "--timeout=120", "--strict", "--",
       "./wait-for-it.sh", "schema-registry:80",               "--timeout=120", "--strict", "--",
       "./wait-for-it.sh", "frenetic-shopping-database:27017", "--timeout=120", "--strict", "--",
-      "python", "generator.py"
+      "python", "generator.py","-s","3"
     ]
     environment:
       ENTRYPOINT: entrypoint:80
@@ -25,9 +25,42 @@ services:
     networks:
       - default
       - ticketoc_extra-net
-    #deploy:
-      #replicas: 2
-
+  frenetic-shopping-generator-valentinesday:
+    image: admo120104/ticketoc:frenetic-shopping-generator
+    build: frenetic-shopping/generator/
+    command: [
+      "./wait-for-it.sh", "entrypoint:80",                    "--timeout=120", "--strict", "--",
+      "./wait-for-it.sh", "schema-registry:80",               "--timeout=120", "--strict", "--",
+      "./wait-for-it.sh", "frenetic-shopping-database:27017", "--timeout=120", "--strict", "--",
+      "python", "generator.py","-s","7045","--holiday","valentinesday"
+    ]
+    environment:
+      ENTRYPOINT: entrypoint:80
+      SCHEMA_REGISTRY: schema-registry:80
+      FRENETIC_SHOPPING_DATABASE: frenetic-shopping-database:27017
+    depends_on:
+      - frenetic-shopping-database
+    networks:
+      - default
+      - ticketoc_extra-net
+  frenetic-shopping-generator-geek:
+    image: admo120104/ticketoc:frenetic-shopping-generator
+    build: frenetic-shopping/generator/
+    command: [
+      "./wait-for-it.sh", "entrypoint:80",                    "--timeout=120", "--strict", "--",
+      "./wait-for-it.sh", "schema-registry:80",               "--timeout=120", "--strict", "--",
+      "./wait-for-it.sh", "frenetic-shopping-database:27017", "--timeout=120", "--strict", "--",
+      "python", "generator.py","--popular","Raspberry Pi,60"
+    ]
+    environment:
+      ENTRYPOINT: entrypoint:80
+      SCHEMA_REGISTRY: schema-registry:80
+      FRENETIC_SHOPPING_DATABASE: frenetic-shopping-database:27017
+    depends_on:
+      - frenetic-shopping-database
+    networks:
+      - default
+      - ticketoc_extra-net
 ########## DATABASE ##########
   frenetic-shopping-database:
     image: mongo:latest

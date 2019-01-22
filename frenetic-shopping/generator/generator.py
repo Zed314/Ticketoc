@@ -36,24 +36,24 @@ products = supermarketDB["products"]
 
 
 exclusionDict = {}
-exclusionDict["frozen"] = []
-exclusionDict["meat"] = []
-exclusionDict["alcool"] =[]
-exclusionDict["non-bio"]=[]
-exclusionDict["non-vegan"]=[]
+exclusionDict["frozen"] = set()
+exclusionDict["meat"] = set()
+exclusionDict["alcool"] =set()
+exclusionDict["non-bio"]=set()
+exclusionDict["non-vegan"]=set()
 allProducts = {}
 for product in products.find({}) :
 	allProducts[product["name"]] = product
 	if not product["isBio"]:
-		exclusionDict["non-bio"].append(product)
+		exclusionDict["non-bio"].add(product["_id"])
 	if product["alcool"]:
-		exclusionDict["alcool"].append(product)
+		exclusionDict["alcool"].add(product["_id"])
 	if product["containsMeat"]:
-		exclusionDict["meat"].append(product)
+		exclusionDict["meat"].add(product["_id"])
 	if not product["vegan"]:
-		exclusionDict["non-vegan"].append(product)
+		exclusionDict["non-vegan"].add(product["_id"])
 	if product["isFrozen"]:
-		exclusionDict["frozen"].append(product)
+		exclusionDict["frozen"].add(product["_id"])
 	
 
 
@@ -62,20 +62,20 @@ def getRandomProduct(exclusionList):
 	return getRandomProducts(1,exclusionList)[0]
 def getRandomProducts(nb,exclusionList,requestDB=False):
 	if requestDB:
-		idList = []
-		for elt in exclusionList:
-			idList.append(elt["_id"])
-		products = supermarketDB.products.aggregate([{"$match":{ "_id":{"$nin":idList}}},{ "$sample": { "size": nb }} ])
+		#idList = []
+		#for elt in exclusionList:
+		#	idList.append(elt["_id"])
+		products = supermarketDB.products.aggregate([{"$match":{ "_id":{"$nin":exclusionList}}},{ "$sample": { "size": nb }} ])
 
 		return list(products)
 	else:
-		idList = []
+		#idList = []
 
 		products = []
-		for elt in exclusionList:
-			idList.append(elt["_id"])
+		#for elt in exclusionList:
+		#	idList.append(elt["_id"])
 		for i in range(nb):
-			products.append(choice([a for a in allProducts.values() if a["_id"] not in idList]))
+			products.append(choice([a for a in allProducts.values() if a["_id"] not in exclusionList]))
 		return products
 	
 def getProductByName(name,useDB = False):
@@ -95,7 +95,11 @@ def getProductsByName(names, useDB=False):
 		return products
 
 def getProductsNotCompatible(season):
-	return list(supermarketDB.products.find( { "$and": [ { "restrictions": { "$nin":[season] } }, { "restrictions": { "$exists": True } } ] }))
+	listElt = list(supermarketDB.products.find( { "$and": [ { "restrictions": { "$nin":[season] } }, { "restrictions": { "$exists": True } } ] }))
+	idSet = set()
+	for elt in listElt:
+		idSet.add(elt["_id"])
+	return idSet
 
 
 def generateLine(ind,productFromDB):
@@ -155,7 +159,7 @@ def generateCashReceipt(storeid=1,terminalid=1,agentid=1,customerid=1,order=None
 		'storeID':str(storeid),
 		'terminalID':str(terminalid),
 		'agentID':str(storeid)+str(agentid),
-		'customerID':str(customerid),
+		'customerID':str(customerid)+order["idConsumerSuffix"],
 		'date':fromTimeStampToDate(timestamp),
 		'lines':[generateLine(i+1,product) for i,product in enumerate(order["products"])]
 	}
@@ -235,7 +239,7 @@ def estimateTimeRequired(order,cashier):
 
 def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfOrder):
 	order = dict()
-	order["vegan"]= False #randint(0,1)==1
+	order["vegan"]= randint(0,1)==1
 	if(order["vegan"]):
 		order["meat"]=False
 	else:
@@ -244,23 +248,20 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 	order["alcool"]=randint(0,1)==1
 	order["onlyBio"]=randint(0,1)==1
 	order["notFrozen"]=randint(0,1)==1
-	order["meat"]= False
-	order["alcool"]= True
-	order["onlyBio"]=True
-	order["notFrozen"]=False
-	exclusionList = []
+	order["idConsumerSuffix"] =  str(int(order["vegan"])*10000+int(order["meat"])*1000+int(order["alcool"])*100+int(order["onlyBio"])*10+int(order["notFrozen"]))
+	exclusionList = set()
 
 	
 	if order["onlyBio"]:
-		exclusionList += exclusionDict["non-bio"]
+		exclusionList.update(exclusionDict["non-bio"])
 	if not order["alcool"]:
-		exclusionList += exclusionDict["alcool"]
+		exclusionList.update(exclusionDict["alcool"])
 	if not order["meat"]:
-		exclusionList += exclusionDict["meat"]
+		exclusionList.update(exclusionDict["meat"])
 	if order["vegan"]:
-		exclusionList += exclusionDict["non-vegan"]
+		exclusionList.update(exclusionDict["non-vegan"])
 	if order["notFrozen"]:
-		exclusionList += exclusionDict["frozen"]
+		exclusionList.update(exclusionDict["frozen"])
 	
 	print(order)
 	#print(exclusionList)
@@ -283,7 +284,7 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 	order["isAnOrder"]=True
 
 	#Init the exclusion list
-	exclusionList += getProductsNotCompatible(season)
+	exclusionList.update(getProductsNotCompatible(season))
 
 
 	products = []
@@ -308,7 +309,7 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 							nameToExclude.append(eltToExclude)
 						eltsToExclude = getProductsByName(nameToExclude)
 						for elt in eltsToExclude:
-							exclusionList.append(elt)
+							exclusionList.add(elt["_id"])
 				totalProducts+=1
 				if totalProducts >= order["numberOfElements"]:
 					break
@@ -320,7 +321,7 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 		for i in range(randint(0,order["numberOfElements"]-totalProducts)):
 
 			choiceProduct = choice(trendingProducts)
-			if choiceProduct in exclusionList:
+			if choiceProduct["_id"] in exclusionList:
 				continue
 			found = False
 			for product in products:
@@ -337,7 +338,7 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 						nameToExclude.append(eltToExclude)
 					eltsToExclude = getProductsByName(nameToExclude)
 					for elt in eltsToExclude:
-						exclusionList.append(elt)
+						exclusionList.add(elt["_id"])
 			totalProducts+=1
 			
 	if totalProducts<order["numberOfElements"]:
@@ -390,7 +391,7 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 					nameToExclude.append(eltToExclude)
 				eltsToExclude = getProductsByName(nameToExclude)
 				for elt in eltsToExclude:
-					exclusionList.append(elt)
+					exclusionList.add(elt["_id"])
 			#if totalProducts<order["numberOfElements"]:
 
 			if "frequentlyboughtwith" in productToAdd:
@@ -459,7 +460,7 @@ parser.add_argument("-t", "--tpm", type=float, default =60,
 parser.add_argument("-c", "--checkoutnumber", type=int, default =20,
                     help="number of different checkout in one store")
 parser.add_argument("-s","--storeID",type=int, default = "0",
-					help="id of the store")
+					help="id of the store, default or 0 : random")
 parser.add_argument("-p","--popular",type=str, default = "r",
 					help="name of the popular product, separated by a comma and followed by the probability in percentage")
 parser.add_argument('--holiday', choices=['motherday','christmas','newyearseve',"valentinesday","blackfriday","easter"],default="", help='Choose the holiday that will influence the clients')
@@ -484,7 +485,7 @@ if len(popularProductsToDecode)>=2:
 		else :
 			popularProducts[len(popularProducts)-1].append(int(elt))
 
-#Todo : change
+
 #popularProducts = []#[("Raspberry Pi",0),("Condoms (XXL)",100)]
 trendingProducts = []
 if args.holiday:
@@ -506,6 +507,8 @@ sigmanbelement = 7.0
 
 cashiers = [{} for i in range(numberOfAgent)] 
 
+if idOfStore == 0:
+	idOfStore = randint(1,100)
 
 for i,cashier in enumerate(cashiers):
 	cashier["id"] = i
@@ -515,10 +518,10 @@ for i,cashier in enumerate(cashiers):
 	cashier[PaymentMethod.BOTH] = cashier[PaymentMethod.CARD] + cashier[PaymentMethod.CASH] + 2
 
 #Todo: change
-#print("auie")
+
 probabilityOfOrder = 80
 currentOrders = [generateOrder(cashiers[i], popularProducts,trendingProducts,args.holiday,probabilityOfOrder) for i in range(numberOfCheckout)] 
-#print("auie")
+
 
 
 
@@ -538,7 +541,7 @@ if force:
 		cashier[PaymentMethod.BOTH] = cashier[PaymentMethod.CARD] + cashier[PaymentMethod.CASH] + 2
 
 		order = generateOrder(cashiers[i], popularProducts,trendingProducts,args.holiday,probabilityOfOrder)
-		cashRec = generateCashReceipt(storeid=idOfStore,terminalid=randint(0,10),agentid=randint(0,10),customerid=randint(0,100),order=order,timestamp=time())
+		cashRec = generateCashReceipt(storeid=idOfStore,terminalid=randint(0,numberOfCheckout),agentid=randint(0,numberOfAgent),customerid=randint(0,100),order=order,timestamp=time())
 		try:
 			if useAvro:
 				bytes_writer = io.BytesIO()
@@ -567,7 +570,7 @@ while True:
 				currentOrders[i] = generateOrder(cashiers[i], popularProducts,trendingProducts,args.holiday,probabilityOfOrder)
 				continue
 			
-			cashRec = generateCashReceipt(storeid=idOfStore,terminalid=i,agentid=i,customerid=200,order=order,timestamp=time())
+			cashRec = generateCashReceipt(storeid=idOfStore,terminalid=i,agentid=i,customerid=randint(0,10000),order=order,timestamp=time())
 			#print(cashRec)
 			
 			try:
