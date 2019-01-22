@@ -1,10 +1,7 @@
+.idea/
 .vscode/
 volumes/kafka/*
 volumes/database/*
 !volumes/kafka/.gitkeep
 !volumes/database/.gitkeep
-.idea/
-spark/Infra/.idea/
-spark/Infra/target/
-spark/Infra/Infra.iml
 .DS_Store
