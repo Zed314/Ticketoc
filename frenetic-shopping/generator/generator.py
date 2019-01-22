@@ -32,11 +32,10 @@ writer = avro.io.DatumWriter(schema)
 client = MongoClient('mongodb://{address}/'.format(address=frenetic_shopping_database))
 supermarketDB = client["supermarket"]
 products = supermarketDB["products"]
-categories = supermarketDB["categories"]
+#categories = supermarketDB["categories"]
 
-taxes = {}
-for category in categories.find({}) :
-	taxes[category["name"]] = category["tax"]
+
+
 allProducts = {}
 for product in products.find({}) :
 	allProducts[product["name"]] = product
@@ -92,7 +91,7 @@ def generateLine(ind,productFromDB):
 	productUnit = productFromDB[0]["unit"]
 	
 	categoryCode = productCategoryName[0:2].upper()
-	taxPercentage=taxes[productCategoryName]
+	taxPercentage=productFromDB[0]["tax"]
 	quantity = productFromDB[1]
 	unitPrice = float(("%.2f"%productFromDB[0]["price"]))
 	creditAmount = float(("%.2f"%(unitPrice * quantity)))
@@ -174,7 +173,7 @@ def generateCashReceipt(storeid=1,terminalid=1,agentid=1,customerid=1,order=None
 		for product in order["products"]:
 		#dictPrices[product[0]["name"]] = product[0]["price"]
 			for i in range(product[1]):
-				developpedPriceList.append(product[0]["price"]*(1+taxes[product[0]["category"]]/100))
+				developpedPriceList.append(product[0]["price"]*(1+product[0]["tax"]/100))
 		shuffle(developpedPriceList)
 		
 		division = [developpedPriceList[i::2] for i in range(2)]
