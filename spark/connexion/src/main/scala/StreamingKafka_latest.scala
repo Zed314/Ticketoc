@@ -1,3 +1,4 @@
+/* docker cp /home/faissalitto/insa/bigdata/Ticketoc_3/Ticketoc/spark/connexion/src/main/scala/StreamingKafka_latest.scala 92be8f9def99:/Sample.scala */
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.SparkConf
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -20,11 +21,12 @@ object StreamingKafka
 	  "bootstrap.servers" -> "kafka:9092",
 	  "key.deserializer" -> classOf[StringDeserializer],
 	  "value.deserializer" -> classOf[StringDeserializer],
+	  "group.id" -> "consumer_ss",
 	  "enable.auto.commit" -> (false: java.lang.Boolean)
 
 	)
 
-	val topics = Array("input_tickets")
+	val topics = Array("input-tickets")
 	val stream = KafkaUtils.createDirectStream[String, String](
 	  ssc,
 	  PreferConsistent,
@@ -32,12 +34,9 @@ object StreamingKafka
 	)
 
 	stream.foreachRDD { rdd =>
-	  // Get the offset ranges in the RDD
-	  val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
-	  for (o <- offsetRanges) {
-	    println(s"${o.topic} ${o.partition} offsets: ${o.fromOffset} to ${o.untilOffset}")
+	     rdd.foreach(println)
 	  }
-	}
+	
 
 
         
@@ -45,44 +44,12 @@ object StreamingKafka
 
 	// the above code is printing out topic details every 5 seconds
 	// until you stop it.
-
-	ssc.stop(stopSparkContext = false)
-
-    /*val struct = new StructType()
-      .add("id", DataTypes.StringType)
-      .add("name", DataTypes.StringType)*/
-
-    /*val spark = SparkSession.builder()
-      .appName("ticketoc")
-      .master("local[*]")
-      .getOrCreate()
-
-    import spark.implicits._
 	
-
-    val inputDf = spark.readStream
-      .format("org.apache.spark.sql.kafka010.KafkaSourceProvider")
-      .option("kafka.bootstrap.servers", "kafka:9092")
-      .option("subscribe", "input_tickets")
-      .load()
-      .selectExpr("CAST(value AS STRING)")
-      .as[String]
-    
+	ssc.awaitTermination()
 
 
 
-
-
-
-    /*** Traitement data ***/
-
-    val consoleOutput = inputDf.writeStream
-      .outputMode("append")
-      .format("console")
-      .start().awaitTermination()
-
-
-    print("fin")*/
+  
 
     /*
 
