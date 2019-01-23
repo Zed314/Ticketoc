@@ -1,9 +1,9 @@
+import Infra.TicketAccumulator
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.SparkConf
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.streaming.kafka010._
-
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 
@@ -13,7 +13,7 @@ object StreamingKafka
   {
 	
     
-	val conf = new SparkConf().setAppName("App").setMaster("local[2]")
+	val conf = new SparkConf().setAppName("ticketoc").setMaster("local[2]")
         val ssc = new StreamingContext(conf, Seconds(5))
 
 	val kafkaParams = Map[String, Object](
@@ -31,12 +31,23 @@ object StreamingKafka
 	  Subscribe[String, String](topics, kafkaParams)
 	)
 
+
+    var somme = new TicketAccumulator()
+
 	stream.foreachRDD { rdd =>
 	  // Get the offset ranges in the RDD
 	  val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
 	  for (o <- offsetRanges) {
 	    println(s"${o.topic} ${o.partition} offsets: ${o.fromOffset} to ${o.untilOffset}")
 	  }
+
+    somme.add(
+      getPrice(rdd.reduce((ticket1,ticket2)=>{
+        val price1 = getPrice(ticket1)
+        val price2 = getPrice(ticket2)
+        return price1+price2
+      }))
+    )
 	}
 
 
@@ -114,5 +125,9 @@ object StreamingKafka
 
 
   }
+
+  def getPrice(ticket : ConsumerRecord[String,String]) : Long(
+    // TODO
+  )
 
 }
