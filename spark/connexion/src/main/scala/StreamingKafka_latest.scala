@@ -1,4 +1,5 @@
 import Infra.TicketAccumulator
+/* docker cp /home/faissalitto/insa/bigdata/Ticketoc_3/Ticketoc/spark/connexion/src/main/scala/StreamingKafka_latest.scala 92be8f9def99:/Sample.scala */
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.SparkConf
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -13,87 +14,54 @@ object StreamingKafka
   {
 	
     
-	val conf = new SparkConf().setAppName("ticketoc").setMaster("local[2]")
-        val ssc = new StreamingContext(conf, Seconds(5))
+    val conf = new SparkConf().setAppName("ticketoc").setMaster("local[2]")
+    val ssc = new StreamingContext(conf, Seconds(5))
 
-	val kafkaParams = Map[String, Object](
-	  "bootstrap.servers" -> "kafka:9092",
-	  "key.deserializer" -> classOf[StringDeserializer],
-	  "value.deserializer" -> classOf[StringDeserializer],
-	  "enable.auto.commit" -> (false: java.lang.Boolean)
+    val kafkaParams = Map[String, Object](
+      "bootstrap.servers" -> "kafka:9092",
+      "key.deserializer" -> classOf[StringDeserializer],
+      "value.deserializer" -> classOf[StringDeserializer],
+      "group.id" -> "consumer_ss",
+      "enable.auto.commit" -> (false: java.lang.Boolean)
 
-	)
-
-	val topics = Array("input_tickets")
-	val stream = KafkaUtils.createDirectStream[String, String](
-	  ssc,
-	  PreferConsistent,
-	  Subscribe[String, String](topics, kafkaParams)
-	)
-
-
-    var somme = new TicketAccumulator()
-
-	stream.foreachRDD { rdd =>
-	  // Get the offset ranges in the RDD
-	  val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
-	  for (o <- offsetRanges) {
-	    println(s"${o.topic} ${o.partition} offsets: ${o.fromOffset} to ${o.untilOffset}")
-	  }
-
-    somme.add(
-      getPrice(rdd.reduce((ticket1,ticket2)=>{
-        val price1 = getPrice(ticket1)
-        val price2 = getPrice(ticket2)
-        return price1+price2
-      }))
     )
-	}
+
+    val topics = Array("input-tickets")
+    val stream = KafkaUtils.createDirectStream[String, String](
+      ssc,
+      PreferConsistent,
+      Subscribe[String, String](topics, kafkaParams)
+    )
 
 
-        
-	ssc.start()
+      var somme = new TicketAccumulator()
 
-	// the above code is printing out topic details every 5 seconds
-	// until you stop it.
+    stream.foreachRDD { rdd =>
+      rdd.foreach(println)
 
-	ssc.stop(stopSparkContext = false)
+      somme.add(
+        getPrice(rdd.reduce((ticket1,ticket2)=>{
+          // TODO
+          return 0
+        }))
+      )
 
-    /*val struct = new StructType()
-      .add("id", DataTypes.StringType)
-      .add("name", DataTypes.StringType)*/
+    }
 
-    /*val spark = SparkSession.builder()
-      .appName("ticketoc")
-      .master("local[*]")
-      .getOrCreate()
+    ssc.start()
 
-    import spark.implicits._
-	
+    // the above code is printing out topic details every 5 seconds
+    // until you stop it.
 
-    val inputDf = spark.readStream
-      .format("org.apache.spark.sql.kafka010.KafkaSourceProvider")
-      .option("kafka.bootstrap.servers", "kafka:9092")
-      .option("subscribe", "input_tickets")
-      .load()
-      .selectExpr("CAST(value AS STRING)")
-      .as[String]
-    
-
-
+    ssc.awaitTermination()
+  }
 
 
 
 
-    /*** Traitement data ***/
-
-    val consoleOutput = inputDf.writeStream
-      .outputMode("append")
-      .format("console")
-      .start().awaitTermination()
 
 
-    print("fin")*/
+  
 
     /*
 
@@ -123,11 +91,10 @@ object StreamingKafka
 
     */
 
-
-  }
-
-  def getPrice(ticket : ConsumerRecord[String,String]) : Long(
+    def getPrice(ticket : ConsumerRecord[String,String]) : Long = {
     // TODO
-  )
+      return 1
+    }
+
 
 }

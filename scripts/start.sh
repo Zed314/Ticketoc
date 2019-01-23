@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-if ! [[ $(cat ~/.docker/config.json | grep "https://index.docker.io/v1/") ]]
-then
-    docker login || exit 1
-fi
+cat ~/.docker/config.json | grep -q "https://index.docker.io/v1/" || \
+docker login                                                      || exit 1
 
 docker swarm init
 docker stack deploy -c docker-compose.yml           ticketoc          --with-registry-auth

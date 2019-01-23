@@ -3,14 +3,10 @@
 docker-compose -f docker-compose.yml           build
 docker-compose -f docker-compose-generator.yml build
 
-if [[ "$1" = "--push" ]]
-then
+[[ "--push" = "${1}" ]] || exit 0
 
-    if ! [[ $(cat ~/.docker/config.json | grep "https://index.docker.io/v1/") ]]
-    then
-        docker login || exit 1
-    fi
+cat ~/.docker/config.json | grep -q "https://index.docker.io/v1/" || \
+docker login                                                      || exit 1
 
-	docker-compose -f docker-compose.yml           push
-	docker-compose -f docker-compose-generator.yml push
-fi
+docker-compose -f docker-compose.yml           push
+docker-compose -f docker-compose-generator.yml push
