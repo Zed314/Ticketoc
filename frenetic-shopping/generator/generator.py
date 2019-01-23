@@ -126,7 +126,7 @@ def generateLine(ind,productFromDB):
 		'unitOfMeasure': productUnit,
 		'unitPrice':unitPrice,
 		'creditAmount':creditAmount,
-		'taxPercentage':taxPercentage,
+		'taxPercentage':int(taxPercentage),
 		'settlementAmount':settlementAmount,
 	}
 
@@ -452,7 +452,7 @@ class PaymentMethod(Enum):
     BOTH = 2     
 
 parser = argparse.ArgumentParser(description='Generate some tickets.')
-parser.add_argument("-a", "--avro", help="use avro serialization (default : json)")
+parser.add_argument("-a", "--avro", action='store_true', help="use avro serialization (default : json)")
 parser.add_argument("-f", "--force", type=int,
                     help="for a number of tickets per second")
 parser.add_argument("-t", "--tpm", type=float, default =60,
