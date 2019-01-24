@@ -1,4 +1,8 @@
 import Infra.TicketAccumulator
+import org.apache.avro.Schema
+import org.apache.avro.generic.GenericRecord
+import org.apache.avro.io.{DatumReader, Decoder, DecoderFactory}
+import org.apache.avro.specific.SpecificDatumReader
 /* docker cp /home/faissalitto/insa/bigdata/Ticketoc_3/Ticketoc/spark/connexion/src/main/scala/StreamingKafka_latest.scala 92be8f9def99:/Sample.scala */
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.SparkConf
@@ -7,6 +11,8 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.streaming.kafka010._
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
+import scalaj.http.Http
+
 
 object StreamingKafka
 {
@@ -27,24 +33,29 @@ object StreamingKafka
     )
 
     val topics = Array("input-tickets")
-    val stream = KafkaUtils.createDirectStream[String, String](
+    val stream = KafkaUtils.createDirectStream[Array[Byte], Array[Byte]](
       ssc,
       PreferConsistent,
-      Subscribe[String, String](topics, kafkaParams)
+      Subscribe[Array[Byte], Array[Byte]](topics, kafkaParams)
     )
 
 
-      var somme = new TicketAccumulator()
+    // https://www.programcreek.com/scala/org.apache.avro.generic.GenericRecord
+
+    val avroFormat = getProductSchema()
+    val schema: Schema = new Schema.Parser().parse(avroFormat)
+
+
+    val reader: DatumReader[GenericRecord] = new SpecificDatumReader[GenericRecord](schema)
+
+
+    var somme = new TicketAccumulator()
 
     stream.foreachRDD { rdd =>
       rdd.foreach(println)
 
-      somme.add(
-        getPrice(rdd.reduce((ticket1,ticket2)=>{
-          // TODO
-          return 0
-        }))
-      )
+      val pricesRdd = rdd.map(getPrice(_,reader))
+      somme.add(pricesRdd.reduce(_+_))
 
     }
 
@@ -91,10 +102,16 @@ object StreamingKafka
 
     */
 
-    def getPrice(ticket : ConsumerRecord[String,String]) : Long = {
-    // TODO
-      return 1
-    }
+  def getPrice(ticket : ConsumerRecord[Array[Byte],Array[Byte]], reader: DatumReader[GenericRecord]) : Float = {
+    val decoder: Decoder = DecoderFactory.get().binaryDecoder(ticket.value(), null)
+    val parsedData: GenericRecord = reader.read(null, decoder)
 
+    parsedData.get("documentTotal").asInstanceOf[GenericRecord].get("netTotal").asInstanceOf[Float]
+  }
+
+  def getProductSchema() : String = {
+    val schemaRegistry = sys.env("SCHEMA_REGISTRY")
+    Http("http://"+schemaRegistry+"/v1/schemas/product").asString.body
+  }
 
 }

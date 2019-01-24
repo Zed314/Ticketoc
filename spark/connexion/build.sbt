@@ -14,3 +14,4 @@ libraryDependencies ++= Seq(
 ).map(_.excludeAll(ExclusionRule("org.glassfish.hk2"),ExclusionRule("javax.validation")))
 
 libraryDependencies += "org.apache.spark" % "spark-streaming-kafka-0-10_2.11" % "2.2.0"
+libraryDependencies +=  "org.scalaj" %% "scalaj-http" % "2.4.1"

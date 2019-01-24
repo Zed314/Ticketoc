@@ -5,3 +5,4 @@ volumes/database/*
 !volumes/kafka/.gitkeep
 !volumes/database/.gitkeep
 .DS_Store
+spark/connexion/project/target/**
