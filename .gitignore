@@ -5,6 +5,6 @@ volumes/database/*
 !volumes/kafka/.gitkeep
 !volumes/database/.gitkeep
 .DS_Store
-ingestion/project/project/target/
-ingestion/project/target/
-ingestion/target/
+ingestion/project/target/**
+ingestion/project/project/target/**
+spark/connexion/project/target/**
