@@ -33,7 +33,7 @@ services:
       - 40510:40510
     depends_on:
       - kafka
-      - spark
+      - ingestion
     deploy:
       replicas: 2
 
@@ -65,20 +65,20 @@ services:
         constraints:
           - node.role == manager
 
-########## INGESTION ##########
+########## ENTRYPOINT ##########
   entrypoint:
     image: admo120104/ticketoc:entrypoint
     build: entrypoint/
-    environment:
-      ROUTE: /v1/tickets
-      KAFKA_CONNECT: kafka:9092
-      KAFKA_TOPIC: input-tickets
-      KAFKA_VALUE_SERIALIZER: json
     command: [
       "./wait-for-it.sh", "kafka:9092",         "--timeout=120", "--strict", "--",
       "./wait-for-it.sh", "schema-registry:80", "--timeout=120", "--strict", "--",
       "python", "entrypoint.py"
     ]
+    environment:
+      ROUTE: /v1/tickets
+      KAFKA_CONNECT: kafka:9092
+      KAFKA_TOPIC: input-tickets
+      KAFKA_VALUE_SERIALIZER: json
     ports:
       - 8000:80
     depends_on:
@@ -126,15 +126,20 @@ services:
         constraints:
           - node.role == manager
 
-########## SPARK ##########
-  spark:
-    image: admo120104/ticketoc:spark
-    build: spark/
-#    command: [
-#      "./wait-for-it.sh", "schema-registry:80", "--timeout=120", "--strict", "--",
-#      "./wait-for-it.sh", "database:27017",     "--timeout=120", "--strict", "--",
-#      "cmd to launch", "spark job"
-#    ]
+########## INGESTION ##########
+  ingestion:
+    image: admo120104/ticketoc:ingestion
+    build: ingestion/
+    command: [
+      "./wait-for-it.sh", "schema-registry:80", "--timeout=120", "--strict", "--",
+      "./wait-for-it.sh", "database:27017",     "--timeout=120", "--strict", "--",
+      "sh", "template.sh"
+    ]
+    environment:
+      ENABLE_INIT_DAEMON: 'false'
+      SPARK_APPLICATION_MAIN_CLASS: fr.insa.ticketoc.ingestion.tickets.StreamingKafka
+    ports:
+    - 4040:4040
     depends_on:
       - kafka
       - database
