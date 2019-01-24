@@ -11,7 +11,7 @@ import {
 const navBarItems = [
   { value: "Home", to: "/", icon: "home", LinkComponent: withRouter(NavLink) },
   {
-    value: "A navigation item",
+    value: "More",
     icon: "box",
     subItems: [
       {

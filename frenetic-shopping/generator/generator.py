@@ -432,6 +432,8 @@ def generateOrder(cashier,popularProducts,trendingProducts,season,propabilityOfO
 	
 	
 	nbSettle = randint(1,2)
+	if totalProducts == 1:
+		nbSettle = 1
 	order["settlements"]=nbSettle
 
 		#divide the order in two parts
