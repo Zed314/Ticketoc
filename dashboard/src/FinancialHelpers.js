@@ -23,7 +23,7 @@ class FinancialHelpers {
   }
 
   static __getFlatGeoData__() {
-    const [ brands, cities ] = __getGeoData__();
+    const [ brands, cities ] = FinancialHelpers.__getGeoData__();
     const flattenedDistricts = [];
     for (let i = 0; i < cities.length; i += 1) {
       if (cities[i].quarters !== null) {
@@ -39,7 +39,7 @@ class FinancialHelpers {
   }
 
   static getMaxStoreId() {
-    const [ brands, cities ] = __getGeoData__();
+    const [ brands, cities ] = FinancialHelpers.__getGeoData__();
     let count = 0;
     for (let i = 0; i < cities.length; i += 1) {
       if (cities[i].quarters !== null) {
@@ -56,19 +56,19 @@ class FinancialHelpers {
   }
 
   static getStoreForId(id) {
-    const [ brands, districts ] = __getFlatGeoData__();
+    const [ brands, districts ] = FinancialHelpers.__getFlatGeoData__();
 
-    return __getStorePrintable__(brands[id % brands.length], districts[Math.floor(id / brands.length)]);
+    return FinancialHelpers.__getStorePrintable__(brands[id % brands.length], districts[Math.floor(id / brands.length)]);
   }
 
   static getRandomStore() {
-    const [ brands, districts ] = __getFlatGeoData__();
+    const [ brands, districts ] = FinancialHelpers.__getFlatGeoData__();
 
     //shuffle through contents of each array, picking one entry per array
     const randBrand = brands[Math.floor(Math.random() * brands.length)];
     const randDistrict = districts[Math.floor(Math.random() * districts.length)];
 
-    return __getStorePrintable__(randBrand, randDistrict)
+    return FinancialHelpers.__getStorePrintable__(randBrand, randDistrict)
   }
 }
 
