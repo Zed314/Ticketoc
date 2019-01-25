@@ -7,4 +7,4 @@ volumes/database/*
 .DS_Store
 ingestion/project/target/**
 ingestion/project/project/target/**
-spark/connexion/project/target/**
+ingestion/target/
