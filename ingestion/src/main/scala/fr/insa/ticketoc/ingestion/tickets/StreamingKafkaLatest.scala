@@ -1,3 +1,5 @@
+package fr.insa.ticketoc.ingestion.tickets
+
 import Infra.TicketAccumulator
 import org.apache.avro.Schema
 import org.apache.avro.generic.GenericRecord
@@ -14,7 +16,7 @@ import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import scalaj.http.Http
 
 
-object StreamingKafka
+object StreamingKafkaLatest
 {
   def main(args: Array[String]): Unit =
   {
