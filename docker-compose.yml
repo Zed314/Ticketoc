@@ -137,7 +137,7 @@ services:
     ]
     environment:
       ENABLE_INIT_DAEMON: 'false'
-      SPARK_APPLICATION_MAIN_CLASS: fr.insa.ticketoc.ingestion.tickets.StreamingKafka
+      SPARK_APPLICATION_MAIN_CLASS: fr.insa.ticketoc.ingestion.tickets.StreamingKafka_latest
     ports:
     - 4040:4040
     depends_on:
