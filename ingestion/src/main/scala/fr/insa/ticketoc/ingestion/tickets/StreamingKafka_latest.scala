@@ -18,7 +18,7 @@ object StreamingKafka
 {
   def main(args: Array[String]): Unit =
   {
-	
+	  println("Hello world")
     
     val conf = new SparkConf().setAppName("ticketoc").setMaster("local[2]")
     val ssc = new StreamingContext(conf, Seconds(5))
@@ -57,6 +57,7 @@ object StreamingKafka
       val pricesRdd = rdd.map(getPrice(_,reader))
       somme.add(pricesRdd.reduce(_+_))
 
+      println("Somme : "+somme)
     }
 
     ssc.start()
