@@ -23,17 +23,20 @@ services:
     build: web-sockets-server/
     command: [
       "./wait-for-it.sh", "kafka:9092", "--timeout=120", "--strict", "--",
+      "./wait-for-it.sh", "schema-registry:80", "--timeout=120","--",
       "python", "web-sockets-server.py"
     ]
     environment:
       KAFKA_CONNECT: kafka:9092
       KAFKA_TOPICS: input-tickets
-      KAFKA_VALUE_DESERIALIZER: json
+      KAFKA_VALUE_DESERIALIZER: avro
+      SCHEMA_REGISTRY: schema-registry:80
     ports:
       - 40510:40510
     depends_on:
       - kafka
       - ingestion
+      - schema-registry
     deploy:
       replicas: 2
 
@@ -55,6 +58,26 @@ services:
       replicas: 2
 
 ########## DATABASE ##########
+  databasefeeder:
+    image: admo120104/ticketoc:databasefeeder
+    build: databasefeeder/
+    command: [
+      "./wait-for-it.sh", "kafka:9092", "--timeout=120", "--strict", "--",
+      "./wait-for-it.sh", "schema-registry:80", "--timeout=120", "--",
+      "python", "databasefeeder.py"
+    ]
+    environment:
+      KAFKA_CONNECT: kafka:9092
+      KAFKA_TOPICS: input-tickets
+      KAFKA_VALUE_DESERIALIZER: avro
+      SCHEMA_REGISTRY: schema-registry:80
+      DATABASE: database:27017
+    depends_on:
+      - kafka
+      - database
+      - schema-registry
+   # deploy:
+    #  replicas: 2
   database:
     image: mongo:latest
     volumes:
@@ -78,7 +101,7 @@ services:
       ROUTE: /v1/tickets
       KAFKA_CONNECT: kafka:9092
       KAFKA_TOPIC: input-tickets
-      KAFKA_VALUE_SERIALIZER: json
+      KAFKA_VALUE_SERIALIZER: avro
     ports:
       - 8000:80
     depends_on:
