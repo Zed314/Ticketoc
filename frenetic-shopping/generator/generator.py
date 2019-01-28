@@ -21,11 +21,11 @@ schema_registry = os.environ['SCHEMA_REGISTRY']
 frenetic_shopping_database = os.environ['FRENETIC_SHOPPING_DATABASE']
 
 
-def getProductSchema():
+def getReceiptSchema():
     return requests.get('http://{address}/v1/schemas/receipt'.format(address=schema_registry)).text
 
 
-schema = avro.schema.Parse(getProductSchema())
+schema = avro.schema.Parse(getReceiptSchema())
 writer = avro.io.DatumWriter(schema)
 
 
@@ -273,7 +273,7 @@ def generateOrder(cashier, popularProducts, trendingProducts, season, propabilit
     if order["notFrozen"]:
         exclusionList.update(exclusionDict["frozen"])
 
-    print(order)
+    # print(order)
     # print(exclusionList)
 
     order["numberOfElements"] = returnValueIfValueOrBelow(
@@ -446,7 +446,7 @@ def generateOrder(cashier, popularProducts, trendingProducts, season, propabilit
     # divide the order in two parts
 
     # print("Order:")
-    print(order["products"])
+    # print(order["products"])
     return order
 
 
@@ -567,12 +567,12 @@ if force:
                 encoder = avro.io.BinaryEncoder(bytes_writer)
                 writer.write(dict(cashRec), encoder)
 
-                r = requests.post('http://{address}/v1/tickets'.format(address=entrypoint), data=bytes_writer.getvalue(),
+                r = requests.post('http://{address}/v1/receipts'.format(address=entrypoint), data=bytes_writer.getvalue(),
                                   headers={'Content-Type': 'application/avro'})
                 # print(r.content)
             else:
                 r = requests.post(
-                    'http://{address}/v1/tickets'.format(address=entrypoint), json=cashRec)
+                    'http://{address}/v1/receipts'.format(address=entrypoint), json=cashRec)
                 # print(r.content)
         finally:
             pass
@@ -593,7 +593,7 @@ while True:
 
             cashRec = generateCashReceipt(storeid=idOfStore, terminalid=i, agentid=i, customerid=randint(
                 0, 10000), order=order, timestamp=time())
-            # print(cashRec)
+            print(cashRec)
 
             try:
                 if useAvro:
@@ -601,12 +601,12 @@ while True:
                     encoder = avro.io.BinaryEncoder(bytes_writer)
                     writer.write(dict(cashRec), encoder)
 
-                    r = requests.post('http://{address}/v1/tickets'.format(address=entrypoint), data=bytes_writer.getvalue(),
+                    r = requests.post('http://{address}/v1/receipts'.format(address=entrypoint), data=bytes_writer.getvalue(),
                                       headers={'Content-Type': 'application/avro'})
                     # print(r.content)
                 else:
                     r = requests.post(
-                        'http://{address}/v1/tickets'.format(address=entrypoint), json=cashRec)
+                        'http://{address}/v1/receipts'.format(address=entrypoint), json=cashRec)
                     # print(r.content)
             finally:
                 pass

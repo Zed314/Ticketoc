@@ -7,14 +7,21 @@ version := "1.0.0-SNAPSHOT"
 scalaVersion := "2.11.11"
 
 val sparkVersion = "2.4.0"
+val log4jVersion = "2.11.1"
+val scalajHttpVersion = "2.4.1"
+val playJsonVersion = "2.6.10"
 
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-core"                 % sparkVersion % "provided",
-  "org.apache.spark" %% "spark-streaming"            % sparkVersion,
-  "org.apache.spark" %% "spark-streaming-kafka-0-10" % sparkVersion,
-  "org.apache.spark" %% "spark-sql"                  % sparkVersion,
-  "org.apache.spark" %% "spark-sql-kafka-0-10"       % sparkVersion,
-  "org.scalaj"       %% "scalaj-http"                % "2.4.1"
+  "org.apache.spark"        %% "spark-core"                 % sparkVersion % "provided",
+  "org.apache.spark"        %% "spark-streaming"            % sparkVersion,
+  "org.apache.spark"        %% "spark-streaming-kafka-0-10" % sparkVersion,
+  "org.apache.spark"        %% "spark-sql"                  % sparkVersion,
+  "org.apache.spark"        %% "spark-sql-kafka-0-10"       % sparkVersion,
+  "org.mongodb.spark"       %% "mongo-spark-connector"      % sparkVersion,
+  "com.typesafe.play"       %% "play-json"                  % playJsonVersion,
+  "org.scalaj"              %% "scalaj-http"                % scalajHttpVersion,
+  "org.apache.logging.log4j" % "log4j-api"                  % log4jVersion,
+  "org.apache.logging.log4j" % "log4j-core"                 % log4jVersion
 )
 
 excludeDependencies ++= Seq(

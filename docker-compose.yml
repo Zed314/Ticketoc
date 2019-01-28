@@ -22,14 +22,14 @@ services:
     image: admo120104/ticketoc:web-sockets-server
     build: web-sockets-server/
     command: [
-      "./wait-for-it.sh", "kafka:9092", "--timeout=120", "--strict", "--",
-      "./wait-for-it.sh", "schema-registry:80", "--timeout=120","--",
+      "./wait-for-it.sh", "kafka:9092",         "--timeout=120", "--strict", "--",
+      "./wait-for-it.sh", "schema-registry:80", "--timeout=120", "--strict", "--",
       "python", "web-sockets-server.py"
     ]
     environment:
       KAFKA_CONNECT: kafka:9092
-      KAFKA_TOPICS: input-tickets
-      KAFKA_VALUE_DESERIALIZER: avro
+      KAFKA_TOPICS: sample-receipts
+      KAFKA_VALUE_DESERIALIZER: json
       SCHEMA_REGISTRY: schema-registry:80
     ports:
       - 40510:40510
@@ -58,26 +58,6 @@ services:
       replicas: 2
 
 ########## DATABASE ##########
-  databasefeeder:
-    image: admo120104/ticketoc:databasefeeder
-    build: databasefeeder/
-    command: [
-      "./wait-for-it.sh", "kafka:9092", "--timeout=120", "--strict", "--",
-      "./wait-for-it.sh", "schema-registry:80", "--timeout=120", "--",
-      "python", "databasefeeder.py"
-    ]
-    environment:
-      KAFKA_CONNECT: kafka:9092
-      KAFKA_TOPICS: input-tickets
-      KAFKA_VALUE_DESERIALIZER: avro
-      SCHEMA_REGISTRY: schema-registry:80
-      DATABASE: database:27017
-    depends_on:
-      - kafka
-      - database
-      - schema-registry
-   # deploy:
-    #  replicas: 2
   database:
     image: mongo:latest
     volumes:
@@ -98,9 +78,9 @@ services:
       "python", "entrypoint.py"
     ]
     environment:
-      ROUTE: /v1/tickets
+      ROUTE: /v1/receipts
       KAFKA_CONNECT: kafka:9092
-      KAFKA_TOPIC: input-tickets
+      KAFKA_TOPIC: input-receipts
       KAFKA_VALUE_SERIALIZER: avro
     ports:
       - 8000:80
@@ -132,7 +112,7 @@ services:
     image: wurstmeister/kafka:latest
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: input-tickets:4:1
+      KAFKA_CREATE_TOPICS: input-receipts:4:1, sample-receipts:4:1, stats-receipts:1:1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
       HOSTNAME_COMMAND: "docker info | grep ^Name: | cut -d' ' -f 2"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
@@ -160,7 +140,11 @@ services:
     ]
     environment:
       ENABLE_INIT_DAEMON: 'false'
-      SPARK_APPLICATION_MAIN_CLASS: fr.insa.ticketoc.ingestion.tickets.StreamingKafkaLatest
+      SPARK_APPLICATION_MAIN_CLASS: fr.insa.ticketoc.ingestion.receipts.StreamingKafka
+      KAFKA_CONNECT: kafka:9092
+      SCHEMA_REGISTRY: schema-registry:80
+      DATABASE: database:27017
+      BATCH_DURATION: 5
     ports:
     - 4040:4040
     depends_on:

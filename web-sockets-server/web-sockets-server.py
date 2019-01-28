@@ -6,15 +6,12 @@ import threading
 import logging
 import jwt
 import urllib.request
-import requests
-import io
 from urllib.request        import HTTPError
 from websockets.exceptions import ConnectionClosed
 from collections           import namedtuple
 from kafka                 import KafkaConsumer
 from asgiref.sync          import sync_to_async
-import avro.schema
-from avro.io import DatumReader
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -23,29 +20,16 @@ logger.addHandler(logging.StreamHandler())
 kafka_connect                 = os.environ['KAFKA_CONNECT']
 kafka_topics                  = os.environ['KAFKA_TOPICS']
 kafka_value_deserializer_type = os.environ['KAFKA_VALUE_DESERIALIZER']
-schema_registry            = os.environ['SCHEMA_REGISTRY']
+
 
 def json_deserializer(data):
     return json.loads(data, encoding='utf-8')
 
-def getProductSchema():
-    return requests.get('http://{address}/v1/schemas/receipt'.format(address=schema_registry)).text
 
-schema = avro.schema.Parse(getProductSchema())
-avro_reader = avro.io.DatumReader(schema)
-
-def avro_deserializer(data):
-    bytes_reader = io.BytesIO(data)
-    decoder = avro.io.BinaryDecoder(bytes_reader)
-
-    return avro_reader.read(decoder)
-
-kafka_topics = { kafka_topic.strip() for kafka_topic in kafka_topics.split(',') }
+kafka_topics = {kafka_topic.strip() for kafka_topic in kafka_topics.split(',')}
 
 if kafka_value_deserializer_type == 'json':
     kafka_value_deserializer = json_deserializer
-elif kafka_value_deserializer_type == 'avro':
-    kafka_value_deserializer = avro_deserializer
 else:
     raise ValueError("unknown value '{value}' for kafka_value_deserializer_type".format(value=kafka_value_deserializer_type))
 
@@ -129,9 +113,10 @@ class Subscriptions:
             self._consumer.close()
 
 
-class Controller:
+Message = namedtuple('Message', ['type', 'topic', 'token'])
 
-    Message = namedtuple('Message', ['type', 'topic', 'token'])
+
+class Controller:
 
     def __init__(self, client):
         self._client = client
@@ -178,7 +163,7 @@ class Controller:
                 record = await self._subscriptions.getone()
 
                 logger.info("_subscriptions_to_client: '{record_topic}'".format(record_topic=record.topic))
-                print(record,flush=True)
+
                 await self._send_to_client(self._message_record(record.topic, record.value))
 
         except ConnectionClosed:
@@ -197,7 +182,7 @@ class Controller:
 
         records = jwt.decode(token, verify=False)
 
-        url = 'https://id.centrallink.de/api/{id}/?client_id={client_id}&token={token}'
+        url = 'https://id.centrallink.de/api/{id}/?client_id={client_id}&token={token}'  # todo: export url
         url = url.format(id=records['id'], client_id='6d8e67f3-a575-49ac-9df1-c3136046dc21', token=token)
 
         try:
@@ -243,7 +228,7 @@ class Controller:
         if isinstance(message, str):
             message = json.loads(message, encoding='utf-8')
 
-        return self.Message(type=message['type'], topic=message['topic'], token=message.get('token', None))
+        return Message(type=message['type'], topic=message['topic'], token=message.get('token', None))
 
     @staticmethod
     def _message_already_subscribed(topic):

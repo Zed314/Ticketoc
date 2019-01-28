@@ -29,7 +29,7 @@ class ReceiptOverview extends Component {
         loading: false,
       })
     }
-    this.socketClient.subscribe("input-tickets", msg => {
+    this.socketClient.subscribe("sample-receipts", msg => {
       const newArray = this.state.receipts.concat([ msg.message ]);
       newArray.splice(0, newArray.length - 20);
       this.setState({
