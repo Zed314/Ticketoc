@@ -25,6 +25,7 @@ class HomePage extends Component {
       reconnecting: false,
       restartSeconds: null,
       loading: true,
+      unauthorized: false,
     }
   }
 
@@ -36,7 +37,11 @@ class HomePage extends Component {
     this.setState({
       loading: true,
     })
-    this.socketClient = new LocalSubscriber(token)
+    this.socketClient = new LocalSubscriber(token, {unauthorizedAction: () => {
+      this.setState({
+        unauthorized: true,
+      })
+    }})
     this.socketClient.connectAction = () => {
       this.setState({
         connectionError: false,
@@ -118,11 +123,14 @@ class HomePage extends Component {
     const countdownPart = this.state.restartSeconds !== null ? (<strong>Reconnecting in {this.state.restartSeconds}s</strong>) : null
     const alertPart = this.state.connectionError ? <Alert type="danger">Connection to the server failed. {countdownPart}</Alert> : null;
     const reconnectPart = this.state.reconnecting ? <Alert type="info">Reconnecting...</Alert> : null
+    const loginAlert = this.state.unauthorized ? (<Alert type="danger" icon="shield-off">Your session has <strong>expired.</strong> <a href="/logout">Log out</a> and sign in again!</Alert>) : null
+
 
     return (<SiteWrapper>
      <Page.Content title="Dashboard">
      {alertPart}
      {reconnectPart}
+     {loginAlert}
      <Grid.Row cards={true}>
      <Grid.Col>
      <NetworkStampCard

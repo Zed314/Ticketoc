@@ -5,14 +5,15 @@ import FinancialHelpers from "../FinancialHelpers";
 import LocalSubscriber from "../LocalSubscriber";
 import {
   Page,
-  Icon
+  Icon,
+  Alert
 } from "tabler-react";
 
 class ReceiptOverview extends Component {
   constructor(props) {
     super(props)
     this.savedReceipts = [];
-    this.state = { receipts: [], paused: false }
+    this.state = { receipts: [], paused: false, unauthorized: false }
     this.toggleActivation = this.toggleActivation.bind(this);
   }
 
@@ -39,7 +40,11 @@ class ReceiptOverview extends Component {
     this.setState({
       loading: true,
     })
-    this.socketClient = new LocalSubscriber(token)
+    this.socketClient = new LocalSubscriber(token, {unauthorizedAction: () => {
+      this.setState({
+        unauthorized: true,
+      })
+    }})
     this.socketClient.connectAction = () => {
       this.setState({
         connectionError: false,
@@ -87,9 +92,11 @@ class ReceiptOverview extends Component {
   }
 
   render() {
+    const alert = this.state.unauthorized ? (<Alert type="danger" icon="shield-off">Your session has <strong>expired.</strong> <a href="/logout">Log out</a> and sign in again!</Alert>) : null
+
     return (<SiteWrapper>
      <Page.Content title={<span>Live receipt tracking <Icon link={true} className="heading-playpause" name={this.state.paused ? "play-circle" : "pause-circle"} onClick={this.toggleActivation} /></span>}>
-     <div></div>
+     {alert}
      <ReceiptTimeline receipts={this.state.receipts} />
      </Page.Content>
      </SiteWrapper>)

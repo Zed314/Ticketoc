@@ -10,23 +10,10 @@ import {
 
 const navBarItems = [
   { value: "Home", to: "/", icon: "home", LinkComponent: withRouter(NavLink) },
-  {
-    value: "More",
-    icon: "box",
-    subItems: [
-      {
-        value: "Latest receipts",
-        to: "/receipts",
-        LinkComponent: withRouter(NavLink),
-      },
-      { value: "Charts", to: "/charts", LinkComponent: withRouter(NavLink) },
-      {
-        value: "Pricing Cards",
-        to: "/pricing-cards",
-        LinkComponent: withRouter(NavLink),
-      },
-    ],
-  },
+  { value: "Latest receipts",
+    to: "/receipts",
+    LinkComponent: withRouter(NavLink),
+    icon: "truck", },
 ];
 
 
