@@ -91,7 +91,7 @@ class Receipt extends Component {
         </Card>
         <Dimmer active={this.state.popupOpen} className="dimmer">
           <Card.Body className="receipt-body">
-            <h3>{FinancialHelpers.getRandomStore()}<small class="receipt-date">{this.props.details.date}</small></h3>
+            <h3>{this.props.details.storeName}<small class="receipt-date">{this.props.details.date}</small></h3>
             <div className="starring-total">
               <div className="sum">€ {FinancialHelpers.toFinancialString(this.props.documentTotal.grossTotal)}</div>
               <PaymentTypes payments={this.props.settlements} />

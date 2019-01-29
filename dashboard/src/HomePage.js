@@ -17,6 +17,10 @@ class HomePage extends Component {
     this.state = {
       totalRevenue: 0,
       saleCount: 0,
+      cashPaymentCount: 0,
+      cardPaymentCount: 0,
+      totalCard: 0,
+      totalCash: 0,
       connectionError: false,
       reconnecting: false,
       restartSeconds: null,
@@ -41,7 +45,17 @@ class HomePage extends Component {
         loading: false,
       })
     }
-    this.socketClient.subscribe("sale-count", msg => {
+    this.socketClient.subscribe("data", msg => {
+      this.setState({
+        saleCount: msg.message.data.nbt_tickets,
+        totalRevenue: msg.message.data.total_tickets,
+        cashPaymentCount: msg.message.data.nbr_tickets_especes,
+        cardPaymentCount: msg.message.data.nbr_tickets_cp,
+        totalCard: msg.message.data.totale_tickets_cp,
+        totalCash: msg.message.data.totale_tickets_especes,
+      })
+    })
+    /*this.socketClient.subscribe("sale-count", msg => {
       this.setState({
         saleCount: msg.message
       })
@@ -50,7 +64,7 @@ class HomePage extends Component {
       this.setState({
         totalRevenue: msg.message
       })
-    })
+    })*/
     this.socketClient.socket.onerror = () => {
       this.setState({
         connectionError: true,
@@ -121,17 +135,9 @@ class HomePage extends Component {
      <Grid.Col>
      <NetworkStampCard
      loading={this.state.loading}
-     color="green"
-     icon="dollar-sign"
-     count={this.nFormatter(this.state.totalRevenue, 2) + " €"}
-     label="total revenue" />
-     </Grid.Col>
-     <Grid.Col>
-     <NetworkStampCard
-     loading={this.state.loading}
      color="indigo"
      icon="layers"
-     count="40"
+     count={this.state.cashPaymentCount}
      label="cash payments" />
      </Grid.Col>
      <Grid.Col>
@@ -139,11 +145,37 @@ class HomePage extends Component {
      loading={this.state.loading}
      color="teal"
      icon="credit-card"
-     count="40"
+     count={this.state.cardPaymentCount}
      label="card payments" />
      </Grid.Col>
-
      </Grid.Row>
+     <Grid.Row>
+     <Grid.Col>
+     <NetworkStampCard
+     loading={this.state.loading}
+     color="red"
+     icon="dollar-sign"
+     count={this.nFormatter(this.state.totalRevenue, 2) + " €"}
+     label="total revenue" />
+     </Grid.Col>
+     <Grid.Col>
+     <NetworkStampCard
+     loading={this.state.loading}
+     color="green"
+     icon="dollar-sign"
+     count={this.nFormatter(this.state.totalCash, 2) + " €"}
+     label="cash revenue" />
+     </Grid.Col>
+     <Grid.Col>
+     <NetworkStampCard
+     loading={this.state.loading}
+     color="blue"
+     icon="dollar-sign"
+     count={this.nFormatter(this.state.totalCard, 2) + " €"}
+     label="card revenue" />
+     </Grid.Col>
+     </Grid.Row>
+
      <Grid.Row>
      <Grid.Col>
      <DiagramCard

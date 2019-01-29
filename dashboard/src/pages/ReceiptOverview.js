@@ -1,16 +1,35 @@
 import React, { Component } from 'react';
 import SiteWrapper from "../SiteWrapper";
 import ReceiptTimeline from "../components/ReceiptTimeline";
+import FinancialHelpers from "../FinancialHelpers";
 import LocalSubscriber from "../LocalSubscriber";
 import {
   Page,
+  Icon
 } from "tabler-react";
 
 class ReceiptOverview extends Component {
   constructor(props) {
     super(props)
-    this.state = { receipts: [] }
+    this.savedReceipts = [];
+    this.state = { receipts: [], paused: false }
+    this.toggleActivation = this.toggleActivation.bind(this);
   }
+
+  toggleActivation(e) {
+    e.preventDefault();
+    if (this.state.paused) {
+      this.setState(state => ({
+        paused: false,
+        receipts: this.savedReceipts,
+      }));
+    } else {
+      this.setState(state => ({
+        paused: true,
+      }));
+    }
+  }
+
 
   componentDidMount() {
     this.startSockClient(window.localStorage.getItem('token'))
@@ -30,11 +49,17 @@ class ReceiptOverview extends Component {
       })
     }
     this.socketClient.subscribe("sample-receipts", msg => {
-      const newArray = this.state.receipts.concat([ msg.message ]);
+      const storeId = parseInt(msg.message.storeID)
+      msg.message.storeName = !isNaN(storeId) && storeId !== 61 ? FinancialHelpers.getStoreForId(storeId % (FinancialHelpers.getMaxStoreId() + 1)) : FinancialHelpers.getRandomStore()
+      const newArray = this.savedReceipts.concat([ msg.message ]);
       newArray.splice(0, newArray.length - 20);
-      this.setState({
-        receipts: newArray
-      });
+
+      this.savedReceipts = newArray;
+      if (!this.state.paused) {
+        this.setState({
+          receipts: this.savedReceipts
+        });
+      }
     })
     this.socketClient.socket.onerror = () => {
       this.setState({
@@ -63,7 +88,8 @@ class ReceiptOverview extends Component {
 
   render() {
     return (<SiteWrapper>
-     <Page.Content title="Live receipt tracking">
+     <Page.Content title={<span>Live receipt tracking <Icon link={true} className="heading-playpause" name={this.state.paused ? "play-circle" : "pause-circle"} onClick={this.toggleActivation} /></span>}>
+     <div></div>
      <ReceiptTimeline receipts={this.state.receipts} />
      </Page.Content>
      </SiteWrapper>)

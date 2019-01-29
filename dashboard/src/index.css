@@ -224,6 +224,11 @@ table.payment-types > tr > td:first-child {
   transition: 0.15s filter;
 }
 
+.heading-playpause {
+  display: inline-block;
+  margin-left: 5px;
+}
+
 .login.btn {
  font-size: 1rem;
 }
