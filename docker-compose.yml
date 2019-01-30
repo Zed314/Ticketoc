@@ -81,7 +81,7 @@ services:
       ROUTE: /v1/receipts
       KAFKA_CONNECT: kafka:9092
       KAFKA_TOPIC: input-receipts
-      KAFKA_VALUE_SERIALIZER: avro
+      KAFKA_VALUE_SERIALIZER: json
     ports:
       - 8000:80
     depends_on:
