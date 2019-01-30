@@ -1,5 +1,4 @@
 package ticktoc
-/* docker cp /home/faissalitto/insa/bigdata/Ticketoc_3/Ticketoc/spark/connexion/src/main/scala/StreamingKafka_latest.scala d5c1a3f2c622:/Sample.scala */
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SQLContext

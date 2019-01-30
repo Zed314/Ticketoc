@@ -8,8 +8,8 @@ app = Flask('backend')
 database = MongoClient('mongodb://{address}/'.format(address=database))
 
 
-def get_ticket_by_cash_receipt_id(cash_receipt_id):
-    return database['ticketoc']['tickets'].find_one({"cashReceiptID": cash_receipt_id})
+def get_receipt_by_id(receipt_id):
+    return database['ticketoc']['receipts'].find_one({"cashReceiptID": receipt_id})
 
 
 @app.errorhandler(404)
@@ -21,11 +21,11 @@ def error_handler(error):
     return jsonify({'error': str(error)}), getattr(error, 'code', 500)
 
 
-@app.route('/v1/tickets/<cash_receipt_id>', methods=['GET'])
-def resource_get_ticket_by_cash_receipt_id(cash_receipt_id):
-    ticket = get_ticket_by_cash_receipt_id(cash_receipt_id)
-    del ticket['_id']  # not serializable
+@app.route('/v1/receipts/<receipt_id>', methods=['GET'])
+def resource_get_receipt_by_id(receipt_id):
+    ticket = get_receipt_by_id(receipt_id)
     if ticket is not None:
+        del ticket['_id']  # not serializable
         return jsonify(ticket)
     abort(404)
 

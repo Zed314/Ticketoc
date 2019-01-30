@@ -2,3 +2,5 @@ kafka-python==1.4.4
 websockets==7.0
 asgiref==2.3.2
 PyJWT==1.7.1
+avro-python3==1.8.2
+requests==2.21.0

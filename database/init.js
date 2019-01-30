@@ -1,6 +1,6 @@
 ticketoc = db.getSiblingDB('ticketoc');
 
-ticketoc.tickets.insertMany(
+ticketoc.receipts.insertMany(
     [
        {
           "cashReceiptID": "133701547997391",

@@ -12,6 +12,7 @@ from collections           import namedtuple
 from kafka                 import KafkaConsumer
 from asgiref.sync          import sync_to_async
 
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
@@ -25,7 +26,7 @@ def json_deserializer(data):
     return json.loads(data, encoding='utf-8')
 
 
-kafka_topics = { kafka_topic.strip() for kafka_topic in kafka_topics.split(',') }
+kafka_topics = {kafka_topic.strip() for kafka_topic in kafka_topics.split(',')}
 
 if kafka_value_deserializer_type == 'json':
     kafka_value_deserializer = json_deserializer
@@ -112,9 +113,10 @@ class Subscriptions:
             self._consumer.close()
 
 
-class Controller:
+Message = namedtuple('Message', ['type', 'topic', 'token'])
 
-    Message = namedtuple('Message', ['type', 'topic', 'token'])
+
+class Controller:
 
     def __init__(self, client):
         self._client = client
@@ -180,7 +182,7 @@ class Controller:
 
         records = jwt.decode(token, verify=False)
 
-        url = 'https://id.centrallink.de/api/{id}/?client_id={client_id}&token={token}'
+        url = 'https://id.centrallink.de/api/{id}/?client_id={client_id}&token={token}'  # todo: export url
         url = url.format(id=records['id'], client_id='6d8e67f3-a575-49ac-9df1-c3136046dc21', token=token)
 
         try:
@@ -226,7 +228,7 @@ class Controller:
         if isinstance(message, str):
             message = json.loads(message, encoding='utf-8')
 
-        return self.Message(type=message['type'], topic=message['topic'], token=message.get('token', None))
+        return Message(type=message['type'], topic=message['topic'], token=message.get('token', None))
 
     @staticmethod
     def _message_already_subscribed(topic):

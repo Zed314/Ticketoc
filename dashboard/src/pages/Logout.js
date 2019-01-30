@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import SiteWrapper from "../SiteWrapper";
-import PromoCard from "../components/PromoCard";
-import AuthHelpers from "../AuthHelpers";
 import { Redirect } from 'react-router-dom';
 import {
   Page,
