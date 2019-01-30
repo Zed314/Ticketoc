@@ -61,7 +61,7 @@ services:
   database:
     image: mongo:latest
     volumes:
-    - ./volumes/database:/data/
+    - ./volumes/database:/data/db
     - ./database:/docker-entrypoint-initdb.d
     deploy:
       placement:

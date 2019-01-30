@@ -68,9 +68,10 @@ object StreamingKafka {
         val card        = settlements.filter(settlement => (settlement \ "paymentMechanism").as[String] == "CB")
         val cash        = settlements.filter(settlement => (settlement \ "paymentMechanism").as[String] == "Especes")
 
-        totalRevenue += receipts.map(receipt    => (receipt    \ "documentTotal" \ "grossTotal").as[Double]).fold(0.0)(_ + _)
-        totalCard    +=     card.map(settlement => (settlement \ "settlementAmount"            ).as[Double]).fold(0.0)(_ + _)
-        totalCash    +=     cash.map(settlement => (settlement \ "settlementAmount"            ).as[Double]).fold(0.0)(_ + _)
+        val batchRevenue: Double = receipts.map(receipt    => (receipt    \ "documentTotal" \ "grossTotal").as[Double]).fold(0.0)(_ + _)
+        totalCard            +=        card.map(settlement => (settlement \ "settlementAmount"            ).as[Double]).fold(0.0)(_ + _)
+        totalCash            +=        cash.map(settlement => (settlement \ "settlementAmount"            ).as[Double]).fold(0.0)(_ + _)
+        totalRevenue         += batchRevenue
 
         saleCount        += receipts.count()
         cardPaymentCount +=     card.count()
@@ -83,7 +84,8 @@ object StreamingKafka {
           "saleCount"        -> saleCount,
           "cardPaymentCount" -> cardPaymentCount,
           "cashPaymentCount" -> cashPaymentCount,
-          "batchSize"        -> batchSize
+          "batchSize"        -> batchSize,
+          "batchRevenue"     -> batchRevenue
         )
 
         producer.send(new ProducerRecord[String, String]("stats-receipts", Json.stringify(stats)))

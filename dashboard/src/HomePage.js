@@ -70,6 +70,7 @@ class HomePage extends Component {
         totalCash: msg.message.totalCash,
         lastTotals: newBatchRevenue,
         lastPurchases: newPurchases,
+        lastAmountPerPurchase: newBatchRatio,
       })
     })
     /*this.socketClient.subscribe("sale-count", msg => {
@@ -206,7 +207,7 @@ class HomePage extends Component {
      <Grid.Col>
      <DiagramCard
      color="#7FDBFF"
-     data={[this.state.lastTotals]}
+     data={this.state.lastTotals}
      label="Total of last batch" />
      </Grid.Col>
      <Grid.Col>
