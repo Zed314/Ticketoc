@@ -34,7 +34,7 @@ services:
       "./wait-for-it.sh", "entrypoint:80",                    "--timeout=120", "--strict", "--",
       "./wait-for-it.sh", "schema-registry:80",               "--timeout=120", "--strict", "--",
       "./wait-for-it.sh", "frenetic-shopping-database:27017", "--timeout=120", "--strict", "--",
-      "python", "generator.py","-s","7045","--holiday","valentinesday"
+      "python", "generator.py", "-s", "7045", "--holiday", "valentinesday"
     ]
     environment:
       ENTRYPOINT: entrypoint:80
@@ -52,7 +52,7 @@ services:
       "./wait-for-it.sh", "entrypoint:80",                    "--timeout=120", "--strict", "--",
       "./wait-for-it.sh", "schema-registry:80",               "--timeout=120", "--strict", "--",
       "./wait-for-it.sh", "frenetic-shopping-database:27017", "--timeout=120", "--strict", "--",
-      "python", "generator.py","--popular","Raspberry Pi,60"
+      "python", "generator.py", "--popular", "Raspberry Pi,60"
     ]
     environment:
       ENTRYPOINT: entrypoint:80
