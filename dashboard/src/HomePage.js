@@ -17,10 +17,18 @@ class HomePage extends Component {
     this.state = {
       totalRevenue: 0,
       saleCount: 0,
+      cashPaymentCount: 0,
+      cardPaymentCount: 0,
+      totalCard: 0,
+      totalCash: 0,
       connectionError: false,
       reconnecting: false,
       restartSeconds: null,
       loading: true,
+      unauthorized: false,
+      lastTotals: [0],
+      lastPurchases: [0],
+      lastAmountPerPurchase: [0],
     }
   }
 
@@ -32,7 +40,11 @@ class HomePage extends Component {
     this.setState({
       loading: true,
     })
-    this.socketClient = new LocalSubscriber(token)
+    this.socketClient = new LocalSubscriber(token, {unauthorizedAction: () => {
+      this.setState({
+        unauthorized: true,
+      })
+    }})
     this.socketClient.connectAction = () => {
       this.setState({
         connectionError: false,
@@ -41,7 +53,27 @@ class HomePage extends Component {
         loading: false,
       })
     }
-    this.socketClient.subscribe("sale-count", msg => {
+    this.socketClient.subscribe("stats-receipts", msg => {
+      const newPurchases = this.state.lastPurchases.concat([ msg.message.batchSize ]);
+      newPurchases.splice(0, newPurchases.length - 20);
+      const newBatchRevenue = this.state.lastTotals.concat([ msg.message.batchRevenue ]);
+      newBatchRevenue.splice(0, newBatchRevenue.length - 20);
+      const newBatchRatio = this.state.lastTotals.concat([ parseInt(msg.message.batchRevenue, 10) / parseInt(msg.message.batchSize, 10) ]);
+      newBatchRatio.splice(0, newBatchRatio.length - 20);
+
+      this.setState({
+        saleCount: msg.message.saleCount,
+        totalRevenue: msg.message.totalRevenue,
+        cashPaymentCount: msg.message.cashPaymentCount,
+        cardPaymentCount: msg.message.cardPaymentCount,
+        totalCard: msg.message.totalCard,
+        totalCash: msg.message.totalCash,
+        lastTotals: newBatchRevenue,
+        lastPurchases: newPurchases,
+        lastAmountPerPurchase: newBatchRatio,
+      })
+    })
+    /*this.socketClient.subscribe("sale-count", msg => {
       this.setState({
         saleCount: msg.message
       })
@@ -50,7 +82,7 @@ class HomePage extends Component {
       this.setState({
         totalRevenue: msg.message
       })
-    })
+    })*/
     this.socketClient.socket.onerror = () => {
       this.setState({
         connectionError: true,
@@ -104,11 +136,14 @@ class HomePage extends Component {
     const countdownPart = this.state.restartSeconds !== null ? (<strong>Reconnecting in {this.state.restartSeconds}s</strong>) : null
     const alertPart = this.state.connectionError ? <Alert type="danger">Connection to the server failed. {countdownPart}</Alert> : null;
     const reconnectPart = this.state.reconnecting ? <Alert type="info">Reconnecting...</Alert> : null
+    const loginAlert = this.state.unauthorized ? (<Alert type="danger" icon="shield-off">Your session has <strong>expired.</strong> <a href="/logout">Log out</a> and sign in again!</Alert>) : null
+
 
     return (<SiteWrapper>
      <Page.Content title="Dashboard">
      {alertPart}
      {reconnectPart}
+     {loginAlert}
      <Grid.Row cards={true}>
      <Grid.Col>
      <NetworkStampCard
@@ -121,17 +156,9 @@ class HomePage extends Component {
      <Grid.Col>
      <NetworkStampCard
      loading={this.state.loading}
-     color="green"
-     icon="dollar-sign"
-     count={this.nFormatter(this.state.totalRevenue, 2) + " €"}
-     label="total revenue" />
-     </Grid.Col>
-     <Grid.Col>
-     <NetworkStampCard
-     loading={this.state.loading}
      color="indigo"
      icon="layers"
-     count="40"
+     count={this.state.cashPaymentCount}
      label="cash payments" />
      </Grid.Col>
      <Grid.Col>
@@ -139,37 +166,56 @@ class HomePage extends Component {
      loading={this.state.loading}
      color="teal"
      icon="credit-card"
-     count="40"
+     count={this.state.cardPaymentCount}
      label="card payments" />
      </Grid.Col>
-
      </Grid.Row>
+     <Grid.Row>
+     <Grid.Col>
+     <NetworkStampCard
+     loading={this.state.loading}
+     color="red"
+     icon="dollar-sign"
+     count={this.nFormatter(this.state.totalRevenue, 2) + " €"}
+     label="total revenue" />
+     </Grid.Col>
+     <Grid.Col>
+     <NetworkStampCard
+     loading={this.state.loading}
+     color="green"
+     icon="dollar-sign"
+     count={this.nFormatter(this.state.totalCash, 2) + " €"}
+     label="cash revenue" />
+     </Grid.Col>
+     <Grid.Col>
+     <NetworkStampCard
+     loading={this.state.loading}
+     color="blue"
+     icon="dollar-sign"
+     count={this.nFormatter(this.state.totalCard, 2) + " €"}
+     label="card revenue" />
+     </Grid.Col>
+     </Grid.Row>
+
      <Grid.Row>
      <Grid.Col>
      <DiagramCard
      color="#39CCCC"
-     data={[9, 6, 6, 7, 0, 3, 5, 7, 4, 6]}
-     label="trees planted" />
+     data={this.state.lastPurchases}
+     label="Transactions in last batch" />
      </Grid.Col>
      <Grid.Col>
      <DiagramCard
      color="#7FDBFF"
-     data={[0, 8, 2, 7, 8, 7, 9, 9, 1, 7]}
-     label="carts ramsacked" />
+     data={this.state.lastTotals}
+     label="Total of last batch" />
      </Grid.Col>
      <Grid.Col>
      <DiagramCard
      color="#0074D9"
-     data={[5, 1, 0, 4, 7, 4, 2, 2, 9, 8]}
-     label="hammoks slept in" />
+     data={this.state.lastAmountPerPurchase}
+     label="Average purchase total in last batch" />
      </Grid.Col>
-     </Grid.Row>
-     <Grid.Row>
-     <Card>
-     <IntelligientTable
-      headings={[{'title': 'A thing', 'property': 'thing'}, {'title': 'Signification', 'property': 'signification'}]}
-      items={[{'thing': 'Table', 'signification': 'workplace'},{'thing': 'Seesaw', 'signification': <i>children are here</i> },{'thing': 'Bongo', 'signification': 'Music fills the place'}]} />
-     </Card>
      </Grid.Row>
      </Page.Content>
      </SiteWrapper>)

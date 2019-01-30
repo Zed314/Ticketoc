@@ -48,7 +48,12 @@ object StreamingKafka {
       Subscribe[String, String](Array("input-receipts"), kafkaParams)
     )
 
-    var income = 0.0
+    var totalRevenue     : Double = 0.0
+    var totalCard        : Double = 0.0
+    var totalCash        : Double = 0.0
+    var saleCount        : Long = 0
+    var cashPaymentCount : Long = 0
+    var cardPaymentCount : Long = 0
 
     stream.foreachRDD { rdd: RDD[ConsumerRecord[String, String]] =>
       try {
@@ -57,13 +62,37 @@ object StreamingKafka {
 
         receipts.map(receipt => Document.parse(Json.stringify(receipt))).saveToMongoDB()
 
-        income += receipts.map(receipt => (receipt \ "documentTotal" \ "grossTotal").as[Double]).fold(0.0)(_ + _)
+        val batchSize = receipts.count()
 
-        producer.send(new ProducerRecord[String, String]("stats-receipts", Json.stringify(Json.obj("income" -> income))))
+        val settlements =   receipts.flatMap(receipt    => (receipt    \ "settlements").as[List[JsObject]])
+        val card        = settlements.filter(settlement => (settlement \ "paymentMechanism").as[String] == "CB")
+        val cash        = settlements.filter(settlement => (settlement \ "paymentMechanism").as[String] == "Especes")
+
+        val batchRevenue: Double = receipts.map(receipt    => (receipt    \ "documentTotal" \ "grossTotal").as[Double]).fold(0.0)(_ + _)
+        totalCard            +=        card.map(settlement => (settlement \ "settlementAmount"            ).as[Double]).fold(0.0)(_ + _)
+        totalCash            +=        cash.map(settlement => (settlement \ "settlementAmount"            ).as[Double]).fold(0.0)(_ + _)
+        totalRevenue         += batchRevenue
+
+        saleCount        += receipts.count()
+        cardPaymentCount +=     card.count()
+        cashPaymentCount +=     cash.count()
+
+        val stats = Json.obj(
+          "totalRevenue"     -> totalRevenue,
+          "totalCard"        -> totalCard,
+          "totalCash"        -> totalCash,
+          "saleCount"        -> saleCount,
+          "cardPaymentCount" -> cardPaymentCount,
+          "cashPaymentCount" -> cashPaymentCount,
+          "batchSize"        -> batchSize,
+          "batchRevenue"     -> batchRevenue
+        )
+
+        producer.send(new ProducerRecord[String, String]("stats-receipts", Json.stringify(stats)))
 
         receipts.take(1) match {
           case Array(receipt) => producer.send(new ProducerRecord[String, String]("sample-receipts", Json.stringify(receipt)))
-          case _ => Unit
+          case _              => Unit
         }
 
       } catch {
@@ -73,5 +102,7 @@ object StreamingKafka {
 
     ssc.start()
     ssc.awaitTermination()
+
+    producer.close()
   }
 }

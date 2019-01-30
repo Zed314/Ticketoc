@@ -9,7 +9,6 @@ class ReceiptTimeline extends Component {
   }
 
   elemShow(i) {
-    console.log(i)
     this.setState({inAction: true})
     setTimeout(() => {
       let clone = this.state.item_stage.concat([])

@@ -21,12 +21,13 @@ libraryDependencies ++= Seq(
   "com.typesafe.play"       %% "play-json"                  % playJsonVersion,
   "org.scalaj"              %% "scalaj-http"                % scalajHttpVersion,
   "org.apache.logging.log4j" % "log4j-api"                  % log4jVersion,
-  "org.apache.logging.log4j" % "log4j-core"                 % log4jVersion
+  "org.apache.logging.log4j" % "log4j-core"                 % log4jVersion,
 )
 
 excludeDependencies ++= Seq(
   ExclusionRule(organization = "org.glassfish.hk2.external")
 )
+
 
 assemblyMergeStrategy in assembly := {
   case PathList("org", "apache", xs @ _*) => MergeStrategy.last

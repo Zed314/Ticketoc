@@ -1,13 +1,14 @@
 
 
 class LocalSubscriber {
-	constructor(token, options={host: "127.0.0.1", port: 40510}) {
+	constructor(token, options) {
 		this.token = token
 		this.connected = false
 		this.commandQueue = []
 		this.topicCallbacks = {}
 		this.connectAction = () => {}
-		this.socket = new WebSocket(`ws://${options.host}:${options.port}`)
+		this.unauthorizedAction = options.unauthorizedAction
+		this.socket = new WebSocket(`ws://${options.host ? options.host : "127.0.0.1"}:${options.port ? options.port : 40510}`)
 
 		// event emmited when connected
 		this.socket.onopen = () => {
@@ -32,6 +33,11 @@ class LocalSubscriber {
 				}
 			} else if (message.type === "action_answer") {
 				if (message.result !== 0) {
+					if (message.note.indexOf) {
+						if (message.note.indexOf('unauthorized') >= 0 && this.unauthorizedAction) {
+							this.unauthorizedAction()
+						}
+					}
 					console.warn(message.note ? message.note : "An error occurred while treating the request")
 				} else if (message.result === 0) {
 					console.log(message.note ? message.note : "Request confirmed")
