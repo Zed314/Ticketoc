@@ -57,15 +57,16 @@ for product in products.find({}):
         exclusionDict["frozen"].add(product["_id"])
 
 
-def getRandomProduct(exclusionList):
-    return getRandomProducts(1, exclusionList)[0]
+def getRandomProduct(exclusionList,exclusionCategories):
+    return getRandomProducts(1, exclusionList,exclusionCategories)[0]
 
 
-def getRandomProducts(nb, exclusionList, requestDB=False):
+def getRandomProducts(nb, exclusionList,exclusionCategories, requestDB=False):
     if requestDB:
         #idList = []
         # for elt in exclusionList:
         #	idList.append(elt["_id"])
+        exclusionList = list(exclusionList)
         products = supermarketDB.products.aggregate(
             [{"$match": {"_id": {"$nin": exclusionList}}}, {"$sample": {"size": nb}}])
 
@@ -78,7 +79,15 @@ def getRandomProducts(nb, exclusionList, requestDB=False):
         #	idList.append(elt["_id"])
         for i in range(nb):
             products.append(
-                choice([a for a in allProducts.values() if a["_id"] not in exclusionList]))
+                choice([a for a in allProducts.values() 
+                if True#a["_id"] not in exclusionList 
+                and ("non-bio" in exclusionCategories and a["bio"]==False or "non-bio" not in exclusionCategories) 
+                and ("meat" in exclusionCategories and a["containsMeat"]==True  or "meat" not in exclusionCategories) 
+                and ("alcool" in exclusionCategories and a["alcool"]==True  or "alcool" not in exclusionCategories) 
+                and ("notFrozen" in exclusionCategories and a["isFrozen"]==True  or "notFrozen" not in exclusionCategories) 
+                and ("vegan" in exclusionCategories and a["isFrozen"]==False  or "vegan" not in exclusionCategories) 
+                
+                ]))
         return products
 
 
@@ -193,9 +202,13 @@ def generateCashReceipt(storeid=1, terminalid=1, agentid=1, customerid=1, order=
     nb_settlements = order["settlements"]
     paymentsMechanismes = ["CB", "Especes"]
     if nb_settlements == 1:
+        if order["billingMethod"] == PaymentMethod.CASH:
+            paymentMechanism = paymentsMechanismes[1]
+        else:
+            paymentMechanism = paymentsMechanismes[0]
         settlements.append({
             'settlementAmount': grossTotal,
-            'paymentMechanism': paymentsMechanismes[randint(0, 1)]
+            'paymentMechanism': paymentMechanism
         })
     else:
         developpedPriceList = []
@@ -261,35 +274,44 @@ def generateOrder(cashier, popularProducts, trendingProducts, season, propabilit
     order["idConsumerSuffix"] = str(int(order["vegan"])*10000+int(order["meat"])*1000+int(
         order["alcool"])*100+int(order["onlyBio"])*10+int(order["notFrozen"]))
     exclusionList = set()
-
+    exclusionCategories = set()
     if order["onlyBio"]:
-        exclusionList.update(exclusionDict["non-bio"])
+       # exclusionList.update(exclusionDict["non-bio"])
+        exclusionCategories.update("non-bio")
     if not order["alcool"]:
-        exclusionList.update(exclusionDict["alcool"])
+      #  exclusionList.update(exclusionDict["alcool"])
+        exclusionCategories.update("alcool")
     if not order["meat"]:
-        exclusionList.update(exclusionDict["meat"])
+        #exclusionList.update(exclusionDict["meat"])
+        exclusionCategories.update("meat")
     if order["vegan"]:
-        exclusionList.update(exclusionDict["non-vegan"])
+        #exclusionList.update(exclusionDict["non-vegan"])
+        exclusionCategories.update("non-vegan")
     if order["notFrozen"]:
-        exclusionList.update(exclusionDict["frozen"])
+        #exclusionList.update(exclusionDict["frozen"])
+        exclusionCategories.update("frozen")
 
     # print(order)
     # print(exclusionList)
 
     order["numberOfElements"] = returnValueIfValueOrBelow(
         int(gauss(munbelement, sigmanbelement)), 1)
-    order["billingMethod"] = PaymentMethod.CASH
-    order["finishTime"] = estimateTimeRequired(order, cashier) + time()
+   
     if len(trendingProducts) == 0:
         doesThisOrderFollowTheTrend = False
     else:
         doesThisOrderFollowTheTrend = uniform(0, 100) < 30
     order["followTheTrend"] = doesThisOrderFollowTheTrend
 
+
+
     # print(probabilityOfOrder)
     #print(100.0 - probabilityOfOrder)
     if randint(0, 100) < (100 - probabilityOfOrder):
         order["isAnOrder"] = False
+            
+        order["billingMethod"] = PaymentMethod.CASH
+        order["finishTime"] = estimateTimeRequired(order, cashier) + time()
         #print("not an order")
         return order
     order["isAnOrder"] = True
@@ -350,14 +372,12 @@ def generateOrder(cashier, popularProducts, trendingProducts, season, propabilit
             totalProducts += 1
 
     if totalProducts < order["numberOfElements"]:
-        productNameSet = {"auieauie"}
+        productNameSet = set()
 
         for product in products:
             if not product[0]["name"] in productNameSet:
                 productNameSet.add(product[0]["name"])
 
-        #quantitiesProduct = getListQuantities(order["numberOfElements"]-len(productsToAddName))
-        #nblines = len(quantitiesProduct)
         productsToAddName = []
         for product in products:
             if "frequentlyboughtwith" in product[0]:
@@ -381,7 +401,7 @@ def generateOrder(cashier, popularProducts, trendingProducts, season, propabilit
                 products.append([getProductByName(nameProductToAdd[0]), 1])
         productsToAdd = {}
         while totalProducts < order["numberOfElements"]:
-            productToAdd = getRandomProduct(exclusionList)
+            productToAdd = getRandomProduct(exclusionList,exclusionCategories)
             found = False
             for product in products:
                 if product[0]["name"] == productToAdd["name"]:
@@ -414,34 +434,23 @@ def generateOrder(cashier, popularProducts, trendingProducts, season, propabilit
                     if not found and uniform(0, 100) < 60:
                         totalProducts += 1
                         products.append([getProductByName(name), 1])
-
-        #
-
-        # quantities=getListQuantities(order["numberOfElements"]-totalProducts)
-
-        # for i,productToAdd in enumerate(getRandomProducts(len(quantities),exclusionList)):
-        # 	found = False
-        # 	if totalProducts==order["numberOfElements"]:
-        # 		break
-        # 	for product in products:
-        # 		if product[0]["name"]==productToAdd["name"]:
-        # 			product[1]+=quantities[i]
-        # 			found=True
-        # 			totalProducts+=quantities[i]
-        # 			break
-        # 	if not found:
-        # 		products.append([productToAdd,quantities[i]])
-        # 		totalProducts+=quantities[i]
-        # 		productNameSet.add(productToAdd["name"])
     else:
-        #print("no more room")
         pass
     order["products"] = products
 
     nbSettle = randint(1, 2)
     if totalProducts == 1:
         nbSettle = 1
+        if randint(0,1)==1:
+            order["billingMethod"] = PaymentMethod.CASH
+        else :
+            order["billingMethod"] = PaymentMethod.CARD
+    else:
+        order["billingMethod"] = PaymentMethod.BOTH
     order["settlements"] = nbSettle
+
+
+    order["finishTime"] = estimateTimeRequired(order, cashier) + time()
 
     # divide the order in two parts
 
@@ -543,41 +552,72 @@ begin = True
 
 effectiveTicketsPerSecond = 0
 begSec = time()
+s = requests.session()
 
 if force:
+    recompute = False
+    
+    probabilityOfOrder = 100
+    cashier = {}
+    cashier["id"] = 1
+    cashier["elementPerSecond"] = returnValueIfValueOrBelow(
+        gauss(muspeedcashier, sigmaspeedcashier), 0.5)
+    cashier[PaymentMethod.CARD] = 8
+    cashier[PaymentMethod.CASH] = returnValueIfValueOrBelow(
+        gauss(muspeedcash, sigmaspeedcash), 2)
+    cashier[PaymentMethod.BOTH] = cashier[PaymentMethod.CARD] + \
+        cashier[PaymentMethod.CASH] + 2
+    #ti = time()
+    order = generateOrder(
+        cashiers[i], popularProducts, trendingProducts, args.holiday, probabilityOfOrder)
+    
+    cashRec = generateCashReceipt(storeid=idOfStore, terminalid=randint(0, numberOfCheckout), agentid=randint(
+        0, numberOfAgent), customerid=randint(0, 100), order=order, timestamp=time())
     while True:
-        probabilityOfOrder = 100
-        cashier = {}
-        cashier["id"] = 1
-        cashier["elementPerSecond"] = returnValueIfValueOrBelow(
-            gauss(muspeedcashier, sigmaspeedcashier), 0.5)
-        cashier[PaymentMethod.CARD] = 8
-        cashier[PaymentMethod.CASH] = returnValueIfValueOrBelow(
-            gauss(muspeedcash, sigmaspeedcash), 2)
-        cashier[PaymentMethod.BOTH] = cashier[PaymentMethod.CARD] + \
-            cashier[PaymentMethod.CASH] + 2
+        start = time()
+        if recompute:
+            probabilityOfOrder = 100
+            cashier = {}
+            cashier["id"] = 1
+            cashier["elementPerSecond"] = returnValueIfValueOrBelow(
+                gauss(muspeedcashier, sigmaspeedcashier), 0.5)
+            cashier[PaymentMethod.CARD] = 8
+            cashier[PaymentMethod.CASH] = returnValueIfValueOrBelow(
+                gauss(muspeedcash, sigmaspeedcash), 2)
+            cashier[PaymentMethod.BOTH] = cashier[PaymentMethod.CARD] + \
+                cashier[PaymentMethod.CASH] + 2
+            #ti = time()
+            order = generateOrder(
+                cashiers[i], popularProducts, trendingProducts, args.holiday, probabilityOfOrder)
 
-        order = generateOrder(
-            cashiers[i], popularProducts, trendingProducts, args.holiday, probabilityOfOrder)
-        cashRec = generateCashReceipt(storeid=idOfStore, terminalid=randint(0, numberOfCheckout), agentid=randint(
-            0, numberOfAgent), customerid=randint(0, 100), order=order, timestamp=time())
+            cashRec = generateCashReceipt(storeid=idOfStore, terminalid=randint(0, numberOfCheckout), agentid=randint(
+                0, numberOfAgent), customerid=randint(0, 100), order=order, timestamp=time())
+        #print(time()-ti)
+        #while True:
+           
         try:
             if useAvro:
                 bytes_writer = io.BytesIO()
                 encoder = avro.io.BinaryEncoder(bytes_writer)
                 writer.write(dict(cashRec), encoder)
 
-                r = requests.post('http://{address}/v1/receipts'.format(address=entrypoint), data=bytes_writer.getvalue(),
+                r = s.post('http://{address}/v1/receipts'.format(address=entrypoint), data=bytes_writer.getvalue(),
                                   headers={'Content-Type': 'application/avro'})
-                # print(r.content)
+                    # print(r.content)
             else:
-                r = requests.post(
-                    'http://{address}/v1/receipts'.format(address=entrypoint), json=cashRec)
-                # print(r.content)
+                r = s.post('http://{address}/v1/receipts'.format(address=entrypoint), json=cashRec)
+  
+            effectiveTicketsPerSecond += 1
         finally:
             pass
-        sleep(1/force)
+        if time()-begSec >= 1:
+            print(effectiveTicketsPerSecond, flush=True)
+            effectiveTicketsPerSecond = 0
+            begSec = time()
+        timeElapsed = time()-start
+        sleep(returnValueIfValueOrBelow(((1/force)-timeElapsed),0))
 while True:
+
     probabilityOfOrder = (cos(time()*2*pi*1/(2*2*60))+1)*100/2
     # print(probabilityOfOrder)
 
@@ -601,13 +641,11 @@ while True:
                     encoder = avro.io.BinaryEncoder(bytes_writer)
                     writer.write(dict(cashRec), encoder)
 
-                    r = requests.post('http://{address}/v1/receipts'.format(address=entrypoint), data=bytes_writer.getvalue(),
+                    r = s.post('http://{address}/v1/receipts'.format(address=entrypoint), data=bytes_writer.getvalue(),
                                       headers={'Content-Type': 'application/avro'})
                     # print(r.content)
                 else:
-                    r = requests.post(
-                        'http://{address}/v1/receipts'.format(address=entrypoint), json=cashRec)
-                    # print(r.content)
+                    r = s.post('http://{address}/v1/receipts'.format(address=entrypoint), json=cashRec)
             finally:
                 pass
             currentOrders[i] = generateOrder(
