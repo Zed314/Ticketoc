@@ -26,6 +26,9 @@ class HomePage extends Component {
       restartSeconds: null,
       loading: true,
       unauthorized: false,
+      lastTotals: [0],
+      lastPurchases: [0],
+      lastAmountPerPurchase: [0],
     }
   }
 
@@ -51,6 +54,13 @@ class HomePage extends Component {
       })
     }
     this.socketClient.subscribe("stats-receipts", msg => {
+      const newPurchases = this.state.lastPurchases.concat([ msg.message.batchSize ]);
+      newPurchases.splice(0, newPurchases.length - 20);
+      const newBatchRevenue = this.state.lastTotals.concat([ msg.message.batchRevenue ]);
+      newBatchRevenue.splice(0, newBatchRevenue.length - 20);
+      const newBatchRatio = this.state.lastTotals.concat([ parseInt(msg.message.batchRevenue, 10) / parseInt(msg.message.batchSize, 10) ]);
+      newBatchRatio.splice(0, newBatchRatio.length - 20);
+
       this.setState({
         saleCount: msg.message.saleCount,
         totalRevenue: msg.message.totalRevenue,
@@ -58,6 +68,8 @@ class HomePage extends Component {
         cardPaymentCount: msg.message.cardPaymentCount,
         totalCard: msg.message.totalCard,
         totalCash: msg.message.totalCash,
+        lastTotals: newBatchRevenue,
+        lastPurchases: newPurchases,
       })
     })
     /*this.socketClient.subscribe("sale-count", msg => {
@@ -188,28 +200,21 @@ class HomePage extends Component {
      <Grid.Col>
      <DiagramCard
      color="#39CCCC"
-     data={[9, 6, 6, 7, 0, 3, 5, 7, 4, 6]}
-     label="trees planted" />
+     data={this.state.lastPurchases}
+     label="Transactions in last batch" />
      </Grid.Col>
      <Grid.Col>
      <DiagramCard
      color="#7FDBFF"
-     data={[0, 8, 2, 7, 8, 7, 9, 9, 1, 7]}
-     label="carts ramsacked" />
+     data={[this.state.lastTotals]}
+     label="Total of last batch" />
      </Grid.Col>
      <Grid.Col>
      <DiagramCard
      color="#0074D9"
-     data={[5, 1, 0, 4, 7, 4, 2, 2, 9, 8]}
-     label="hammoks slept in" />
+     data={this.state.lastAmountPerPurchase}
+     label="Average purchase total in last batch" />
      </Grid.Col>
-     </Grid.Row>
-     <Grid.Row>
-     <Card>
-     <IntelligientTable
-      headings={[{'title': 'A thing', 'property': 'thing'}, {'title': 'Signification', 'property': 'signification'}]}
-      items={[{'thing': 'Table', 'signification': 'workplace'},{'thing': 'Seesaw', 'signification': <i>children are here</i> },{'thing': 'Bongo', 'signification': 'Music fills the place'}]} />
-     </Card>
      </Grid.Row>
      </Page.Content>
      </SiteWrapper>)
