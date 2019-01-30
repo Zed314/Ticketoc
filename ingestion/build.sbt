@@ -14,12 +14,15 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-streaming-kafka-0-10" % sparkVersion,
   "org.apache.spark" %% "spark-sql"                  % sparkVersion,
   "org.apache.spark" %% "spark-sql-kafka-0-10"       % sparkVersion,
-  "org.scalaj"       %% "scalaj-http"                % "2.4.1"
+  "org.scalaj"       %% "scalaj-http"                % "2.4.1",
+  "com.typesafe.play" %% "play-json" % "2.5.19",
+  "net.liftweb" %% "lift-json" % "3.0"
 )
 
 excludeDependencies ++= Seq(
   ExclusionRule(organization = "org.glassfish.hk2.external")
 )
+
 
 assemblyMergeStrategy in assembly := {
   case PathList("org", "apache", xs @ _*) => MergeStrategy.last
