@@ -58,7 +58,8 @@ class HomePage extends Component {
       newPurchases.splice(0, newPurchases.length - 20);
       const newBatchRevenue = this.state.lastTotals.concat([ msg.message.batchRevenue ]);
       newBatchRevenue.splice(0, newBatchRevenue.length - 20);
-      const newBatchRatio = this.state.lastTotals.concat([ parseInt(msg.message.batchRevenue, 10) / parseInt(msg.message.batchSize, 10) ]);
+      const ratio = parseInt(msg.message.batchRevenue, 10) / parseInt(msg.message.batchSize, 10);
+      const newBatchRatio = this.state.lastAmountPerPurchase.concat([ isNaN(ratio) ? 0 : ratio ]);
       newBatchRatio.splice(0, newBatchRatio.length - 20);
 
       this.setState({
@@ -207,12 +208,14 @@ class HomePage extends Component {
      <Grid.Col>
      <DiagramCard
      color="#7FDBFF"
+     financial={true}
      data={this.state.lastTotals}
      label="Total of last batch" />
      </Grid.Col>
      <Grid.Col>
      <DiagramCard
      color="#0074D9"
+     financial={true}
      data={this.state.lastAmountPerPurchase}
      label="Average purchase total in last batch" />
      </Grid.Col>

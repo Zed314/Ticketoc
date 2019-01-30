@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import FinancialHelpers from "../FinancialHelpers";
 import {
   StatsCard,
 } from "tabler-react";
@@ -11,11 +12,12 @@ class DiagramCard extends Component {
       const percentage = Math.round((b-a) * 100 / a)
       return percentage < Infinity ? percentage : "+∞"
     }
+    const total = this.props.data[this.props.data.length - 1];
     return (
       <StatsCard
       layout={this.props.layout || 2}
-      movement={getPercent(this.props.data[0], this.props.data[this.props.data.length - 1])}
-      total={this.props.data[this.props.data.length - 1]}
+      movement={getPercent(this.props.data.length >= 2 ? this.props.data[1] : this.props.data[0], this.props.data[this.props.data.length - 1])}
+      total={ this.props.financial ? `${FinancialHelpers.toFinancialString(total)} €` : total }
       label={this.props.label}
       chart={
         <C3Chart
