@@ -22,8 +22,6 @@ libraryDependencies ++= Seq(
   "org.scalaj"              %% "scalaj-http"                % scalajHttpVersion,
   "org.apache.logging.log4j" % "log4j-api"                  % log4jVersion,
   "org.apache.logging.log4j" % "log4j-core"                 % log4jVersion,
-  "com.typesafe.play" %% "play-json" % "2.5.19",
-  "net.liftweb" %% "lift-json" % "3.0"
 )
 
 excludeDependencies ++= Seq(

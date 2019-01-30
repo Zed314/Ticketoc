@@ -28,7 +28,7 @@ services:
     ]
     environment:
       KAFKA_CONNECT: kafka:9092
-      KAFKA_TOPICS: sample-receipts
+      KAFKA_TOPICS: sample-receipts, stats-receipts
       KAFKA_VALUE_DESERIALIZER: json
       SCHEMA_REGISTRY: schema-registry:80
     ports:

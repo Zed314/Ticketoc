@@ -50,14 +50,14 @@ class HomePage extends Component {
         loading: false,
       })
     }
-    this.socketClient.subscribe("data", msg => {
+    this.socketClient.subscribe("stats-receipts", msg => {
       this.setState({
-        saleCount: msg.message.data.nbt_tickets,
-        totalRevenue: msg.message.data.total_tickets,
-        cashPaymentCount: msg.message.data.nbr_tickets_especes,
-        cardPaymentCount: msg.message.data.nbr_tickets_cp,
-        totalCard: msg.message.data.totale_tickets_cp,
-        totalCash: msg.message.data.totale_tickets_especes,
+        saleCount: msg.message.saleCount,
+        totalRevenue: msg.message.totalRevenue,
+        cashPaymentCount: msg.message.cashPaymentCount,
+        cardPaymentCount: msg.message.cardPaymentCount,
+        totalCard: msg.message.totalCard,
+        totalCash: msg.message.totalCash,
       })
     })
     /*this.socketClient.subscribe("sale-count", msg => {
